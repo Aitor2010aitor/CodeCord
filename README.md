@@ -42,34 +42,44 @@ Se divide en tres pestañas diseñadas para el control total del soporte técnic
 
 ---
 
-## ⚡ Instalación y Configuración Rápida
+## ⚡ Instalación y Despliegue en Hosting (bot-hosting.net / Pterodactyl)
 
-1. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
+Para subir y ejecutar este bot en hostings especializados como **Bot-Hosting.net**, sigue estos sencillos pasos:
 
-2. **Configurar las variables de entorno:**
-   Crea o edita el archivo `.env` en la raíz del proyecto con la siguiente estructura:
-   ```env
-   BOT_TOKEN=tu_token_secreto_del_bot
-   CLIENT_ID=id_de_la_aplicacion_discord
-   CLIENT_SECRET=secret_client_de_discord
-   REDIRECT_URI=http://tu-dominio-o-ip:puerto/callback
-   GUILD_ID=id_del_servidor_principal
-   ```
+1. **Subir los Archivos:**
+   Sube todos los archivos del proyecto al explorador de archivos del panel de tu hosting (se recomienda usar SFTP o subir en un archivo `.zip` / `.rar` y descomprimirlo allí). **No subas la carpeta `node_modules`**, el hosting las instalará automáticamente al iniciar.
 
-3. **Registrar Comandos Slash (/) en Discord:**
-   Ejecuta el script para sincronizar los comandos del bot con los servidores:
+2. **Configurar las Variables de Entorno:**
+   Tienes dos opciones para definir las credenciales:
+   * **Opción A (Recomendada)**: Ve a la pestaña **"Startup" (Configuración de Inicio)** de tu panel en Bot-Hosting.net y rellena las variables de entorno allí.
+   * **Opción B**: Crea un archivo llamado `.env` en la raíz de los archivos de tu hosting con esta estructura:
+     ```env
+     BOT_TOKEN=tu_token_secreto_del_bot
+     CLIENT_ID=id_de_la_aplicacion_discord
+     CLIENT_SECRET=secret_client_de_discord
+     REDIRECT_URI=http://tu-dominio-o-ip:puerto/callback
+     GUILD_ID=id_del_servidor_principal
+     ```
+
+3. **Registrar los Comandos Slash (/) en Discord:**
+   La primera vez que subas el bot (o cuando agregues comandos nuevos), ejecuta en la **Consola** de tu panel de hosting:
    ```bash
    node deploy-commands-simple-fixed.js
    ```
+   *(Esto registrará e instalará de forma correcta los comandos en tu servidor de Discord).*
 
-4. **Iniciar el Servidor y el Bot:**
-   Puedes usar el ejecutable automatizado `INICIAR-BOT.bat` o iniciar directamente desde consola:
-   ```bash
-   npm start
-   ```
+4. **Iniciar el Bot:**
+   Presiona el botón **"Start" (Iniciar)** en la consola de Bot-Hosting.net. El panel descargará e instalará todas las dependencias necesarias de manera automática y encenderá el bot y el panel administrativo.
+
+---
+
+### 💻 Despliegue Local (Opcional - En tu PC)
+
+Si prefieres ejecutar el bot en tu ordenador local para hacer pruebas:
+1. Instala las dependencias ejecutando: `npm install`
+2. Configura el archivo `.env` en la raíz con tus credenciales.
+3. Ejecuta `node deploy-commands-simple-fixed.js` para registrar comandos.
+4. Ejecuta `npm start` (o abre el archivo automatizado `INICIAR-BOT.bat`).
 
 ---
 
