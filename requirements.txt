@@ -1,0 +1,8 @@
+# Requisitos para Bot Discord Manager
+# Instalar con: pip install -r requirements.txt
+
+# No hay dependencias externas - solo usa librería estándar de Python
+# tkinter viene incluido con Python
+
+# Para compilar a EXE (opcional):
+# pip install pyinstaller

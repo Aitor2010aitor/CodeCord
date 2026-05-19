@@ -1,0 +1,32 @@
+# Archivos de configuración sensibles
+.env
+config.env
+*.env
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos temporales
+temp/
+tmp/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de tickets (contienen información sensible)
+tickets/
+*.html
+*.pdf
+*.ico
+
+# Archivos de configuración del bot
+config.json
+settings.json
