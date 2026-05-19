@@ -94,7 +94,7 @@ Si cambias de hosting, IP o puerto, o si quieres activar/desactivar la pantalla 
    ```json
    {
      "url": "",
-     "port": 22300,
+     "port": ,
      "requireDiscordAuth": false
    }
    ```
