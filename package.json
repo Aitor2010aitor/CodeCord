@@ -1,11 +1,11 @@
 {
   "name": "bot-luggames-community",
   "version": "1.0.0",
-  "description": " - Bot multifuncional",
+  "description": "𝐒𝐎𝐘 𝐁𝐎𝐓 𝐃𝐄 𝐋𝐔𝐆𝐆𝐀𝐌𝐄𝐒 𝐂𝐎𝐌𝐔𝐍𝐈𝐓𝐘 - Bot multifuncional",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "deploy": "node deploy-commands.js"
+    "deploy": "node scripts/deploy-commands.js"
   },
   "dependencies": {
     "@discordjs/voice": "^0.16.1",

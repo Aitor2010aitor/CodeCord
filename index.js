@@ -1,6 +1,6 @@
 // index.js
 require('dotenv').config();
-const { startAdminPanel } = require('./admin-panel.js');
+const { startAdminPanel } = require('./WEB/admin-panel.js');
 // Manejadores globales para capturar errores y mostrar trazas
 process.on('uncaughtException', (err) => {
   console.error('❌ Uncaught Exception:', err);
@@ -525,7 +525,7 @@ client.tempVoiceChannelBannedUsers = new Map(); // Usuarios baneados de cada sal
 client.userWarnings = new Map(); // Sistema de advertencias por servidor {guildId: {userId: [{reason, moderator, timestamp}]}}
 
 // ===== FUNCIONES DE CONFIGURACIÓN DE TICKETS =====
-const ticketsConfigPath = path.join(__dirname, 'tickets-config.json');
+const ticketsConfigPath = path.join(__dirname, 'config', 'tickets-config.json');
 
 // Cargar configuración de tickets desde archivo
 function loadTicketsConfig() {
@@ -613,8 +613,8 @@ client.antiRaid = {
 
 function loadStaffConfig() {
   try {
-    if (fs.existsSync('staff-roles.json')) {
-      const staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+    if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+      const staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
       for (const [guildId, data] of Object.entries(staffData)) {
         if (data.ticketStaffRole) {
           client.ticketStaffRole.set(guildId, data.ticketStaffRole);
@@ -644,8 +644,8 @@ function loadStaffConfig() {
 function saveStaffConfig() {
   let staffData = {};
   try {
-    if (fs.existsSync('staff-roles.json')) {
-      staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+    if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+      staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
     }
   } catch (error) {
     console.error('Error leyendo staff-roles.json:', error);
@@ -692,7 +692,7 @@ function saveStaffConfig() {
   }
 
   try {
-    fs.writeFileSync('staff-roles.json', JSON.stringify(staffData, null, 2));
+    fs.writeFileSync(path.join(__dirname, 'config', 'staff-roles.json'), JSON.stringify(staffData, null, 2));
   } catch (error) {
     console.error('Error guardando staff-roles.json:', error);
   }
@@ -894,8 +894,8 @@ client.once('clientReady', () => {
   
   // Restaurar cambios de color automáticos al reiniciar el bot
   try {
-    if (fs.existsSync('color-roles.json')) {
-      const colorData = JSON.parse(fs.readFileSync('color-roles.json', 'utf8'));
+    if (fs.existsSync(path.join(__dirname, 'config', 'color-roles.json'))) {
+      const colorData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'color-roles.json'), 'utf8'));
       for (const [guildId, data] of Object.entries(colorData)) {
         const guild = client.guilds.cache.get(guildId);
         if (guild) {
@@ -1060,7 +1060,7 @@ client.on('interactionCreate', async (interaction) => {
         const suggestionText = interaction.options.getString('texto');
         
         // Cargar configuración de sugerencias
-        const suggestionsConfigPath = path.join(__dirname, 'suggestions-config.json');
+        const suggestionsConfigPath = path.join(__dirname, 'config', 'suggestions-config.json');
         let suggestionsConfig = { guilds: {} };
         if (fs.existsSync(suggestionsConfigPath)) {
           try { suggestionsConfig = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch(e){}
@@ -1286,7 +1286,7 @@ function getLogChannelByGuild(guild) {
 
 // NUEVO: Registrar actividad persistente para el panel web
 async function logBotActivity(guildId, type, message) {
-  const activityPath = path.join(__dirname, 'bot-activity.json');
+  const activityPath = path.join(__dirname, 'config', 'bot-activity.json');
   let activity = [];
   try {
     if (fs.existsSync(activityPath)) {
@@ -1314,7 +1314,7 @@ async function sendLogEmbed(guild, embed, eventType = null) {
     // Registrar en actividad reciente
     await logBotActivity(guild.id, eventType || 'INFO', embed.data.title || embed.data.description || 'Evento sin descripción');
     // Cargar config granular si existe
-    const logsConfigPath = path.join(__dirname, 'logs-config.json');
+    const logsConfigPath = path.join(__dirname, 'config', 'logs-config.json');
     let granularConfig = null;
     
     if (eventType && fs.existsSync(logsConfigPath)) {
@@ -1427,7 +1427,7 @@ client.on('messageCreate', async (message) => {
 
   // ===== SISTEMA DE AUTO-RESPUESTAS =====
   try {
-    const arPath = path.join(__dirname, 'auto-responses.json');
+    const arPath = path.join(__dirname, 'config', 'auto-responses.json');
     if (fs.existsSync(arPath)) {
       const arConfig = JSON.parse(fs.readFileSync(arPath, 'utf8'));
       const guildResponses = arConfig.guilds?.[message.guild.id];
@@ -3201,7 +3201,7 @@ client.on('guildMemberAdd', async (member) => {
 
   // --- Sistema de Bienvenidas Pro ---
   try {
-    const welcomeConfigPath = path.join(__dirname, 'welcome-config.json');
+    const welcomeConfigPath = path.join(__dirname, 'config', 'welcome-config.json');
     if (fs.existsSync(welcomeConfigPath)) {
       const welcomeConfig = JSON.parse(fs.readFileSync(welcomeConfigPath, 'utf8'));
       const guildConfig = welcomeConfig[member.guild.id];
@@ -3242,7 +3242,7 @@ client.on('guildMemberAdd', async (member) => {
 
           let cardBuffer = null;
           try {
-            const { generateWelcomeCard } = require('./welcome-card.js');
+            const { generateWelcomeCard } = require('./scripts/welcome-card.js');
             cardBuffer = await generateWelcomeCard({
               bgPath: bgPath,
               avatarUrl: avatarUrl,
@@ -5598,13 +5598,13 @@ client.on('interactionCreate', async (interaction) => {
       // Guardar en archivo
       let staffData = {};
       try {
-        if (fs.existsSync('staff-roles.json')) {
-          staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+        if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+          staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
         }
       } catch (e) {}
       if (!staffData[interaction.guild.id]) staffData[interaction.guild.id] = {};
       staffData[interaction.guild.id].commandRoles = roleIds;
-      fs.writeFileSync('staff-roles.json', JSON.stringify(staffData, null, 2));
+      fs.writeFileSync(path.join(__dirname, 'config', 'staff-roles.json'), JSON.stringify(staffData, null, 2));
 
       const embed = new EmbedBuilder()
         .setTitle('✅ Roles Configurados')
@@ -6041,11 +6041,11 @@ client.on('interactionCreate', async (interaction) => {
         // Guardar configuración en archivo para persistencia
         try {
           let colorData = {};
-          if (fs.existsSync('color-roles.json')) {
-            colorData = JSON.parse(fs.readFileSync('color-roles.json', 'utf8'));
+          if (fs.existsSync(path.join(__dirname, 'config', 'color-roles.json'))) {
+            colorData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'color-roles.json'), 'utf8'));
           }
           colorData[guild.id] = { roleId: targetRole.id, speed: speed };
-          fs.writeFileSync('color-roles.json', JSON.stringify(colorData, null, 2));
+          fs.writeFileSync(path.join(__dirname, 'config', 'color-roles.json'), JSON.stringify(colorData, null, 2));
         } catch (saveError) {
           console.error('Error guardando configuración de color:', saveError);
         }
@@ -6087,10 +6087,10 @@ client.on('interactionCreate', async (interaction) => {
 
         // Eliminar configuración guardada
         try {
-          if (fs.existsSync('color-roles.json')) {
-            let colorData = JSON.parse(fs.readFileSync('color-roles.json', 'utf8'));
+          if (fs.existsSync(path.join(__dirname, 'config', 'color-roles.json'))) {
+            let colorData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'color-roles.json'), 'utf8'));
             delete colorData[guild.id];
-            fs.writeFileSync('color-roles.json', JSON.stringify(colorData, null, 2));
+            fs.writeFileSync(path.join(__dirname, 'config', 'color-roles.json'), JSON.stringify(colorData, null, 2));
           }
         } catch (saveError) {
           console.error('Error eliminando configuración de color:', saveError);
@@ -6993,7 +6993,7 @@ client.on('interactionCreate', async (interaction) => {
         // Obtener el canal de logs configurado para tickets
         let ticketLogChannelId = null;
         try {
-          const ticketsConfigPath = path.join(__dirname, 'tickets-config.json');
+          const ticketsConfigPath = path.join(__dirname, 'config', 'tickets-config.json');
           if (fs.existsSync(ticketsConfigPath)) {
             const ticketsConfig = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8'));
             if (ticketsConfig.guilds && ticketsConfig.guilds[interaction.guild.id]) {
@@ -8016,7 +8016,7 @@ client.on('interactionCreate', async (interaction) => {
       client.antiRaid.logChannel.set(interaction.guild.id, channelId);
 
       // 2. Sincronizar con logs-config.json para el panel web
-      const logsConfigPath = path.join(__dirname, 'logs-config.json');
+      const logsConfigPath = path.join(__dirname, 'config', 'logs-config.json');
       let config = {};
       try {
         if (fs.existsSync(logsConfigPath)) {
@@ -8078,13 +8078,13 @@ client.on('interactionCreate', async (interaction) => {
       // Guardar en archivo
       let staffData = {};
       try {
-        if (fs.existsSync('staff-roles.json')) {
-          staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+        if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+          staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
         }
       } catch (e) {}
       if (!staffData[interaction.guild.id]) staffData[interaction.guild.id] = {};
       staffData[interaction.guild.id].commandRoles = currentRoles;
-      fs.writeFileSync('staff-roles.json', JSON.stringify(staffData, null, 2));
+      fs.writeFileSync(path.join(__dirname, 'config', 'staff-roles.json'), JSON.stringify(staffData, null, 2));
       
       const embed = new EmbedBuilder()
         .setTitle('✅ Rol Añadido')
@@ -8113,13 +8113,13 @@ client.on('interactionCreate', async (interaction) => {
       // Guardar en archivo
       let staffData = {};
       try {
-        if (fs.existsSync('staff-roles.json')) {
-          staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+        if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+          staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
         }
       } catch (e) {}
       if (!staffData[interaction.guild.id]) staffData[interaction.guild.id] = {};
       staffData[interaction.guild.id].commandRoles = currentRoles;
-      fs.writeFileSync('staff-roles.json', JSON.stringify(staffData, null, 2));
+      fs.writeFileSync(path.join(__dirname, 'config', 'staff-roles.json'), JSON.stringify(staffData, null, 2));
       
       const embed = new EmbedBuilder()
         .setTitle('✅ Rol Eliminado')
@@ -8156,13 +8156,13 @@ client.on('interactionCreate', async (interaction) => {
         // Guardar en archivo
         let staffData = {};
         try {
-          if (fs.existsSync('staff-roles.json')) {
-            staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+          if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+            staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
           }
         } catch (e) {}
         if (!staffData[interaction.guild.id]) staffData[interaction.guild.id] = {};
         staffData[interaction.guild.id].commandRoles = currentRoles;
-        fs.writeFileSync('staff-roles.json', JSON.stringify(staffData, null, 2));
+        fs.writeFileSync(path.join(__dirname, 'config', 'staff-roles.json'), JSON.stringify(staffData, null, 2));
         
         const embed = new EmbedBuilder()
           .setTitle('✅ Rol Añadido')
@@ -8181,13 +8181,13 @@ client.on('interactionCreate', async (interaction) => {
         // Guardar en archivo
         let staffData = {};
         try {
-          if (fs.existsSync('staff-roles.json')) {
-            staffData = JSON.parse(fs.readFileSync('staff-roles.json', 'utf8'));
+          if (fs.existsSync(path.join(__dirname, 'config', 'staff-roles.json'))) {
+            staffData = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'staff-roles.json'), 'utf8'));
           }
         } catch (e) {}
         if (!staffData[interaction.guild.id]) staffData[interaction.guild.id] = {};
         staffData[interaction.guild.id].commandRoles = currentRoles;
-        fs.writeFileSync('staff-roles.json', JSON.stringify(staffData, null, 2));
+        fs.writeFileSync(path.join(__dirname, 'config', 'staff-roles.json'), JSON.stringify(staffData, null, 2));
         
         const embed = new EmbedBuilder()
           .setTitle('✅ Rol Eliminado')

@@ -30,3 +30,5 @@ tickets/
 # Archivos de configuración del bot
 config.json
 settings.json
+config/sessions.json
+config/bot-activity.json

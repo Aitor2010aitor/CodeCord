@@ -12,12 +12,12 @@ const os = require('os');
 // =====================================================================
 let panelConfig = {
     url: '',
-    port: ,
+    port: 22300,
     requireDiscordAuth: false
 };
 
 try {
-    const configPath = path.join(__dirname, 'panel-config.json');
+    const configPath = path.join(__dirname, '..', 'config', 'panel-config.json');
     if (fs.existsSync(configPath)) {
         const pConf = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (pConf.url) panelConfig.url = pConf.url;
@@ -48,7 +48,7 @@ const multer = require('multer');
 const app = express();
 
 // Crear carpeta de uploads si no existe
-const uploadsPath = path.join(__dirname, 'uploads');
+const uploadsPath = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath);
 
 app.use(express.json());
@@ -72,7 +72,7 @@ const Store = session.Store;
 class SimpleFileStore extends Store {
     constructor() {
         super();
-        this.path = path.join(__dirname, 'sessions.json');
+        this.path = path.join(__dirname, '..', 'config', 'sessions.json');
         this.sessions = {};
         if (fs.existsSync(this.path)) {
             try { this.sessions = JSON.parse(fs.readFileSync(this.path, 'utf8')); } catch (e) { }
@@ -108,7 +108,7 @@ const upload = multer({ storage: storage });
 
 // NUEVO: Función para registrar actividad desde el panel
 function logPanelActivity(guildId, type, message) {
-    const activityPath = path.join(__dirname, 'bot-activity.json');
+    const activityPath = path.join(__dirname, '..', 'config', 'bot-activity.json');
     let activity = [];
     try {
         if (fs.existsSync(activityPath)) {
@@ -274,7 +274,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 
 // Servir archivos estáticos si existen
-const publicPath = path.join(__dirname, 'admin-public');
+const publicPath = path.join(__dirname, '..', 'admin-public');
 if (fs.existsSync(publicPath)) {
     app.use(express.static(publicPath));
 }
@@ -329,7 +329,7 @@ function formatUptime(ms) {
 }
 
 function getTicketLogs() {
-    const ticketsDir = path.join(__dirname, 'tickets');
+    const ticketsDir = path.join(__dirname, '..', 'tickets');
     const logs = [];
 
     if (!fs.existsSync(ticketsDir)) {
@@ -356,7 +356,7 @@ function getTicketLogs() {
 
 // Endpoint para obtener logs del bot (actividad real)
 app.get('/api/logs', (req, res) => {
-    const activityPath = path.join(__dirname, 'bot-activity.json');
+    const activityPath = path.join(__dirname, '..', 'config', 'bot-activity.json');
     try {
         if (fs.existsSync(activityPath)) {
             const activity = JSON.parse(fs.readFileSync(activityPath, 'utf8'));
@@ -394,7 +394,7 @@ app.get('/api/tickets', (req, res) => {
 });
 
 app.get('/api/tickets/:filename', (req, res) => {
-    const filePath = path.join(__dirname, 'tickets', req.params.filename);
+    const filePath = path.join(__dirname, '..', 'tickets', req.params.filename);
 
     if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Ticket no encontrado' });
@@ -466,7 +466,7 @@ app.get('/api/guilds/:guildId/members', async (req, res) => {
 });
 
 // Endpoints para configuración de logs (según la imagen de ProBot)
-const logsConfigPath = path.join(__dirname, 'logs-config.json');
+const logsConfigPath = path.join(__dirname, '..', 'config', 'logs-config.json');
 
 function loadLogsConfig() {
     try {
@@ -497,7 +497,7 @@ app.post('/api/guilds/:guildId/logs-config', (req, res) => {
 });
 
 // Endpoints para configuración de bienvenidas
-const welcomeConfigPath = path.join(__dirname, 'welcome-config.json');
+const welcomeConfigPath = path.join(__dirname, '..', 'config', 'welcome-config.json');
 
 function loadWelcomeConfig() {
     try {
@@ -660,7 +660,7 @@ app.post('/api/guilds/:guildId/send-ticket-panel', async (req, res) => {
         await channel.send({ embeds: [embed], components: rows });
 
         // Guardar configuración del panel
-        const ticketsConfigPath = path.join(__dirname, 'tickets-config.json');
+        const ticketsConfigPath = path.join(__dirname, '..', 'config', 'tickets-config.json');
         let config = { guilds: {} };
         if (fs.existsSync(ticketsConfigPath)) {
             try { config = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8')); } catch (e) { }
@@ -748,7 +748,7 @@ app.get('/api/guilds/:guildId/suggestions', async (req, res) => {
     if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
 
     try {
-        const suggestionsConfigPath = path.join(__dirname, 'suggestions-config.json');
+        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
         let config = { guilds: {} };
         if (fs.existsSync(suggestionsConfigPath)) {
             try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
@@ -776,7 +776,7 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
         const { status } = req.body;
         const suggestionId = parseInt(req.params.suggestionId);
 
-        const suggestionsConfigPath = path.join(__dirname, 'suggestions-config.json');
+        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
         let config = { guilds: {} };
         if (fs.existsSync(suggestionsConfigPath)) {
             try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
@@ -831,7 +831,7 @@ app.post('/api/guilds/:guildId/suggestions-channel', async (req, res) => {
         const channel = guild.channels.cache.get(channelId);
         if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
-        const suggestionsConfigPath = path.join(__dirname, 'suggestions-config.json');
+        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
         let config = { guilds: {} };
         if (fs.existsSync(suggestionsConfigPath)) {
             try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
@@ -863,7 +863,7 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
     }
 
     try {
-        const suggestionsConfigPath = path.join(__dirname, 'suggestions-config.json');
+        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
         let config = { guilds: {} };
         if (fs.existsSync(suggestionsConfigPath)) {
             try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
@@ -909,7 +909,7 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
 });
 
 // ===== AUTO-RESPUESTAS =====
-const autoResponsesPath = path.join(__dirname, 'auto-responses.json');
+const autoResponsesPath = path.join(__dirname, '..', 'config', 'auto-responses.json');
 
 function loadAutoResponses() {
     try {
@@ -997,7 +997,7 @@ app.delete('/api/guilds/:guildId/auto-responses/:responseId', (req, res) => {
 // ===== TICKET CONFIG MEJORADO =====
 // GET: Obtener configuración del panel de tickets (para cargarla en el formulario)
 app.get('/api/guilds/:guildId/ticket-config', (req, res) => {
-    const ticketsConfigPath = path.join(__dirname, 'tickets-config.json');
+    const ticketsConfigPath = path.join(__dirname, '..', 'config', 'tickets-config.json');
     let config = { guilds: {} };
     if (fs.existsSync(ticketsConfigPath)) {
         try { config = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8')); } catch (e) { }
@@ -1005,7 +1005,7 @@ app.get('/api/guilds/:guildId/ticket-config', (req, res) => {
     const guildConfig = config.guilds[req.params.guildId] || {};
 
     // También cargar el staffRoleId desde staff-roles.json
-    const staffRolesPath = path.join(__dirname, 'staff-roles.json');
+    const staffRolesPath = path.join(__dirname, '..', 'config', 'staff-roles.json');
     let staffRoles = {};
     if (fs.existsSync(staffRolesPath)) {
         try { staffRoles = JSON.parse(fs.readFileSync(staffRolesPath, 'utf8')); } catch (e) { }
@@ -1023,7 +1023,7 @@ app.get('/api/guilds/:guildId/ticket-config', (req, res) => {
 
 // PUT: Actualizar configuración del panel de tickets (sin enviar, solo guardar)
 app.put('/api/guilds/:guildId/ticket-config', (req, res) => {
-    const ticketsConfigPath = path.join(__dirname, 'tickets-config.json');
+    const ticketsConfigPath = path.join(__dirname, '..', 'config', 'tickets-config.json');
     let config = { guilds: {} };
     if (fs.existsSync(ticketsConfigPath)) {
         try { config = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8')); } catch (e) { }
@@ -1040,7 +1040,7 @@ app.put('/api/guilds/:guildId/ticket-config', (req, res) => {
 
     // Si se envían roles de staff, también actualizar en staff-roles.json y en el bot
     if (req.body.ticketStaffRoles && req.body.ticketStaffRoles.length > 0) {
-        const staffRolesPath = path.join(__dirname, 'staff-roles.json');
+        const staffRolesPath = path.join(__dirname, '..', 'config', 'staff-roles.json');
         let staffRoles = {};
         if (fs.existsSync(staffRolesPath)) {
             try { staffRoles = JSON.parse(fs.readFileSync(staffRolesPath, 'utf8')); } catch (e) { }

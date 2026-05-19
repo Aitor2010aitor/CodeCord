@@ -1,4 +1,4 @@
-# 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
+# 🤖 Bot de Discord + Panel Web Administrativo (Luggames Community)
 
 Este repositorio contiene un bot de Discord multifuncional de alto rendimiento integrado con un **Panel Web de Administración** interactivo que permite gestionar el bot y el servidor cómodamente a través de una interfaz gráfica moderna, rápida y segura.
 
@@ -64,7 +64,7 @@ Para subir y ejecutar este bot en hostings especializados como **Bot-Hosting.net
 3. **Registrar los Comandos Slash (/) en Discord:**
    La primera vez que subas el bot (o cuando agregues comandos nuevos), ejecuta en la **Consola** de tu panel de hosting:
    ```bash
-   node deploy-commands-simple-fixed.js
+   node scripts/deploy-commands-simple-fixed.js
    ```
    *(Esto registrará e instalará de forma correcta los comandos en tu servidor de Discord).*
 
@@ -78,7 +78,7 @@ Para subir y ejecutar este bot en hostings especializados como **Bot-Hosting.net
 Si prefieres ejecutar el bot en tu ordenador local para hacer pruebas:
 1. Instala las dependencias ejecutando: `npm install`
 2. Configura el archivo `.env` en la raíz con tus credenciales.
-3. Ejecuta `node deploy-commands-simple-fixed.js` para registrar comandos.
+3. Ejecuta `node scripts/deploy-commands-simple-fixed.js` para registrar comandos.
 4. Ejecuta `npm start` (o abre el archivo automatizado `INICIAR-BOT.bat`).
 
 ---
@@ -94,7 +94,7 @@ Si cambias de hosting, IP o puerto, o si quieres activar/desactivar la pantalla 
    ```json
    {
      "url": "",
-     "port": ,
+     "port": 22300,
      "requireDiscordAuth": false
    }
    ```
@@ -123,9 +123,8 @@ El proyecto está construido sobre el ecosistema de **Node.js** con las siguient
 ## 📜 Estructura de Archivos del Proyecto
 
 - `index.js` - Núcleo del bot de Discord y gestor de eventos del servidor.
-- `admin-panel.js` - Servidor Express y endpoints API que alimentan el panel web.
-- `admin.html` - Interfaz visual del panel administrativo (construida con Bootstrap, FontAwesome y micro-animaciones premium).
-- `panel-config.json` - Configuración de la red y login del panel web.
-- `auto-responses.json` - Reglas persistentes de auto-respuestas.
-- `tickets-config.json` - Estado guardado de los paneles de tickets.
-- `staff-roles.json` - Roles autorizados a gestionar soporte.
+- `WEB/` - Carpeta que contiene los archivos del panel web:
+  - `admin-panel.js` - Servidor Express y API que alimenta el panel web.
+  - `admin.html` - Interfaz visual del panel administrativo (Bootstrap + CSS).
+- `config/` - Carpeta que contiene archivos de configuración JSON persistentes (`auto-responses.json`, `tickets-config.json`, `staff-roles.json`, etc. y `panel-config.json` si se crea).
+- `scripts/` - Scripts de utilidad del bot como `deploy-commands.js`, `clear-commands.js` y `welcome-card.js` (generación de tarjetas).
