@@ -1,4 +1,5 @@
-# 🤖 Bot de Discord + Panel Web Administrativo (Luggames Community)
+# 🤖 Bot de Discord + Panel Web Administrativo (CodeCord
+)
 
 Este repositorio contiene un bot de Discord multifuncional de alto rendimiento integrado con un **Panel Web de Administración** interactivo que permite gestionar el bot y el servidor cómodamente a través de una interfaz gráfica moderna, rápida y segura.
 
