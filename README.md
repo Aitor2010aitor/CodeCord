@@ -14,7 +14,7 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 
 ### 2. 🎫 Gestión de Tickets
 Se divide en tres pestañas diseñadas para el control total del soporte técnico del servidor:
-- **Lista**: Muestra el historial de tickets creados. Permite ver y descargar transcripciones de tickets anteriores directamente en formato **PDF profesional** generado al instante.
+- **Lista**: Muestra el historial de tickets creados. Permite ver y descargar transcripciones de tickets anteriores directamente en formato **html  profesional** generado al instante.
 - **Crear Panel**: Permite escribir el mensaje informativo para el canal de soporte, seleccionar el canal de destino del panel y el canal donde irán los logs de tickets. Puedes añadir hasta **5 botones interactivos** y decidir si cada botón abrirá un formulario de pregunta para el usuario. La configuración se guarda de forma persistente.
 - **Configuración (Roles de Staff)**: Permite asignar qué rol de staff será el principal (mencionado al abrir un soporte) y qué roles adicionales tendrán permisos automáticos de lectura y escritura en los canales de tickets.
 
