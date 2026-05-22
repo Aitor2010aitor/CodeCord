@@ -1070,12 +1070,15 @@
                     <input type="text" id="ar-trigger" placeholder="Palabra o frase que activa la respuesta..." class="log-select" style="margin:0;">
                 </div>
 
-                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
                         <input type="checkbox" id="ar-wildcard"> <span>🎯 Comodín</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
-                        <input type="checkbox" id="ar-reply"> <span>↩️ Enviar como respuesta</span>
+                        <input type="checkbox" id="ar-reply" onchange="toggleReplyPingVisibility()"> <span>↩️ Enviar como respuesta</span>
+                    </label>
+                    <label id="ar-reply-ping-wrapper" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; transition: opacity 0.2s;">
+                        <input type="checkbox" id="ar-reply-ping" checked> <span>🔔 Mencionar (Ping)</span>
                     </label>
                 </div>
 
@@ -2341,6 +2344,8 @@
             document.getElementById('ar-trigger').value = editData ? editData.trigger : '';
             document.getElementById('ar-wildcard').checked = editData ? editData.wildcard : false;
             document.getElementById('ar-reply').checked = editData ? editData.reply : false;
+            document.getElementById('ar-reply-ping').checked = editData ? (editData.replyPing !== false) : true;
+            toggleReplyPingVisibility();
             
             // Cargar campos normales
             document.getElementById('ar-response').value = editData ? (editData.response || '') : '';
@@ -2386,6 +2391,21 @@
             
             updateArPreview();
             document.getElementById('ar-modal').style.display = 'flex';
+        }
+
+        function toggleReplyPingVisibility() {
+            const replyChecked = document.getElementById('ar-reply').checked;
+            const pingWrapper = document.getElementById('ar-reply-ping-wrapper');
+            const pingCheckbox = document.getElementById('ar-reply-ping');
+            if (replyChecked) {
+                pingWrapper.style.opacity = '1';
+                pingWrapper.style.pointerEvents = 'auto';
+                pingCheckbox.disabled = false;
+            } else {
+                pingWrapper.style.opacity = '0.4';
+                pingWrapper.style.pointerEvents = 'none';
+                pingCheckbox.disabled = true;
+            }
         }
 
         function setMultiSelect(id, values) {
@@ -2526,6 +2546,7 @@
                 embedFooter: document.getElementById('ar-embed-footer').value,
                 wildcard: document.getElementById('ar-wildcard').checked,
                 reply: document.getElementById('ar-reply').checked,
+                replyPing: document.getElementById('ar-reply-ping').checked,
                 randomResponses: Array.from(document.querySelectorAll('.ar-random-text')).map(el => el.value).filter(v => v.trim()),
                 enabledRoles: Array.from(document.getElementById('ar-enabled-roles').selectedOptions).map(o => o.value),
                 disabledRoles: Array.from(document.getElementById('ar-disabled-roles').selectedOptions).map(o => o.value),

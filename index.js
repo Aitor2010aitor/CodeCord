@@ -876,7 +876,7 @@ async function sanctionSupportUser(guild, userId, reason, sanctionedBy = null) {
   }
 }
 
-client.once('clientReady', () => {
+client.once('ready', () => {
   fs.writeFileSync('debug-ready.txt', `Bot listo a las ${new Date().toLocaleString()} como ${client.user.tag}`);
   console.log(`✅ Conectado como ${client.user.tag}`);
   console.log(`📊 Servidores detectados (${client.guilds.cache.size}): ${client.guilds.cache.map(g => g.name).join(', ')}`);
@@ -1431,25 +1431,40 @@ client.on('messageCreate', async (message) => {
     if (fs.existsSync(arPath)) {
       const arConfig = JSON.parse(fs.readFileSync(arPath, 'utf8'));
       const guildResponses = arConfig.guilds?.[message.guild.id];
-      if (guildResponses && Array.isArray(guildResponses)) {
+      if (guildResponses && Array.isArray(guildResponses) && guildResponses.length > 0) {
+        // Alerta si el contenido del mensaje viene vacío (típico cuando falta el Message Content Intent en el Dev Portal)
+        if (!message.content || message.content.trim() === '') {
+          console.warn(`[AUTO-RESPUESTAS] Advertencia: Se detectó un mensaje sin contenido en el servidor "${message.guild.name}" (ID: ${message.guild.id}). Si el bot tiene auto-respuestas configuradas, asegúrate de activar el "MESSAGE CONTENT INTENT" en la sección "Bot" de Discord Developer Portal (https://discord.com/developers/applications).`);
+        }
+
         for (const ar of guildResponses) {
           if (!ar.enabled || !ar.trigger) continue;
+          
           // Verificar canales habilitados/deshabilitados
           if (ar.enabledChannels && ar.enabledChannels.length > 0 && !ar.enabledChannels.includes(message.channel.id)) continue;
           if (ar.disabledChannels && ar.disabledChannels.length > 0 && ar.disabledChannels.includes(message.channel.id)) continue;
-          // Verificar roles habilitados/deshabilitados
-          if (ar.enabledRoles && ar.enabledRoles.length > 0 && !ar.enabledRoles.some(rId => message.member.roles.cache.has(rId))) continue;
-          if (ar.disabledRoles && ar.disabledRoles.length > 0 && ar.disabledRoles.some(rId => message.member.roles.cache.has(rId))) continue;
-          // Verificar trigger
-          const msgLower = message.content.toLowerCase();
-          const triggerLower = ar.trigger.toLowerCase();
+          
+          // Verificar roles habilitados/deshabilitados (evitando errores si message.member es null)
+          if (ar.enabledRoles && ar.enabledRoles.length > 0) {
+            if (!message.member || !message.member.roles || !ar.enabledRoles.some(rId => message.member.roles.cache.has(rId))) continue;
+          }
+          if (ar.disabledRoles && ar.disabledRoles.length > 0) {
+            if (message.member && message.member.roles && ar.disabledRoles.some(rId => message.member.roles.cache.has(rId))) continue;
+          }
+          
+          // Verificar trigger (con trim y prevención de valores vacíos)
+          const msgLower = (message.content || '').trim().toLowerCase();
+          const triggerLower = ar.trigger.trim().toLowerCase();
           let matches = false;
           if (ar.wildcard) {
             matches = msgLower.includes(triggerLower);
           } else {
             matches = msgLower === triggerLower;
           }
+          
           if (matches) {
+            console.log(`[AUTO-RESPUESTAS] Coincidencia encontrada para el disparador "${ar.trigger}" en el servidor "${message.guild.name}". Enviando respuesta...`);
+            
             // Elegir respuesta (aleatoria si hay varias)
             let responseText = ar.response || '';
             if (ar.randomResponses && ar.randomResponses.length > 0) {
@@ -1496,16 +1511,32 @@ client.on('messageCreate', async (message) => {
               }
               if (embedFooter) embed.setFooter({ text: embedFooter });
 
-              const sendOptions = { embeds: [embed] };
+              const sendOptions = { 
+                embeds: [embed],
+                allowedMentions: { repliedUser: ar.replyPing !== false }
+              };
               if (ar.reply) {
-                await message.reply(sendOptions);
+                try {
+                  await message.reply(sendOptions);
+                } catch (replyError) {
+                  console.error('[AUTO-RESPUESTAS] Error al responder (embed), enviando mensaje en canal:', replyError);
+                  await message.channel.send({ embeds: [embed] });
+                }
               } else {
-                await message.channel.send(sendOptions);
+                await message.channel.send({ embeds: [embed] });
               }
             } else {
               // Enviar respuesta normal de texto
               if (ar.reply) {
-                await message.reply(responseText);
+                try {
+                  await message.reply({
+                    content: responseText,
+                    allowedMentions: { repliedUser: ar.replyPing !== false }
+                  });
+                } catch (replyError) {
+                  console.error('[AUTO-RESPUESTAS] Error al responder (texto), enviando mensaje en canal:', replyError);
+                  await message.channel.send(responseText);
+                }
               } else {
                 await message.channel.send(responseText);
               }

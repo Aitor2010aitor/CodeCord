@@ -12,7 +12,7 @@ const os = require('os');
 // =====================================================================
 let panelConfig = {
     url: '',
-    port: 22300,
+    port: aqui,
     requireDiscordAuth: false
 };
 
@@ -951,6 +951,7 @@ app.post('/api/guilds/:guildId/auto-responses', (req, res) => {
         randomResponses: req.body.randomResponses || [],
         wildcard: req.body.wildcard || false,
         reply: req.body.reply || false,
+        replyPing: req.body.replyPing !== false,
         enabledRoles: req.body.enabledRoles || [],
         disabledRoles: req.body.disabledRoles || [],
         enabledChannels: req.body.enabledChannels || [],
