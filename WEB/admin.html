@@ -2370,32 +2370,6 @@
                 showToast('❌ Error cargando miembros', 'error');
                 return false;
             }
-                let html = '';
-                members.forEach(m => {
-                    const date = new Date(m.joinedAt).toLocaleDateString('es-ES');
-                    const rolesHtml = (m.roleList || []).slice(0, 4).map(r =>
-                        `<span onclick="showRoleInfo('${guildId}','${r.id}')" style="display:inline-block;background:${r.color === '#000000' ? '#4f545c' : r.color};color:white;font-size:0.7rem;padding:2px 8px;border-radius:10px;margin:2px;cursor:pointer;">${r.name}</span>`
-                    ).join('');
-                    html += `<tr>
-                        <td style="cursor:pointer;" onclick="showMemberProfile('${guildId}','${m.id}')">
-                            <div class="member-row">
-                                <img src="${m.avatar}" class="member-avatar">
-                                <div>
-                                    <div style="font-weight: 600; color: var(--accent);">${m.tag}</div>
-                                    <div style="font-size: 0.8rem; color: var(--text-muted);">${m.nickname || ''}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="color: var(--text-muted); font-size: 0.85rem;">${m.id}</td>
-                        <td>${rolesHtml}<span style="font-size:0.75rem;color:var(--text-muted);">${m.roles > 4 ? ' +' + (m.roles - 4) + ' más' : ''}</span></td>
-                        <td>${date}</td>
-                    </tr>`;
-                });
-                body.innerHTML = members.length > 0 ? html : '<tr><td colspan="4" style="text-align: center; padding: 20px;">No hay miembros por mostrar</td></tr>';
-                updateMembersPaginationControls();
-            } catch (e) {
-                body.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--danger);">Error cargando miembros</td></tr>';
-            }
         }
 
         function updateMembersPaginationControls() {
