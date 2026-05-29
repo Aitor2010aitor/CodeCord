@@ -1,6 +1,6 @@
 // index.js
 require('dotenv').config();
-const { startAdminPanel } = require('./WEB/admin-panel.js');
+const { startAdminPanel, handleGiveawayInteraction } = require('./WEB/admin-panel.js');
 // Manejadores globales para capturar errores y mostrar trazas
 process.on('uncaughtException', (err) => {
   console.error('❌ Uncaught Exception:', err);
@@ -6796,7 +6796,13 @@ client.on('interactionCreate', async (interaction) => {
       interaction.customId.startsWith('juegos_') ||
       interaction.customId.startsWith('vi_') ||
       interaction.customId.startsWith('create_ticket') ||
-      interaction.customId === 'close_ticket';
+      interaction.customId === 'close_ticket' ||
+      interaction.customId.startsWith('giveaway_join_');
+
+    // Manejar participación en sorteos primero, sin pedir permisos adicionales
+    if (interaction.customId.startsWith('giveaway_join_')) {
+      return handleGiveawayInteraction(interaction);
+    }
 
     // Permitir si es admin, tiene rol permitido, o es botón de UI público
     if (!isAdmin && !canUse && !uiButtonAllowed) {

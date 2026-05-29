@@ -11,8 +11,8 @@ const os = require('os');
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: 'aqui_lik',
-    port: aqui_el_puerto ,
+    url: 'lik_qui',
+    port: puerto_aqui ,
     requireDiscordAuth: false
 };
 
@@ -569,7 +569,450 @@ app.get('/api/guilds/:guildId/channels', (req, res) => {
     res.json(channels);
 });
 
-// Endpoint para "Say" (enviar mensaje normal)
+const giveawaysConfigPath = path.join(__dirname, '..', 'config', 'giveaways-config.json');
+
+function loadGiveawaysConfig() {
+    try {
+        if (fs.existsSync(giveawaysConfigPath)) {
+            return JSON.parse(fs.readFileSync(giveawaysConfigPath, 'utf8'));
+        }
+    } catch (e) { console.error('Error cargando giveaways-config.json:', e); }
+    return { guilds: {} };
+}
+
+function saveGiveawaysConfig(config) {
+    try {
+        fs.writeFileSync(giveawaysConfigPath, JSON.stringify(config, null, 2), 'utf8');
+    } catch (e) {
+        console.error('Error guardando giveaways-config.json:', e);
+    }
+}
+
+function getGuildGiveawayData(guildId) {
+    const config = loadGiveawaysConfig();
+    if (!config.guilds) config.guilds = {};
+    if (!config.guilds[guildId]) {
+        config.guilds[guildId] = {
+            giveaways: [],
+            permissions: {
+                canReroll: [],
+                canFinish: [],
+                canEdit: []
+            }
+        };
+    }
+    return config.guilds[guildId];
+}
+
+function saveGuildGiveawayData(guildId, guildData) {
+    const config = loadGiveawaysConfig();
+    if (!config.guilds) config.guilds = {};
+    config.guilds[guildId] = guildData;
+    saveGiveawaysConfig(config);
+}
+
+function formatGiveawayEmbed(guild, giveaway) {
+    const embed = new (require('discord.js').EmbedBuilder)()
+        .setTitle(`🎉 Sorteo: ${giveaway.prize}`)
+        .setDescription(giveaway.details || 'Participa y gana el premio del sorteo.')
+        .setColor(giveaway.status === 'active' ? '#f9d342' : '#5865f2')
+        .setTimestamp();
+
+    if (giveaway.image) {
+        embed.setImage(giveaway.image);
+    }
+
+    const channel = guild.channels.cache.get(giveaway.channelId);
+    const channelName = channel ? `#${channel.name}` : 'Canal no encontrado';
+
+    embed.addFields(
+        { name: 'Canal del Sorteo', value: channelName, inline: true },
+        { name: 'Estado', value: giveaway.status === 'scheduled' ? 'Programado' : giveaway.status === 'active' ? 'Activo' : giveaway.status === 'ended' ? 'Finalizado' : 'Cancelado', inline: true },
+        { name: 'Participantes', value: `${(giveaway.participants || []).length}`, inline: true }
+    );
+
+    if (giveaway.startTime) {
+        embed.addFields({ name: 'Inicia', value: new Date(giveaway.startTime).toLocaleString('es-ES'), inline: true });
+    }
+    if (giveaway.endTime) {
+        embed.addFields({ name: 'Finaliza', value: new Date(giveaway.endTime).toLocaleString('es-ES'), inline: true });
+    }
+
+    if (giveaway.status !== 'active' && giveaway.winnerId) {
+        embed.addFields({ name: 'Ganador', value: giveaway.winnerTag || 'Desconocido', inline: true });
+        embed.addFields({ name: 'Estado del ganador', value: giveaway.winnerStatus || 'Pendiente', inline: true });
+    }
+
+    if (giveaway.status === 'active') {
+        embed.setFooter({ text: 'Presiona el botón para participar en el sorteo.' });
+    } else {
+        embed.setFooter({ text: `Sorteo ${giveaway.status === 'ended' ? 'finalizado' : 'cancelado'}` });
+    }
+
+    return embed;
+}
+
+async function updateGiveawayMessage(guild, giveaway) {
+    if (!giveaway.channelId || !giveaway.messageId) return;
+    try {
+        const channel = guild.channels.cache.get(giveaway.channelId);
+        if (!channel || !channel.isTextBased()) return;
+        const message = await channel.messages.fetch(giveaway.messageId).catch(() => null);
+        if (!message) return;
+
+        const embed = formatGiveawayEmbed(guild, giveaway);
+        const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const joinButton = new ButtonBuilder()
+            .setCustomId(`giveaway_join_${giveaway.id}`)
+            .setLabel(giveaway.status === 'active' ? 'Participar' : 'Sorteo cerrado')
+            .setStyle(ButtonStyle.Success)
+            .setEmoji('🎉')
+            .setDisabled(giveaway.status !== 'active');
+
+        const actionRow = new ActionRowBuilder().addComponents(joinButton);
+
+        await message.edit({ embeds: [embed], components: [actionRow] });
+    } catch (error) {
+        console.error('Error actualizando mensaje de sorteo:', error);
+    }
+}
+
+function pickRandomParticipant(giveaway, exclude = []) {
+    const participants = (giveaway.participants || []).filter(id => !exclude.includes(id));
+    if (participants.length === 0) return null;
+    return participants[Math.floor(Math.random() * participants.length)];
+}
+
+async function finalizeGiveaway(guild, giveaway, actor = null, forceNew = false) {
+    if (giveaway.status === 'cancelled') return giveaway;
+    const oldWinnerId = giveaway.winnerId;
+    const oldWinnerTag = giveaway.winnerTag;
+    const exclude = forceNew && oldWinnerId ? [oldWinnerId] : [];
+    const newWinnerId = pickRandomParticipant(giveaway, exclude);
+
+    giveaway.status = 'ended';
+    giveaway.endedAt = new Date().toISOString();
+
+    if (!newWinnerId) {
+        giveaway.winnerId = null;
+        giveaway.winnerTag = 'Sin participantes';
+        giveaway.winnerStatus = 'Pendiente';
+    } else {
+        const member = await guild.members.fetch(newWinnerId).catch(() => null);
+        giveaway.winnerId = newWinnerId;
+        giveaway.winnerTag = member ? `${member.user.tag}` : `${newWinnerId}`;
+        giveaway.winnerStatus = 'Pendiente';
+    }
+
+    const entry = {
+        type: forceNew ? 'reroll' : 'winner',
+        date: new Date().toISOString(),
+        actorId: actor?.id || null,
+        actorTag: actor?.tag || null,
+        winnerId: giveaway.winnerId,
+        winnerTag: giveaway.winnerTag,
+        previousWinnerId: forceNew ? oldWinnerId : null,
+        previousWinnerTag: forceNew ? oldWinnerTag : null
+    };
+    if (!giveaway.history) giveaway.history = [];
+    giveaway.history.push(entry);
+    if (forceNew) giveaway.rerollCount = (giveaway.rerollCount || 0) + 1;
+
+    const guildData = getGuildGiveawayData(guild.id);
+    const giveawayIndex = guildData.giveaways.findIndex(g => g.id === giveaway.id);
+    if (giveawayIndex >= 0) {
+        guildData.giveaways[giveawayIndex] = giveaway;
+        saveGuildGiveawayData(guild.id, guildData);
+    }
+
+    await updateGiveawayMessage(guild, giveaway);
+
+    try {
+        const channel = guild.channels.cache.get(giveaway.channelId);
+        if (channel && channel.isTextBased()) {
+            const mention = giveaway.winnerId ? `<@${giveaway.winnerId}>` : 'Nadie';
+            const everyone = giveaway.mentionEveryone ? ' @everyone' : '';
+            const content = giveaway.winnerId
+                ? `🎉 ¡Sorteo terminado! ${mention} ha ganado **${giveaway.prize}**.${everyone}`
+                : `⚠️ El sorteo **${giveaway.prize}** ha terminado sin participantes.${everyone}`;
+            await channel.send({
+                content,
+                allowedMentions: { parse: ['users', 'everyone'] }
+            }).catch(() => null);
+        }
+    } catch (announcementError) {
+        console.error('Error enviando anuncio de sorteo finalizado:', announcementError);
+    }
+
+    return giveaway;
+}
+
+async function processScheduledGiveaways() {
+    if (!botClient) return;
+    try {
+        const config = loadGiveawaysConfig();
+        if (!config.guilds) return;
+        for (const [guildId, guildData] of Object.entries(config.guilds)) {
+            const guild = botClient.guilds.cache.get(guildId);
+            if (!guild || !guildData.giveaways) continue;
+            let changed = false;
+            for (const giveaway of guildData.giveaways) {
+                const now = Date.now();
+                const startMs = giveaway.startTime ? new Date(giveaway.startTime).getTime() : null;
+                const endMs = giveaway.endTime ? new Date(giveaway.endTime).getTime() : null;
+
+                if (giveaway.status === 'scheduled' && startMs && now >= startMs) {
+                    giveaway.status = 'active';
+                    changed = true;
+                    await updateGiveawayMessage(guild, giveaway);
+                }
+                if ((giveaway.status === 'active' || giveaway.status === 'scheduled') && endMs && now >= endMs) {
+                    await finalizeGiveaway(guild, giveaway);
+                    changed = true;
+                }
+            }
+            if (changed) saveGuildGiveawayData(guildId, guildData);
+        }
+    } catch (error) {
+        console.error('Error procesando sorteos programados:', error);
+    }
+}
+
+setInterval(processScheduledGiveaways, 30000);
+
+async function handleGiveawayInteraction(interaction) {
+    try {
+        if (!interaction.customId.startsWith('giveaway_join_')) return false;
+
+        const giveawayId = interaction.customId.replace('giveaway_join_', '');
+        const guildId = interaction.guildId;
+        const guild = botClient.guilds.cache.get(guildId);
+        if (!guild) return false;
+
+        const guildData = getGuildGiveawayData(guildId);
+        const giveaway = guildData.giveaways.find(g => g.id === giveawayId);
+        if (!giveaway) {
+            await interaction.reply({ content: '❌ Sorteo no encontrado o ya no está disponible.', ephemeral: true });
+            return true;
+        }
+
+        if (giveaway.status !== 'active') {
+            await interaction.reply({ content: '⚠️ Este sorteo no está activo en este momento.', ephemeral: true });
+            return true;
+        }
+
+        const userId = interaction.user.id;
+        if (giveaway.participants.includes(userId)) {
+            await interaction.reply({ content: '✅ Ya estás participando en este sorteo.', ephemeral: true });
+            return true;
+        }
+
+        giveaway.participants.push(userId);
+        saveGuildGiveawayData(guildId, guildData);
+        await updateGiveawayMessage(guild, giveaway);
+
+        await interaction.reply({ content: '🎉 ¡Te has unido al sorteo! Mucha suerte.', ephemeral: true });
+        return true;
+    } catch (error) {
+        console.error('Error manejando interacción de sorteo:', error);
+        try { await interaction.reply({ content: '❌ Error procesando tu participación.', ephemeral: true }); } catch (e) { }
+        return true;
+    }
+}
+
+app.get('/api/guilds/:guildId/giveaways', (req, res) => {
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    res.json(guildData);
+});
+
+app.post('/api/guilds/:guildId/giveaways', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const { prize, details, channelId, image, startTime, endTime, permissions } = req.body;
+    if (!prize || !channelId) {
+        return res.status(400).json({ error: 'Faltan campos obligatorios: prize, channelId' });
+    }
+
+    const channel = guild.channels.cache.get(channelId);
+    if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
+
+    const normalizedStart = startTime || new Date().toISOString();
+    const normalizedEnd = endTime || null;
+    const isScheduled = startTime && new Date(startTime).getTime() > Date.now();
+
+    const giveaway = {
+        id: `gw_${Date.now()}`,
+        prize,
+        details: details || '',
+        channelId,
+        image: image || null,
+        startTime: normalizedStart,
+        endTime: normalizedEnd,
+        createdAt: new Date().toISOString(),
+        status: isScheduled ? 'scheduled' : 'active',
+        winnerId: null,
+        winnerTag: null,
+        winnerStatus: 'Pendiente',
+        participants: [],
+        history: [],
+        rerollCount: 0,
+        mentionEveryone: req.body.mentionEveryone || false,
+        permissions: {
+            canReroll: permissions?.canReroll || [],
+            canFinish: permissions?.canFinish || [],
+            canEdit: permissions?.canEdit || []
+        }
+    };
+
+    try {
+        const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const embed = formatGiveawayEmbed(guild, giveaway);
+        const joinButton = new ButtonBuilder()
+            .setCustomId(`giveaway_join_${giveaway.id}`)
+            .setLabel(giveaway.status === 'active' ? 'Participar' : 'Sorteo programado')
+            .setStyle(ButtonStyle.Success)
+            .setEmoji('🎉')
+            .setDisabled(giveaway.status !== 'active');
+
+        const row = new ActionRowBuilder().addComponents(joinButton);
+        const msg = await channel.send({ embeds: [embed], components: [row] });
+        giveaway.messageId = msg.id;
+    } catch (error) {
+        console.error('Error enviando el mensaje del sorteo:', error);
+        return res.status(500).json({ error: 'Error enviando mensaje del sorteo' });
+    }
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    guildData.giveaways.unshift(giveaway);
+    saveGuildGiveawayData(req.params.guildId, guildData);
+
+    res.json({ success: true, giveaway });
+});
+
+app.put('/api/guilds/:guildId/giveaways/:giveawayId', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    const giveaway = guildData.giveaways.find(g => g.id === req.params.giveawayId);
+    if (!giveaway) return res.status(404).json({ error: 'Sorteo no encontrado' });
+
+    const { prize, details, channelId, image, startTime, endTime, status, winnerStatus, permissions } = req.body;
+    if (prize !== undefined) giveaway.prize = prize;
+    if (details !== undefined) giveaway.details = details;
+    if (channelId !== undefined) giveaway.channelId = channelId;
+    if (image !== undefined) giveaway.image = image;
+    if (startTime !== undefined) giveaway.startTime = startTime;
+    if (endTime !== undefined) giveaway.endTime = endTime;
+    if (status !== undefined) giveaway.status = status;
+    if (winnerStatus !== undefined) giveaway.winnerStatus = winnerStatus;
+    if (permissions !== undefined) {
+        giveaway.permissions.canReroll = permissions.canReroll || giveaway.permissions.canReroll;
+        giveaway.permissions.canFinish = permissions.canFinish || giveaway.permissions.canFinish;
+        giveaway.permissions.canEdit = permissions.canEdit || giveaway.permissions.canEdit;
+    }
+    if (req.body.mentionEveryone !== undefined) {
+        giveaway.mentionEveryone = !!req.body.mentionEveryone;
+    }
+
+    saveGuildGiveawayData(req.params.guildId, guildData);
+    await updateGiveawayMessage(guild, giveaway);
+    res.json({ success: true, giveaway });
+});
+
+app.post('/api/guilds/:guildId/giveaways/:giveawayId/reroll', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    const giveaway = guildData.giveaways.find(g => g.id === req.params.giveawayId);
+    if (!giveaway) return res.status(404).json({ error: 'Sorteo no encontrado' });
+    if (!giveaway.participants || giveaway.participants.length === 0) {
+        return res.status(400).json({ error: 'No hay participantes para rerollear' });
+    }
+
+    const actor = req.body.actor || null;
+    try {
+        await finalizeGiveaway(guild, giveaway, actor, true);
+        res.json({ success: true, giveaway });
+    } catch (e) {
+        console.error('Error rerolleanado sorteo:', e);
+        res.status(500).json({ error: 'Error rerolleanado sorteo' });
+    }
+});
+
+app.post('/api/guilds/:guildId/giveaways/:giveawayId/end', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    const giveaway = guildData.giveaways.find(g => g.id === req.params.giveawayId);
+    if (!giveaway) return res.status(404).json({ error: 'Sorteo no encontrado' });
+
+    try {
+        await finalizeGiveaway(guild, giveaway, req.body.actor || null, false);
+        res.json({ success: true, giveaway });
+    } catch (e) {
+        console.error('Error finalizando sorteo:', e);
+        res.status(500).json({ error: 'Error finalizando sorteo' });
+    }
+});
+
+app.post('/api/guilds/:guildId/giveaways/:giveawayId/cancel', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    const giveaway = guildData.giveaways.find(g => g.id === req.params.giveawayId);
+    if (!giveaway) return res.status(404).json({ error: 'Sorteo no encontrado' });
+
+    giveaway.status = 'cancelled';
+    giveaway.winnerStatus = 'Cancelado';
+    giveaway.endedAt = new Date().toISOString();
+    saveGuildGiveawayData(req.params.guildId, guildData);
+    await updateGiveawayMessage(guild, giveaway);
+    res.json({ success: true, giveaway });
+});
+
+// Endpoint para manejar unirse a sorteos
+app.post('/api/guilds/:guildId/giveaways/:giveawayId/join', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    const giveaway = guildData.giveaways.find(g => g.id === req.params.giveawayId);
+    if (!giveaway) return res.status(404).json({ error: 'Sorteo no encontrado' });
+    if (giveaway.status !== 'active') return res.status(400).json({ error: 'El sorteo no está activo' });
+
+    const userId = req.body.userId;
+    if (!userId) return res.status(400).json({ error: 'Falta userId' });
+    if (!giveaway.participants.includes(userId)) {
+        giveaway.participants.push(userId);
+        saveGuildGiveawayData(req.params.guildId, guildData);
+        await updateGiveawayMessage(guild, giveaway);
+    }
+
+    res.json({ success: true, giveaway });
+});
+
+// Endpoint para actualizaciones de permisos de sorteos
+app.post('/api/guilds/:guildId/giveaways-permissions', (req, res) => {
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    const { canReroll, canFinish, canEdit } = req.body;
+    if (canReroll !== undefined) guildData.permissions.canReroll = canReroll;
+    if (canFinish !== undefined) guildData.permissions.canFinish = canFinish;
+    if (canEdit !== undefined) guildData.permissions.canEdit = canEdit;
+    saveGuildGiveawayData(req.params.guildId, guildData);
+    res.json({ success: true, permissions: guildData.permissions });
+});
+
 app.post('/api/guilds/:guildId/send', async (req, res) => {
     const { channelId, message } = req.body;
     if (!botClient) return res.json({ error: 'Bot no conectado' });
@@ -1161,4 +1604,4 @@ function startAdminPanel(client) {
     });
 }
 
-module.exports = { startAdminPanel };
+module.exports = { startAdminPanel, handleGiveawayInteraction };

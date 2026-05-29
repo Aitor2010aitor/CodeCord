@@ -668,6 +668,9 @@
             <a href="#suggestions" class="nav-link" onclick="showSection('suggestions')">
                 <i class="fas fa-lightbulb"></i> <span>Sugerencias</span>
             </a>
+            <a href="#giveaways" class="nav-link" onclick="showSection('giveaways')">
+                <i class="fas fa-gift"></i> <span>Sorteos</span>
+            </a>
             <a href="#members" class="nav-link" onclick="showSection('members')">
                 <i class="fas fa-users"></i> <span>Miembros</span>
             </a>
@@ -1413,6 +1416,134 @@
             </div>
         </div>
 
+        <!-- Giveaways Section -->
+        <div id="giveaways" class="section">
+            <div class="section-header" style="flex-wrap:wrap; gap:12px;">
+                <span class="section-title">🎁 Gestión de Sorteos</span>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="view-btn" onclick="loadGiveaways()" style="background: rgba(255,255,255,0.1); color: white;">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                    <button class="view-btn" onclick="createGiveaway()" style="background: var(--success); color: #181825; font-weight:700;">
+                        <i class="fas fa-plus-circle"></i> Crear Sorteo
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start;">
+                <div class="stat-card" style="flex-direction:column;gap:18px;">
+                    <form id="gw-form" style="display:grid;gap:18px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Premio</label>
+                            <input id="gw-prize" type="text" placeholder="Ej: Giftcard 20€" class="log-select" style="margin:0;">
+                        </div>
+                        <div>
+                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Canal del sorteo</label>
+                            <select id="gw-channel" class="log-select" style="margin:0;"><option value="">Seleccionar canal...</option></select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Detalles del sorteo</label>
+                        <textarea id="gw-details" rows="4" placeholder="Descripción del premio y reglas del sorteo" style="width:100%;background:#181825;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;padding:12px;resize:none;font-family:inherit;"></textarea>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div>
+                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Inicio</label>
+                            <input id="gw-start" type="datetime-local" class="log-select" style="margin:0;">
+                        </div>
+                        <div>
+                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Fin</label>
+                            <input id="gw-end" type="datetime-local" class="log-select" style="margin:0;">
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px;margin-bottom:0;">Si dejas el fin vacío, el sorteo quedará abierto hasta cerrarlo manualmente. La hora se toma de tu navegador.</p>
+
+                    <div>
+                        <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Imagen del sorteo</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input id="gw-image" type="text" placeholder="URL de imagen o sube una" class="log-select" style="flex:1;margin:0;">
+                            <button onclick="document.getElementById('gw-image-upload').click()" class="view-btn" style="padding:0 12px;height:44px;background:var(--bg-sidebar);border:1px solid rgba(255,255,255,0.1);">
+                                <i class="fas fa-upload"></i>
+                            </button>
+                            <input id="gw-image-upload" type="file" accept="image/*" style="display:none;" onchange="uploadGiveawayImage(this)">
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div>
+                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Roles que pueden rerollear</label>
+                            <select id="gw-roles-reroll" class="log-select" multiple style="height:100px;">
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Roles que pueden terminar/edit</label>
+                            <select id="gw-roles-finish" class="log-select" multiple style="height:100px;">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <input id="gw-mention-everyone" type="checkbox" style="width:16px;height:16px;">
+                        <label for="gw-mention-everyone" style="color:var(--text-muted);font-size:0.9rem;">Mencionar @everyone al cerrar el sorteo</label>
+                    </div>
+
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <button onclick="saveGiveawayPermissions()" class="view-btn" style="background: var(--accent); color:white; padding:12px;">
+                            <i class="fas fa-user-check"></i> Guardar permisos
+                        </button>
+                        <button onclick="clearGiveawayForm()" class="view-btn" style="background: rgba(255,255,255,0.1); color:white; padding:12px;">
+                            <i class="fas fa-eraser"></i> Limpiar formulario
+                        </button>
+                    </div>
+                    </form>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); padding:24px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);">
+                    <h3 style="margin-bottom:16px;">Información rápida</h3>
+                    <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+                        Crea un sorteo con premio, canal, imagen y permisos. Si no pones fecha de fin, el sorteo se mantendrá abierto hasta cerrarlo manualmente.
+                    </p>
+                    <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
+                        El bot genera un embed visual en Discord y anuncia el ganador en el canal cuando termina el sorteo.
+                    </p>
+                    <div style="margin-top:20px;display:grid;gap:12px;">
+                        <div style="background:rgba(88,101,242,0.08);padding:12px;border-radius:10px;">
+                            <strong>Estados:</strong>
+                            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                                <span style="background:#22c55e;color:#0b1220;padding:4px 10px;border-radius:999px;font-size:0.8rem;">Entregado</span>
+                                <span style="background:#facc15;color:#1f2937;padding:4px 10px;border-radius:999px;font-size:0.8rem;">Pendiente</span>
+                                <span style="background:#f87171;color:#1f2937;padding:4px 10px;border-radius:999px;font-size:0.8rem;">No respondió</span>
+                            </div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:10px;">
+                            <strong>Historial:</strong>
+                            <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">Se guardan todos los ganadores y rerolls con fecha y quién ejecutó cada acción.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:30px;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="view-btn active-tab" id="gw-tab-active" onclick="switchGiveawayTab('active')" style="background: var(--accent); color:white;">
+                        <i class="fas fa-play"></i> Sorteos Activos
+                    </button>
+                    <button class="view-btn" id="gw-tab-ended" onclick="switchGiveawayTab('ended')" style="background: rgba(255,255,255,0.1); color:white;">
+                        <i class="fas fa-check-circle"></i> Sorteos Terminados
+                    </button>
+                </div>
+                <div id="giveaway-active-container" style="margin-top:20px;">
+                    <div class="loading"><div class="spinner"></div>Cargando sorteos activos...</div>
+                </div>
+                <div id="giveaway-ended-container" style="display:none;margin-top:20px;">
+                    <div class="loading"><div class="spinner"></div>Cargando sorteos terminados...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Members Section -->
         <div id="members" class="section">
             <div class="section-header">
@@ -1541,6 +1672,7 @@
             if (sectionId === 'tickets') loadTickets();
             if (sectionId === 'auto-responses') loadAutoResponses();
             if (sectionId === 'suggestions') loadSuggestions();
+            if (sectionId === 'giveaways') loadGiveaways();
             if (sectionId === 'servers') loadServers();
         }
 
@@ -1562,6 +1694,7 @@
                 'auto-responses': 'Auto Respuestas',
                 'tickets': 'Gestión de Tickets',
                 'suggestions': 'Gestión de Sugerencias',
+                'giveaways': 'Sorteos',
                 'members': 'Lista de Miembros',
                 'logs': 'Historial de Actividad',
                 'servers': 'Servidores Conectados'
@@ -1583,6 +1716,211 @@
                 const res = await fetch(`/api/guilds/${currentGuildId}/roles`);
                 guildRoles = await res.json();
             } catch (e) { console.error(e); }
+        }
+
+        function populateGiveawaySelectors() {
+            const channelSelect = document.getElementById('gw-channel');
+            channelSelect.innerHTML = '<option value="">Seleccionar canal...</option>' +
+                guildChannels.map(channel => `<option value="${channel.id}">${channel.name}</option>`).join('');
+
+            const rerollRoles = document.getElementById('gw-roles-reroll');
+            const finishRoles = document.getElementById('gw-roles-finish');
+            const rolesMarkup = guildRoles
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(role => `<option value="${role.id}">${role.name}</option>`)
+                .join('');
+
+            rerollRoles.innerHTML = rolesMarkup;
+            finishRoles.innerHTML = rolesMarkup;
+        }
+
+        function clearGiveawayForm() {
+            const form = document.getElementById('gw-form');
+            if (form) form.reset();
+        }
+
+        async function uploadGiveawayImage(input) {
+            if (!input.files || !input.files[0]) return;
+            const formData = new FormData();
+            formData.append('image', input.files[0]);
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.url) {
+                    document.getElementById('gw-image').value = data.url;
+                    showToast('✅ Imagen subida con éxito');
+                }
+            } catch (e) {
+                showToast('❌ Error al subir la imagen', 'error');
+            }
+        }
+
+        async function saveGiveawayPermissions() {
+            try {
+                const reroll = Array.from(document.getElementById('gw-roles-reroll').selectedOptions).map(opt => opt.value);
+                const finish = Array.from(document.getElementById('gw-roles-finish').selectedOptions).map(opt => opt.value);
+                const res = await fetch(`/api/guilds/${currentGuildId}/giveaways-permissions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ canReroll: reroll, canFinish: finish, canEdit: [] })
+                });
+                if (res.ok) {
+                    showToast('✅ Permisos de sorteos guardados');
+                } else {
+                    showToast('❌ No se pudieron guardar los permisos', 'error');
+                }
+            } catch (e) {
+                showToast('❌ Error guardando permisos', 'error');
+            }
+        }
+
+        async function loadGiveaways() {
+            if (!currentGuildId) return;
+            try {
+                await loadChannels();
+                await loadRoles();
+                populateGiveawaySelectors();
+                const res = await fetch(`/api/guilds/${currentGuildId}/giveaways`);
+                const data = await res.json();
+                const giveaways = data.giveaways || [];
+                const activeGiveaways = giveaways.filter(g => g.status === 'active' || g.status === 'scheduled');
+                const endedGiveaways = giveaways.filter(g => g.status !== 'active' && g.status !== 'scheduled');
+
+                document.getElementById('giveaway-active-container').innerHTML = activeGiveaways.length
+                    ? activeGiveaways.map(g => renderGiveawayCard(g, false)).join('')
+                    : '<div class="loading">No hay sorteos activos.</div>';
+
+                document.getElementById('giveaway-ended-container').innerHTML = endedGiveaways.length
+                    ? endedGiveaways.map(g => renderGiveawayCard(g, true)).join('')
+                    : '<div class="loading">No hay sorteos terminados.</div>';
+
+                switchGiveawayTab('active');
+
+                if (data.permissions) {
+                    const reroll = document.getElementById('gw-roles-reroll');
+                    const finish = document.getElementById('gw-roles-finish');
+                    const setSelected = (select, values) => {
+                        Array.from(select.options).forEach(option => {
+                            option.selected = values.includes(option.value);
+                        });
+                    };
+                    setSelected(reroll, data.permissions.canReroll || []);
+                    setSelected(finish, data.permissions.canFinish || []);
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('❌ No se pudieron cargar los sorteos', 'error');
+            }
+        }
+
+        function formatGiveawayDetails(text) {
+            return text ? text.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+        }
+
+        function renderGiveawayCard(giveaway, isEnded) {
+            const start = giveaway.startTime ? new Date(giveaway.startTime).toLocaleString('es-ES') : 'No definido';
+            const end = giveaway.endTime ? new Date(giveaway.endTime).toLocaleString('es-ES') : (giveaway.endedAt ? new Date(giveaway.endedAt).toLocaleString('es-ES') : 'Sin fin');
+            const status = giveaway.status === 'active' ? 'Activo' : giveaway.status === 'scheduled' ? 'Programado' : giveaway.status === 'Finalizado';
+            const winner = giveaway.winnerTag || 'Sin participantes';
+            const participants = (giveaway.participants || []).length;
+            const mentionEveryone = giveaway.mentionEveryone ? '<span style="color:#a5f3fc;">Menciona @everyone al cerrar</span>' : '';
+            const description = formatGiveawayDetails(giveaway.details || 'Sin descripción.');
+
+            const actionButtons = [];
+            if (!isEnded) {
+                actionButtons.push(`<button class="view-btn" onclick="executeGiveawayAction('end', '${giveaway.id}')" style="background:#f59e0b;">Terminar</button>`);
+                actionButtons.push(`<button class="view-btn" onclick="executeGiveawayAction('cancel', '${giveaway.id}')" style="background:#ef4444;">Cancelar</button>`);
+            }
+            if (isEnded && giveaway.participants?.length > 0) {
+                actionButtons.push(`<button class="view-btn" onclick="executeGiveawayAction('reroll', '${giveaway.id}')" style="background:#22c55e;">Reroll</button>`);
+            }
+
+            return `
+                <div class="log-config-card" style="padding:20px;">
+                    <div class="log-card-header">
+                        <div>
+                            <strong>${giveaway.prize}</strong>
+                            <div style="font-size:0.9rem;color:var(--text-muted);margin-top:6px;">${status} · ${participants} participaciones</div>
+                        </div>
+                        <span style="font-size:0.8rem;color:var(--text-muted);">${start} → ${end}</span>
+                    </div>
+                    <p style="margin-top:14px;color:var(--text-muted);line-height:1.6;">${description}</p>
+                    <div style="display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:12px;margin-top:16px;font-size:0.9rem;color:var(--text-muted);">
+                        <div><strong>Canal:</strong><br>${giveaway.channelId}</div>
+                        <div><strong>Estado ganador:</strong><br>${giveaway.winnerStatus || 'Pendiente'}</div>
+                        <div><strong>Ganador:</strong><br>${winner}</div>
+                        <div><strong>Rerolls:</strong><br>${giveaway.rerollCount || 0}</div>
+                    </div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:0.85rem;color:var(--text-muted);">
+                        <div><strong>Inicio:</strong> ${start}</div>
+                        <div><strong>Fin:</strong> ${end}</div>
+                        ${mentionEveryone}
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">${actionButtons.join('')}</div>
+                </div>
+            `;
+        }
+
+        async function createGiveaway() {
+            const prize = document.getElementById('gw-prize').value.trim();
+            const details = document.getElementById('gw-details').value.trim();
+            const channelId = document.getElementById('gw-channel').value;
+            const image = document.getElementById('gw-image').value.trim();
+            const startTime = document.getElementById('gw-start').value;
+            const endTime = document.getElementById('gw-end').value;
+            const permissions = {
+                canReroll: Array.from(document.getElementById('gw-roles-reroll').selectedOptions).map(opt => opt.value),
+                canFinish: Array.from(document.getElementById('gw-roles-finish').selectedOptions).map(opt => opt.value),
+                canEdit: []
+            };
+            const mentionEveryone = document.getElementById('gw-mention-everyone').checked;
+
+            if (!prize || !channelId) {
+                return showToast('Completa al menos el premio y el canal.', 'info');
+            }
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/giveaways`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prize, details, channelId, image, startTime, endTime, permissions, mentionEveryone })
+                });
+                if (!res.ok) {
+                    const body = await res.json();
+                    return showToast(`❌ Error creando sorteo: ${body.error || 'Unknown'}`, 'error');
+                }
+                showToast('✅ Sorteo creado con éxito');
+                clearGiveawayForm();
+                loadGiveaways();
+            } catch (e) {
+                console.error(e);
+                showToast('❌ Error creando el sorteo', 'error');
+            }
+        }
+
+        async function executeGiveawayAction(action, giveawayId) {
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/giveaways/${giveawayId}/${action}`, { method: 'POST' });
+                if (!res.ok) {
+                    const body = await res.json();
+                    return showToast(`❌ ${body.error || 'Acción fallida'}`, 'error');
+                }
+                showToast(`✅ Acción '${action}' ejecutada`);
+                loadGiveaways();
+            } catch (e) {
+                console.error(e);
+                showToast('❌ Error ejecutando la acción', 'error');
+            }
+        }
+
+        function switchGiveawayTab(tab) {
+            document.getElementById('giveaway-active-container').style.display = tab === 'active' ? 'block' : 'none';
+            document.getElementById('giveaway-ended-container').style.display = tab === 'ended' ? 'block' : 'none';
+            document.getElementById('gw-tab-active').style.background = tab === 'active' ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('gw-tab-ended').style.background = tab === 'ended' ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
         }
 
         function loadChannelsForSay() {
@@ -1987,15 +2325,17 @@
             body.innerHTML = '<tr><td colspan="4" class="loading"><div class="spinner"></div>Cargando miembros...</td></tr>';
             try {
                 const params = new URLSearchParams({ limit: membersPageSize });
-                if (after) params.append('after', after);
+                if (after !== null) params.append('after', after);
                 const res = await fetch(`/api/guilds/${guildId}/members?${params.toString()}`);
                 const data = await res.json();
                 const members = Array.isArray(data.members) ? data.members : data;
                 membersPagination.hasMore = data.hasMore || false;
                 membersPagination.nextAfter = data.nextAfter || null;
-                if (!after) {
+                if (reset || after === null) {
                     membersPagination.page = 1;
                     membersPagination.afterStack = [null];
+                } else if (membersPagination.afterStack[membersPagination.afterStack.length - 1] !== after) {
+                    membersPagination.afterStack.push(after);
                 }
                 let html = '';
                 members.forEach(m => {
@@ -2034,7 +2374,6 @@
         function goMembersNext() {
             if (!membersPagination.hasMore || !membersPagination.nextAfter) return;
             membersPagination.page += 1;
-            membersPagination.afterStack.push(membersPagination.nextAfter);
             loadMembers(currentGuildId, membersPagination.nextAfter);
         }
 
