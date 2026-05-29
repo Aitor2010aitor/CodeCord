@@ -86,10 +86,30 @@ const commands = [
     .setName('ticketpanel')
     .setDescription('Publica el panel para abrir tickets (solo moderadores)')
     .addStringOption(opt => opt.setName('boton1').setDescription('Formato: nombre|pregunta (ej: Crear Ticket|¿Tipo de problema?)').setRequired(false))
+    .addStringOption(opt => opt.setName('pregunta1').setDescription('Pregunta para el botón 1 (opcional)').setRequired(false))
     .addStringOption(opt => opt.setName('boton2').setDescription('Segundo botón (opcional)').setRequired(false))
+    .addStringOption(opt => opt.setName('pregunta2').setDescription('Pregunta para el botón 2 (opcional)').setRequired(false))
     .addStringOption(opt => opt.setName('boton3').setDescription('Tercer botón (opcional)').setRequired(false))
+    .addStringOption(opt => opt.setName('pregunta3').setDescription('Pregunta para el botón 3 (opcional)').setRequired(false))
     .addStringOption(opt => opt.setName('boton4').setDescription('Cuarto botón (opcional)').setRequired(false))
+    .addStringOption(opt => opt.setName('pregunta4').setDescription('Pregunta para el botón 4 (opcional)').setRequired(false))
     .addStringOption(opt => opt.setName('boton5').setDescription('Quinto botón (opcional)').setRequired(false))
+    .addStringOption(opt => opt.setName('pregunta5').setDescription('Pregunta para el botón 5 (opcional)').setRequired(false))
+    .addStringOption(opt => opt.setName('mensaje').setDescription('Mensaje que se mostrará en el panel de tickets').setRequired(false))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('ticketstaffrole')
+    .setDescription('Configurar el rol de staff que puede ver y atender tickets')
+    .addRoleOption(opt => opt.setName('rol').setDescription('Rol de staff para tickets').setRequired(true))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('ticketlogchannel')
+    .setDescription('Configurar el canal de logs para tickets')
+    .addChannelOption(opt => opt.setName('canal').setDescription('Canal de texto para logs de tickets').setRequired(true))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('ticketclose')
+    .setDescription('Cerrar el ticket actual desde slash command')
     .toJSON(),
   new SlashCommandBuilder()
     .setName('staffrole')
@@ -141,6 +161,11 @@ const commands = [
     .setDescription('Sancionar un usuario de soporte de voz')
     .addUserOption(opt => opt.setName('usuario').setDescription('Usuario a sancionar').setRequired(true))
     .addStringOption(opt => opt.setName('motivo').setDescription('Motivo de la sanción').setRequired(false))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('sanctionhistory')
+    .setDescription('Ver historial de sanciones de soporte de voz')
+    .addUserOption(opt => opt.setName('usuario').setDescription('Usuario para ver historial').setRequired(false))
     .toJSON(),
 ];
 

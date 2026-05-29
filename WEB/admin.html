@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProPanel - Luggames Community</title>
+    <title>CodeCord - Panel de Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -641,7 +641,7 @@
             <div class="bot-logo" id="sidebar-bot-logo">
                 <i class="fas fa-robot"></i>
             </div>
-            <span class="bot-name" id="sidebar-bot-name">ProPanel</span>
+            <span class="bot-name" id="sidebar-bot-name">CodeCord</span>
         </div>
         <nav class="nav-links">
             <a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">
@@ -1016,7 +1016,7 @@
         <!-- Logs Config Section -->
         <div id="logs-config" class="section">
             <div class="section-header" style="margin-bottom: 8px;">
-                <span class="section-title">⚙️ Configuración de Logs (Estilo ProBot)</span>
+                <span class="section-title">⚙️ Configuración de Logs (Estilo CodeCord)</span>
                 <div style="display: flex; gap: 12px;">
                     <button onclick="loadLogsConfig()" class="view-btn" style="background: rgba(255,255,255,0.1);">
                         <i class="fas fa-sync"></i> Recargar
@@ -1029,6 +1029,22 @@
             </div>
             <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem;">Selecciona qué eventos quieres
                 registrar y en qué canales. Cada evento puede tener su propio color de embed.</p>
+
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom: 22px;">
+                <div style="flex:1; min-width:260px;">
+                    <label style="display:block; margin-bottom:8px; font-size:0.9rem; font-weight:600; color:var(--text-muted);">Canal común para todos los logs</label>
+                    <select id="logs-global-channel" class="log-select"><option value="">Cargando canales...</option></select>
+                </div>
+                <button onclick="applyCommonLogChannel()" class="view-btn" style="background: var(--accent); color: white;">
+                    <i class="fas fa-link"></i> Aplicar canal a todos
+                </button>
+                <button onclick="enableAllLogEvents()" class="view-btn" style="background: #22c55e; color: #181825; font-weight: 700;">
+                    <i class="fas fa-toggle-on"></i> Activar todos
+                </button>
+                <button onclick="disableAllLogEvents()" class="view-btn" style="background: #f87171; color: #181825; font-weight: 700;">
+                    <i class="fas fa-toggle-off"></i> Desactivar todos
+                </button>
+            </div>
 
             <div id="logs-config-container">
                 <div class="loading">
@@ -1419,6 +1435,11 @@
                     </tbody>
                 </table>
             </div>
+            <div id="members-pagination" style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:16px;">
+                <button id="members-prev-btn" onclick="goMembersPrev()" disabled style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:white;cursor:pointer;">Anterior</button>
+                <span id="members-page-info" style="color:var(--text-muted);font-size:0.95rem;">Página 1</span>
+                <button id="members-next-btn" onclick="goMembersNext()" disabled style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:white;cursor:pointer;">Siguiente</button>
+            </div>
         </div>
 
         <!-- Logs Section -->
@@ -1482,6 +1503,20 @@
 
         let currentGuildId = '';
         let guildChannels = [];
+        let membersPageSize = 100;
+        const membersPagination = {
+            page: 1,
+            afterStack: [null],
+            nextAfter: null,
+            hasMore: false
+        };
+
+        function resetMembersPagination() {
+            membersPagination.page = 1;
+            membersPagination.afterStack = [null];
+            membersPagination.nextAfter = null;
+            membersPagination.hasMore = false;
+        }
 
         async function updateGlobalGuild(guildId) {
             currentGuildId = guildId;
@@ -1502,7 +1537,7 @@
             if (sectionId === 'welcome') loadWelcomeConfig();
             if (sectionId === 'say') loadChannelsForSay();
             if (sectionId === 'embed-builder') loadChannelsForEB();
-            if (sectionId === 'members') loadMembers(currentGuildId);
+            if (sectionId === 'members') loadMembers(currentGuildId, null, true);
             if (sectionId === 'tickets') loadTickets();
             if (sectionId === 'auto-responses') loadAutoResponses();
             if (sectionId === 'suggestions') loadSuggestions();
@@ -1788,6 +1823,18 @@
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/logs-config`);
                 const config = await res.json();
+                const globalChannelSelect = document.getElementById('logs-global-channel');
+                if (globalChannelSelect) {
+                    let options = '<option value="">Seleccionar canal para todos...</option>';
+                    guildChannels.forEach(c => {
+                        options += `<option value="${c.id}"># ${c.name}</option>`;
+                    });
+                    globalChannelSelect.innerHTML = options;
+                    const firstChannel = logEvents.reduce((acc, ev) => acc || (config[ev.id]?.channel || ''), '');
+                    if (firstChannel && guildChannels.some(c => c.id === firstChannel)) {
+                        globalChannelSelect.value = firstChannel;
+                    }
+                }
                 let html = '<div class="logs-grid">';
                 logEvents.forEach(ev => {
                     const settings = config[ev.id] || { enabled: false, channel: '', color: '#5865f2' };
@@ -1833,6 +1880,34 @@
                 });
                 if (res.ok) showToast('✅ Configuración de logs guardada correctamente');
             } catch (e) { showToast('❌ Error al guardar los logs', 'error'); }
+        }
+
+        function applyCommonLogChannel() {
+            const channelId = document.getElementById('logs-global-channel').value;
+            if (!channelId) {
+                return showToast('Selecciona primero un canal para aplicar.', 'error');
+            }
+            logEvents.forEach(ev => {
+                const channelSelect = document.getElementById(`channel-${ev.id}`);
+                if (channelSelect) channelSelect.value = channelId;
+            });
+            showToast('✅ Canal común aplicado a todos los eventos de logs');
+        }
+
+        function enableAllLogEvents() {
+            logEvents.forEach(ev => {
+                const checkbox = document.getElementById(`enable-${ev.id}`);
+                if (checkbox) checkbox.checked = true;
+            });
+            showToast('✅ Todos los eventos de logs están activados');
+        }
+
+        function disableAllLogEvents() {
+            logEvents.forEach(ev => {
+                const checkbox = document.getElementById(`enable-${ev.id}`);
+                if (checkbox) checkbox.checked = false;
+            });
+            showToast('✅ Todos los eventos de logs están desactivados');
         }
 
         function showToast(message, type = 'success') {
@@ -1905,12 +1980,23 @@
             } catch (e) { body.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--danger);">Error cargando tickets</td></tr>'; }
         }
 
-        async function loadMembers(guildId) {
+        async function loadMembers(guildId, after = null, reset = false) {
+            if (!guildId) return;
+            if (reset) resetMembersPagination();
             const body = document.getElementById('members-body');
             body.innerHTML = '<tr><td colspan="4" class="loading"><div class="spinner"></div>Cargando miembros...</td></tr>';
             try {
-                const res = await fetch(`/api/guilds/${guildId}/members`);
-                const members = await res.json();
+                const params = new URLSearchParams({ limit: membersPageSize });
+                if (after) params.append('after', after);
+                const res = await fetch(`/api/guilds/${guildId}/members?${params.toString()}`);
+                const data = await res.json();
+                const members = Array.isArray(data.members) ? data.members : data;
+                membersPagination.hasMore = data.hasMore || false;
+                membersPagination.nextAfter = data.nextAfter || null;
+                if (!after) {
+                    membersPagination.page = 1;
+                    membersPagination.afterStack = [null];
+                }
                 let html = '';
                 members.forEach(m => {
                     const date = new Date(m.joinedAt).toLocaleDateString('es-ES');
@@ -1932,8 +2018,32 @@
                         <td>${date}</td>
                     </tr>`;
                 });
-                body.innerHTML = html;
-            } catch (e) { body.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--danger);">Error cargando miembros</td></tr>'; }
+                body.innerHTML = members.length > 0 ? html : '<tr><td colspan="4" style="text-align: center; padding: 20px;">No hay miembros por mostrar</td></tr>';
+                updateMembersPaginationControls();
+            } catch (e) {
+                body.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--danger);">Error cargando miembros</td></tr>';
+            }
+        }
+
+        function updateMembersPaginationControls() {
+            document.getElementById('members-page-info').innerText = `Página ${membersPagination.page}`;
+            document.getElementById('members-prev-btn').disabled = membersPagination.page <= 1;
+            document.getElementById('members-next-btn').disabled = !membersPagination.hasMore;
+        }
+
+        function goMembersNext() {
+            if (!membersPagination.hasMore || !membersPagination.nextAfter) return;
+            membersPagination.page += 1;
+            membersPagination.afterStack.push(membersPagination.nextAfter);
+            loadMembers(currentGuildId, membersPagination.nextAfter);
+        }
+
+        function goMembersPrev() {
+            if (membersPagination.page <= 1) return;
+            membersPagination.page -= 1;
+            membersPagination.afterStack.pop();
+            const prevAfter = membersPagination.afterStack[membersPagination.page - 1] || null;
+            loadMembers(currentGuildId, prevAfter);
         }
 
         async function showMemberProfile(guildId, memberId) {
@@ -2150,7 +2260,10 @@
 
         function addTicketButtonWithData(name, question, hasForm) {
             const container = document.getElementById('tp-buttons-container');
-            if (container.children.length >= 5) return;
+            if (container.children.length >= 5) {
+                showToast('Máximo 5 botones permitidos en el panel de tickets.', 'info');
+                return;
+            }
             const div = document.createElement('div');
             div.className = 'tp-button-item';
             div.style = 'background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); position: relative;';
@@ -2177,6 +2290,10 @@
         }
 
         function addTicketButton() {
+            const container = document.getElementById('tp-buttons-container');
+            if (container.children.length >= 5) {
+                return showToast('No puedes añadir más de 5 botones de ticket.', 'info');
+            }
             addTicketButtonWithData('Nuevo Botón', '', false);
         }
 
@@ -2200,6 +2317,7 @@
         async function saveTicketConfig() {
             if (!currentGuildId) return showToast('Selecciona un servidor', 'error');
             const buttons = getTicketButtonsData();
+            if (buttons.length > 5) return showToast('Máximo 5 botones permitidos.', 'error');
             const data = {
                 panelMessage: document.getElementById('tp-message').value,
                 panelConfigs: buttons,
@@ -2223,6 +2341,7 @@
             const message = document.getElementById('tp-message').value;
             const buttons = getTicketButtonsData();
             if (buttons.length === 0) return showToast('Añade al menos un botón', 'error');
+            if (buttons.length > 5) return showToast('Máximo 5 botones permitidos.', 'error');
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/send-ticket-panel`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -2244,13 +2363,16 @@
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/ticket-config`);
                 const config = await res.json();
-                if (config.staffRoleId) document.getElementById('tc-staff-role').value = config.staffRoleId;
+                const mainRoleId = config.staffRoleId || (config.ticketStaffRoles && config.ticketStaffRoles.length > 0 ? config.ticketStaffRoles[0] : '');
+                if (mainRoleId) document.getElementById('tc-staff-role').value = mainRoleId;
                 if (config.ticketStaffRoles && config.ticketStaffRoles.length > 0) {
                     const sel = document.getElementById('tc-extra-roles');
                     config.ticketStaffRoles.forEach(rId => {
                         for (let opt of sel.options) { if (opt.value === rId) opt.selected = true; }
                     });
                     renderCurrentRoles(config.ticketStaffRoles);
+                } else {
+                    renderCurrentRoles([]);
                 }
             } catch (e) { console.error(e); }
         }
@@ -2278,10 +2400,18 @@
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/ticket-config`, {
                     method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticketStaffRoles: allRoles })
+                    body: JSON.stringify({
+                        ticketStaffRoles: allRoles,
+                        staffRoleId: mainRole || (allRoles[0] || '')
+                    })
                 });
-                if (res.ok) { showToast('✅ Roles de tickets guardados'); renderCurrentRoles(allRoles); }
-                else showToast('❌ Error al guardar', 'error');
+                if (res.ok) {
+                    showToast('✅ Roles de tickets guardados');
+                    renderCurrentRoles(allRoles);
+                    await loadTicketConfigRoles();
+                } else {
+                    showToast('❌ Error al guardar', 'error');
+                }
             } catch (e) { showToast('❌ Error de conexión', 'error'); }
         }
 
@@ -2290,9 +2420,13 @@
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/ticket-config`, {
                     method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticketStaffRoles: [] })
+                    body: JSON.stringify({ ticketStaffRoles: [], staffRoleId: '' })
                 });
-                if (res.ok) { showToast('🗑️ Roles de tickets eliminados'); renderCurrentRoles([]); }
+                if (res.ok) {
+                    showToast('🗑️ Roles de tickets eliminados');
+                    renderCurrentRoles([]);
+                    document.getElementById('tc-staff-role').value = '';
+                }
             } catch (e) { showToast('❌ Error', 'error'); }
         }
 
@@ -2758,6 +2892,7 @@
         async function sendCommentAndNotify() {
             const suggestionId = document.getElementById('comment-suggestion-id').value;
             const commentText = document.getElementById('comment-text').value;
+            const postInChannel = document.getElementById('comment-post-in-channel').checked;
 
             if (!commentText.trim()) {
                 showToast('error', 'Escribe un comentario');
@@ -2768,12 +2903,18 @@
                 const res = await fetch(`/api/guilds/${currentGuildId}/suggestions/${suggestionId}/comment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment: commentText })
+                    body: JSON.stringify({ 
+                        comment: commentText,
+                        postInChannel: postInChannel
+                    })
                 });
 
                 const data = await res.json();
                 if (data.success) {
-                    showToast('success', 'Comentario enviado al usuario');
+                    const message = postInChannel 
+                        ? '✅ Comentario enviado al usuario y al canal'
+                        : '✅ Comentario enviado al usuario por MD';
+                    showToast('success', message);
                     document.getElementById('comment-modal').style.display = 'none';
                     loadSuggestions();
                 } else {
@@ -2814,6 +2955,19 @@
             <input type="hidden" id="comment-suggestion-id">
             <h3 style="margin-bottom: 16px; color: white;">📝 Enviar comentario a <span id="comment-user-tag"></span></h3>
             <textarea id="comment-text" placeholder="Escribe tu comentario..." style="width: 100%; height: 120px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: vertical;"></textarea>
+            
+            <!-- NUEVA OPCIÓN: Enviar al canal de sugerencias -->
+            <div style="display: flex; align-items: center; gap: 10px; margin: 16px 0; background: rgba(88,101,242,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(88,101,242,0.2);">
+                <label class="switch" style="margin: 0;">
+                    <input type="checkbox" id="comment-post-in-channel">
+                    <span class="slider"></span>
+                </label>
+                <div>
+                    <div style="font-weight: 600; color: white; font-size: 0.9rem;">Enviar también al canal 📢</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">El comentario se publicará en el canal de sugerencias (el MD siempre se envía)</div>
+                </div>
+            </div>
+            
             <div style="display: flex; gap: 10px; margin-top: 16px;">
                 <button onclick="sendCommentAndNotify()" class="view-btn" style="flex: 1; background: var(--success); color: white; padding: 10px;">
                     <i class="fas fa-paper-plane"></i> Enviar

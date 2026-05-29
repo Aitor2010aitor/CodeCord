@@ -35,6 +35,54 @@ const PDFDocument = require('pdfkit');
 const os = require('os');
 const https = require('https');
 
+const sanctionsConfigPath = path.join(__dirname, 'config', 'sanctions.json');
+const sanctionsFolderPath = path.join(__dirname, 'sancion');
+
+function loadSanctionsConfig() {
+  try {
+    if (!fs.existsSync(sanctionsConfigPath)) return {};
+    const content = fs.readFileSync(sanctionsConfigPath, 'utf8') || '{}';
+    return JSON.parse(content);
+  } catch (error) {
+    console.error('Error leyendo config de sanciones:', error);
+    return {};
+  }
+}
+
+function saveSanctionsConfig(data) {
+  try {
+    fs.writeFileSync(sanctionsConfigPath, JSON.stringify(data, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error guardando config de sanciones:', error);
+  }
+}
+
+function addSanctionRecord(guildId, record) {
+  try {
+    const data = loadSanctionsConfig();
+    if (!data[guildId]) data[guildId] = [];
+    data[guildId].push(record);
+    saveSanctionsConfig(data);
+
+    if (!fs.existsSync(sanctionsFolderPath)) {
+      fs.mkdirSync(sanctionsFolderPath, { recursive: true });
+    }
+
+    const filePath = path.join(sanctionsFolderPath, `sanciones_${guildId}.txt`);
+    const line = `[${new Date(record.timestamp).toLocaleString('es-ES')}] ${record.type || 'VOICE_SUPPORT'}: ${record.userTag} (${record.userId}) sancionado por ${record.moderatorTag || 'Sistema'} - ${record.reason}\n`;
+    fs.appendFileSync(filePath, line, 'utf8');
+  } catch (error) {
+    console.error('Error registrando sanción:', error);
+  }
+}
+
+function getSanctionRecords(guildId, userId = null) {
+  const data = loadSanctionsConfig();
+  if (!data[guildId] || data[guildId].length === 0) return [];
+  if (!userId) return data[guildId];
+  return data[guildId].filter(record => record.userId === userId);
+}
+
 const { 
   joinVoiceChannel, 
   createAudioPlayer, 
@@ -531,11 +579,16 @@ const ticketsConfigPath = path.join(__dirname, 'config', 'tickets-config.json');
 function loadTicketsConfig() {
   try {
     if (fs.existsSync(ticketsConfigPath)) {
-      const data = fs.readFileSync(ticketsConfigPath, 'utf8');
+      const data = fs.readFileSync(ticketsConfigPath, 'utf8').trim();
+      if (!data) {
+        saveTicketsConfig({ guilds: {} });
+        return { guilds: {} };
+      }
       return JSON.parse(data);
     }
   } catch (err) {
-    console.error('❌ Error cargando tickets-config.json:', err);
+    console.error('⚠️ tickets-config.json corrupto, reiniciando configuración');
+    saveTicketsConfig({ guilds: {} });
   }
   return { guilds: {} };
 }
@@ -596,8 +649,126 @@ function hasStaffPermission(member, guild) {
   
   // Verificar rol de staff de soporte de voz
   if (voiceStaffRoleId && member.roles.cache.has(voiceStaffRoleId)) return true;
-  
+
   return false;
+}
+
+function isTicketChannel(channel) {
+  return channel && typeof channel.name === 'string' && channel.name.toLowerCase().startsWith('ticket-');
+}
+
+function findTicketUserByChannel(ticketChannel) {
+  if (!ticketChannel || !ticketChannel.permissionOverwrites) return null;
+
+  for (const [id, overwrite] of ticketChannel.permissionOverwrites.cache) {
+    if (overwrite.allow && overwrite.allow.has(PermissionsBitField.Flags.ViewChannel) && !overwrite.deny?.has(PermissionsBitField.Flags.ViewChannel)) {
+      const member = ticketChannel.guild.members.cache.get(id);
+      if (member && !member.user.bot) return member;
+    }
+  }
+
+  const match = ticketChannel.name.match(/ticket-(\d+)/);
+  if (match) {
+    return ticketChannel.guild.members.cache.get(match[1]) || null;
+  }
+
+  return null;
+}
+
+async function closeTicketChannel(ticketChannel, closedBy, replyCallback = null) {
+  if (!ticketChannel || !isTicketChannel(ticketChannel)) return;
+
+  const ticketName = ticketChannel.name;
+  const closingEmbed = new EmbedBuilder()
+    .setTitle('🔒 Cerrando ticket...')
+    .setDescription('Este ticket se cerrará en 5 segundos.')
+    .setColor(0xFFA500);
+
+  if (replyCallback) {
+    try {
+      await replyCallback({ content: '⚠️ Cerrando el ticket...', embeds: [closingEmbed], ephemeral: true });
+    } catch (error) {
+      console.error('Error enviando respuesta de cierre:', error);
+    }
+  }
+
+  try {
+    await ticketChannel.send({ embeds: [closingEmbed] });
+  } catch (error) {
+    console.error('Error enviando mensaje de cierre en el canal:', error);
+  }
+
+  let htmlPath = null;
+  let pdfPath = null;
+  try {
+    htmlPath = await generateTicketHTML(ticketChannel, ticketName, closedBy.user?.tag || closedBy.tag || String(closedBy));
+  } catch (error) {
+    console.error(`Error generando HTML al cerrar ticket ${ticketName}:`, error);
+  }
+
+  const logEmbed = new EmbedBuilder()
+    .setTitle('🔒 Ticket Cerrado')
+    .setDescription(`**Ticket:** ${ticketName}\n**Cerrado por:** ${closedBy.user?.tag || closedBy.tag || String(closedBy)}\n**ID del canal:** ${ticketChannel.id}\n**HTML generado:** ${htmlPath ? '✅ Sí' : '❌ No'}`)
+    .setColor(0xFF0000)
+    .setTimestamp();
+
+  let ticketLogChannelId = null;
+  try {
+    const ticketsConfig = loadTicketsConfig();
+    if (ticketsConfig.guilds && ticketsConfig.guilds[ticketChannel.guild.id]) {
+      ticketLogChannelId = ticketsConfig.guilds[ticketChannel.guild.id].ticketLogChannelId || null;
+    }
+  } catch (error) {
+    console.error('Error leyendo tickets-config.json para cierre de ticket:', error);
+  }
+
+  await sendSecurityLog(ticketChannel.guild, logEmbed, htmlPath, pdfPath, ticketLogChannelId);
+
+  let ticketUser = findTicketUserByChannel(ticketChannel);
+  if (!ticketUser) {
+    const match = ticketChannel.name.match(/ticket-(\d+)/);
+    if (match) {
+      ticketUser = await ticketChannel.guild.members.fetch(match[1]).catch(() => null);
+    }
+  }
+  if (!ticketUser) {
+    ticketUser = ticketChannel.guild.members.cache.get(ticketChannel.guild.ownerId) || null;
+  }
+
+  if (ticketUser) {
+    try {
+      const userEmbed = new EmbedBuilder()
+        .setTitle('🔒 Tu ticket ha sido cerrado')
+        .setDescription(`Tu ticket **${ticketName}** ha sido cerrado por **${closedBy.user?.tag || closedBy.tag || String(closedBy)}**.`)
+        .addFields({ name: '📄 Archivo', value: htmlPath ? 'HTML generado y adjunto' : 'No disponible', inline: true })
+        .setColor(0x00FF00)
+        .setTimestamp();
+
+      const userFiles = [];
+      if (htmlPath && fs.existsSync(htmlPath)) {
+        userFiles.push({ attachment: htmlPath, name: path.basename(htmlPath) });
+      }
+      if (pdfPath && fs.existsSync(pdfPath)) {
+        userFiles.push({ attachment: pdfPath, name: path.basename(pdfPath) });
+      }
+
+      if (userFiles.length > 0) {
+        await ticketUser.send({ embeds: [userEmbed], files: userFiles });
+      } else {
+        await ticketUser.send({ embeds: [userEmbed] });
+      }
+    } catch (dmError) {
+      console.warn('No se pudo enviar DM al creador del ticket:', dmError.message);
+    }
+  }
+
+  setTimeout(async () => {
+    try {
+      await ticketChannel.delete('Ticket cerrado');
+    } catch (deleteError) {
+      console.error('Error eliminando canal del ticket:', deleteError);
+    }
+  }, 5000);
 }
 
 // Sistema Anti-Raid
@@ -866,6 +1037,16 @@ async function sanctionSupportUser(guild, userId, reason, sanctionedBy = null) {
       warningSent.delete(userId);
       client.voiceSupportWarningSent.set(guild.id, warningSent);
     }
+
+    addSanctionRecord(guild.id, {
+      userId: member.user.id,
+      userTag: member.user.tag,
+      moderatorId: sanctionedBy?.id || null,
+      moderatorTag: sanctionedBy?.user?.tag || 'Sistema',
+      reason: reason || 'No se especificó un motivo',
+      timestamp: Date.now(),
+      type: 'VOICE_SUPPORT'
+    });
     
     console.log(`[DEBUG] Sanción completada exitosamente para ${userId}`);
     return true;
@@ -876,7 +1057,12 @@ async function sanctionSupportUser(guild, userId, reason, sanctionedBy = null) {
   }
 }
 
-client.once('ready', () => {
+let hasInitialized = false;
+
+function onClientReady() {
+  if (hasInitialized) return;
+  hasInitialized = true;
+
   fs.writeFileSync('debug-ready.txt', `Bot listo a las ${new Date().toLocaleString()} como ${client.user.tag}`);
   console.log(`✅ Conectado como ${client.user.tag}`);
   console.log(`📊 Servidores detectados (${client.guilds.cache.size}): ${client.guilds.cache.map(g => g.name).join(', ')}`);
@@ -887,6 +1073,9 @@ client.once('ready', () => {
   
   // Cargar roles de staff y configuración de automod al iniciar
   loadStaffConfig();
+}
+client.once('ready', onClientReady);
+client.once('clientReady', onClientReady);
   
   // Cargar configuración de tickets desde archivo JSON
   const ticketsConfig = loadTicketsConfig();
@@ -1001,7 +1190,6 @@ client.once('ready', () => {
       }
     }
   }, 1000); // Verificar cada segundo para actualizar tiempo en tiempo real
-});
 
 // Manejador de interacciones (slash commands)
 client.on('interactionCreate', async (interaction) => {
@@ -1168,55 +1356,55 @@ client.on('interactionCreate', async (interaction) => {
 async function sendSecurityLog(guild, embed, htmlPath = null, pdfPath = null, customLogChannelId = null) {
   const logChannelId = customLogChannelId || client.antiRaid.logChannel.get(guild.id);
   console.log(`🔍 Debug - Guild ID: ${guild.id}, Log Channel ID: ${logChannelId}`);
-  
+
   if (!logChannelId) {
     console.log('❌ No hay canal de logs configurado para este servidor');
     return;
   }
-  
-  const logChannel = guild.channels.cache.get(logChannelId);
+
+  // Intentar obtener el canal (cache o fetch)
+  let logChannel = guild.channels.cache.get(logChannelId);
+  if (!logChannel) {
+    logChannel = await guild.channels.fetch(logChannelId).catch(() => null);
+  }
+
   console.log(`🔍 Debug - Canal de logs encontrado: ${logChannel ? 'Sí' : 'No'}`);
-  
-  if (logChannel) {
-    try {
-      const messageOptions = { embeds: [embed] };
-      const files = [];
-      
-      // Si hay archivos HTML y/o PDF, agregarlos al mensaje
-      if (htmlPath && fs.existsSync(htmlPath)) {
-        console.log(`📄 Debug - Archivo HTML encontrado: ${htmlPath}`);
-        files.push({
-          attachment: htmlPath,
-          name: path.basename(htmlPath)
-        });
-      } else {
-        console.log(`❌ Debug - Archivo HTML no encontrado: ${htmlPath}`);
-      }
-      
-      if (pdfPath && fs.existsSync(pdfPath)) {
-        console.log(`📄 Debug - Archivo PDF encontrado: ${pdfPath}`);
-        files.push({
-          attachment: pdfPath,
-          name: path.basename(pdfPath)
-        });
-      } else {
-        console.log(`❌ Debug - Archivo PDF no encontrado: ${pdfPath}`);
-      }
-      
-      if (files.length > 0) {
-        messageOptions.files = files;
-        console.log(`📤 Debug - Enviando mensaje con ${files.length} archivo(s) adjunto(s)`);
-      } else {
-        console.log(`❌ Debug - No hay archivos para adjuntar`);
-      }
-      
-      const sentMessage = await logChannel.send(messageOptions);
-      console.log(`✅ Debug - Mensaje enviado exitosamente al canal de logs: ${sentMessage.id}`);
-    } catch (error) {
-      console.error('❌ Error enviando log de seguridad:', error);
+
+  if (!logChannel) {
+    console.warn(`❌ Canal de logs ${logChannelId} no existe en ${guild.name} (${guild.id}).`);
+    return;
+  }
+
+  // Verificar permisos antes de intentar enviar
+  const me = guild.members.me || await guild.members.fetch(client.user.id).catch(() => null);
+  if (!me) {
+    console.warn('❌ No pude obtener la identidad del bot en el servidor.');
+    return;
+  }
+
+  const perms = me.permissionsIn(logChannel);
+  if (!perms || !perms.has(PermissionsBitField.Flags.ViewChannel) || !perms.has(PermissionsBitField.Flags.SendMessages)) {
+    console.warn(`❌ Sin permisos para enviar en el canal ${logChannel.id} de ${guild.name}. Permisos necesarios: VIEW_CHANNEL, SEND_MESSAGES`);
+    return;
+  }
+
+  try {
+    const messageOptions = { embeds: [embed] };
+    const files = [];
+
+    if (htmlPath && fs.existsSync(htmlPath)) {
+      files.push({ attachment: htmlPath, name: path.basename(htmlPath) });
     }
-  } else {
-    console.log('❌ No se pudo encontrar el canal de logs');
+    if (pdfPath && fs.existsSync(pdfPath)) {
+      files.push({ attachment: pdfPath, name: path.basename(pdfPath) });
+    }
+
+    if (files.length > 0) messageOptions.files = files;
+
+    const sentMessage = await logChannel.send(messageOptions);
+    console.log(`✅ Debug - Mensaje enviado exitosamente al canal de logs: ${sentMessage.id}`);
+  } catch (error) {
+    console.error('❌ Error enviando log de seguridad:', error);
   }
 }
 
@@ -1347,13 +1535,39 @@ async function sendLogEmbed(guild, embed, eventType = null) {
     if (!targetChannel) {
       targetChannel = getLogChannelByGuild(guild);
     }
-
     if (!targetChannel) {
       console.warn(`[LOGS] No se pudo encontrar canal de destino para evento ${eventType} en ${guild.name}`);
       return;
     }
 
-    await targetChannel.send({ embeds: [embed] });
+    // Asegurarse que el canal existe y el bot tiene permisos
+    if (!targetChannel.id) {
+      console.warn(`[LOGS] Canal objetivo inválido para ${guild.name}`);
+      return;
+    }
+
+    let resolvedChannel = guild.channels.cache.get(targetChannel.id) || targetChannel;
+    if (!resolvedChannel) {
+      resolvedChannel = await guild.channels.fetch(targetChannel.id).catch(() => null);
+    }
+    if (!resolvedChannel) {
+      console.warn(`[LOGS] Canal ${targetChannel.id} no existe en ${guild.name}`);
+      return;
+    }
+
+    const me = guild.members.me || await guild.members.fetch(client.user.id).catch(() => null);
+    if (!me) {
+      console.warn('❌ No pude obtener la identidad del bot en el servidor.');
+      return;
+    }
+
+    const perms = me.permissionsIn(resolvedChannel);
+    if (!perms || !perms.has(PermissionsBitField.Flags.ViewChannel) || !perms.has(PermissionsBitField.Flags.SendMessages)) {
+      console.warn(`❌ Sin permisos para enviar en el canal ${resolvedChannel.id} de ${guild.name}`);
+      return;
+    }
+
+    await resolvedChannel.send({ embeds: [embed] });
   } catch (error) {
     console.error(`❌ Error enviando log [${eventType || 'general'}]:`, error);
   }
@@ -1550,6 +1764,22 @@ client.on('messageCreate', async (message) => {
     console.error('[AUTO-RESPUESTAS] Error:', arError);
   }
 
+  // Cierre rápido de ticket por texto en canales de ticket
+  try {
+    const cleanContent = (message.content || '').trim().toLowerCase().replace(/[.!?]+$/, '');
+    if (isTicketChannel(message.channel) && /^(ticket|tika)\s+(cerrar|close)$/.test(cleanContent)) {
+      if (hasStaffPermission(message.member, message.guild)) {
+        await closeTicketChannel(message.channel, message.member, async (replyOptions) => {
+          const safeOptions = { content: replyOptions.content, embeds: replyOptions.embeds };
+          await message.reply(safeOptions);
+        });
+        return;
+      }
+    }
+  } catch (closeError) {
+    console.error('Error en cierre rápido de ticket:', closeError);
+  }
+
   // COMANDO: !userfolder (prefijo) - Genera archivo TXT con la lista de usuarios
   if (message.content.toLowerCase().startsWith('!userfolder')) {
     try {
@@ -1602,6 +1832,42 @@ client.on('messageCreate', async (message) => {
       console.error('Error creando user folder (prefijo):', err);
       try { return message.reply({ content: '❌ Error creando la carpeta o el archivo. Revisa permisos.' }); } catch (e) { return; }
     }
+  }
+
+  // COMANDO: !sanciones - Ver sanciones registradas
+  if (message.content.toLowerCase().startsWith('!sanciones')) {
+    const member = message.member;
+    const hasPerm = member?.permissions?.has && (member.permissions.has(PermissionsBitField.Flags.ManageGuild) || member.permissions.has(PermissionsBitField.Flags.Administrator));
+    if (!hasPerm) {
+      return message.reply({ content: '❌ Necesitas permisos de administrador o "Gestionar el servidor" para ver el historial de sanciones.' });
+    }
+
+    const mentionMatch = message.content.match(/<@!?(\d+)>/);
+    const userId = mentionMatch ? mentionMatch[1] : null;
+    const records = getSanctionRecords(message.guild.id, userId);
+
+    if (!records || records.length === 0) {
+      return message.reply({ content: userId ? '❌ No se encontraron sanciones para ese usuario.' : '❌ No hay sanciones registradas en este servidor.' });
+    }
+
+    const lines = records.slice(-20).map((record, index) => {
+      const date = new Date(record.timestamp).toLocaleString('es-ES');
+      return `${index + 1}. [${date}] ${record.userTag} (${record.userId}) sancionado por ${record.moderatorTag || 'Sistema'} - ${record.reason}`;
+    });
+
+    if (lines.join('\n').length > 1800) {
+      if (!fs.existsSync(sanctionsFolderPath)) fs.mkdirSync(sanctionsFolderPath, { recursive: true });
+      const outputPath = path.join(sanctionsFolderPath, `sanciones_${message.guild.id}_${Date.now()}.txt`);
+      fs.writeFileSync(outputPath, lines.join('\n'), 'utf8');
+      try {
+        await message.reply({ content: `✅ Historial de sanciones generado.`, files: [outputPath] });
+      } catch (sendErr) {
+        await message.reply({ content: `✅ Historial de sanciones generado en archivo: ${outputPath}` });
+      }
+    } else {
+      await message.reply(lines.join('\n'));
+    }
+    return;
   }
 
   // COMANDO: !ban - Banear usuario de la sala de voz (solo propietario)
@@ -3321,32 +3587,59 @@ client.on('guildMemberAdd', async (member) => {
   }
 });
 
-// LOG: Usuario sale / Bot eliminado / Expulsado
+// LOG: Usuario sale / Bot eliminado / Expulsado / Baneado
 client.on('guildMemberRemove', async (member) => {
   let reason = 'Salió del servidor';
   let executor = 'N/A';
   const isBot = member.user.bot;
   let isKick = false;
+  let isBanned = false;
   
   try {
-    const auditLogs = await member.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberKick });
-    const kickLog = auditLogs.entries.first();
-    if (kickLog && kickLog.target.id === member.id && Date.now() - kickLog.createdTimestamp < 5000) {
+    // Primero intentar detectar kick (más común)
+    const kickLogs = await member.guild.fetchAuditLogs({ limit: 5, type: AuditLogEvent.MemberKick });
+    let kickLog = null;
+    for (const [id, entry] of kickLogs.entries) {
+      if (entry.target.id === member.id && Date.now() - entry.createdTimestamp < 5000) {
+        kickLog = entry;
+        break;
+      }
+    }
+    
+    if (kickLog) {
       reason = kickLog.reason || 'Sin razón';
       executor = kickLog.executor.tag;
       isKick = true;
+    } else {
+      // Si no fue kick, buscar ban
+      const banLogs = await member.guild.fetchAuditLogs({ limit: 5, type: AuditLogEvent.MemberBanAdd });
+      let banLog = null;
+      for (const [id, entry] of banLogs.entries) {
+        if (entry.target.id === member.id && Date.now() - entry.createdTimestamp < 5000) {
+          banLog = entry;
+          break;
+        }
+      }
+      
+      if (banLog) {
+        reason = banLog.reason || 'Sin razón';
+        executor = banLog.executor.tag;
+        isBanned = true;
+      }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Error leyendo audit logs en guildMemberRemove:', e);
+  }
   
   const embed = new EmbedBuilder()
-    .setTitle(isKick ? '👢 Miembro expulsado' : (isBot ? '➖ Bot Eliminado' : '👋 Usuario Salió'))
+    .setTitle(isBanned ? '🔨 Miembro baneado' : (isKick ? '👢 Miembro expulsado' : (isBot ? '➖ Bot Eliminado' : '👋 Usuario Salió')))
     .setDescription(`**Usuario:** ${member.user.tag} (${member.user.id})\n**Mención:** ${member}\n**Razón:** ${reason}\n**Ejecutor:** ${executor}`)
     .setThumbnail(member.user.displayAvatarURL())
-    .setColor(isKick ? 0xFFA500 : (isBot ? 0x7289DA : 0xFF0000))
+    .setColor(isBanned ? 0xFF0000 : (isKick ? 0xFFA500 : (isBot ? 0x7289DA : 0xFF0000)))
     .setFooter({ text: `Total de miembros: ${member.guild.memberCount}` })
     .setTimestamp();
   
-  await sendLogEmbed(member.guild, embed, isKick ? 'guildMemberKick' : 'guildMemberRemove');
+  await sendLogEmbed(member.guild, embed, isBanned ? 'guildBanAdd' : (isKick ? 'guildMemberKick' : 'guildMemberRemove'));
 });
 
 // LOG: Roles modificados / Miembro actualizado / Nickname / Timeout
@@ -4256,17 +4549,17 @@ client.on('interactionCreate', async (interaction) => {
           },
           {
             name: "🏠 Salas Privadas",
-            value: "`/voiceinterface` - Interfaz de salas\n`/setup` - Configurar salas\n`/createcategory` - Crear categoría\n`/rename` - Renombrar sala",
+            value: "`/voiceinterface` - Interfaz de salas\n`/setup` - Configurar salas\n`/createcategory` - Crear categoría\n`/rename` - Renombrar sala\n`/nick` - Cambiar apodo de un usuario",
             inline: false
           },
           {
             name: "🎫 Tickets",
-            value: "`/ticketpanel` - Panel de tickets",
+            value: "`/ticketpanel` - Panel de tickets\n`/ticketstaffrole` - Configurar rol de staff para tickets\n`/ticketlogchannel` - Canal de logs de tickets\n`/ticketclose` - Cerrar ticket actual",
             inline: false
           },
           {
             name: "🎧 Soporte de Voz",
-            value: "`/createsupportchannels` - Crear canales soporte\n`/addsupportrole` - Agregar roles soporte\n`/voicesupportnextrole` - Rol para !nex\n`/voicesanctionedrole` - Rol sancionado\n`/sanctionsupport` - Sancionar usuario",
+            value: "`/createsupportchannels` - Crear canales soporte\n`/addsupportrole` - Agregar roles soporte\n`/voicesupportnextrole` - Rol para !nex\n`/voicesanctionedrole` - Rol sancionado\n`/sanctionsupport` - Sancionar usuario\n`/sanctionhistory` - Ver historial de sanciones",
             inline: false
           },
           {
@@ -5346,6 +5639,39 @@ client.on('interactionCreate', async (interaction) => {
       }
     }
 
+    // /nick : cambia el apodo de un usuario o el tuyo
+    if (commandName === 'nick') {
+      const targetUser = interaction.options.getUser('usuario');
+      const newNick = interaction.options.getString('nuevo_nick');
+      const targetMember = targetUser
+        ? await interaction.guild.members.fetch(targetUser.id).catch(() => null)
+        : interaction.member;
+
+      if (!targetMember) {
+        return interaction.reply({ content: 'No pude encontrar al usuario indicado.', ephemeral: true });
+      }
+
+      const botMember = interaction.guild.members.me;
+      if (!botMember?.permissions.has(PermissionsBitField.Flags.ManageNicknames)) {
+        return interaction.reply({ content: '❌ No tengo permiso para cambiar apodos. Otorga el permiso Gestionar Apodos al bot.', ephemeral: true });
+      }
+
+      if (targetMember.id !== interaction.member.id) {
+        const canManage = interaction.member.permissions.has(PermissionsBitField.Flags.ManageNicknames) || interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+        if (!canManage) {
+          return interaction.reply({ content: '❌ Necesitas permisos para gestionar apodos de otros usuarios.', ephemeral: true });
+        }
+      }
+
+      try {
+        await targetMember.setNickname(newNick, `Cambio de apodo vía /nick por ${interaction.user.tag}`);
+        return interaction.reply({ content: `✅ Apodo de ${targetMember.user.tag} actualizado a **${newNick}**.`, ephemeral: true });
+      } catch (e) {
+        console.error('Error cambiando apodo:', e);
+        return interaction.reply({ content: '❌ No pude cambiar el apodo. Revisa mis permisos y la jerarquía de roles.', ephemeral: true });
+      }
+    }
+
     // /staffrole : gestión de roles de staff
     if (commandName === 'staffrole') {
       if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
@@ -5431,6 +5757,57 @@ client.on('interactionCreate', async (interaction) => {
       const row2 = new ActionRowBuilder().addComponents(removeMenu);
       
       return interaction.reply({ embeds: [embed], components: [row1, row2], ephemeral: true });
+    }
+
+    // /ticketstaffrole : asignar rol que puede ver/atender tickets
+    if (commandName === 'ticketstaffrole') {
+      if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        return interaction.reply({ content: '❌ Solo administradores pueden configurar el rol de tickets.', ephemeral: true });
+      }
+
+      const role = interaction.options.getRole('rol');
+      if (!role) {
+        return interaction.reply({ content: '❌ Debes seleccionar un rol válido.', ephemeral: true });
+      }
+
+      client.ticketStaffRole.set(interaction.guild.id, role.id);
+      saveStaffConfig();
+
+      return interaction.reply({ content: `✅ Rol de staff para tickets configurado: ${role}`, ephemeral: true });
+    }
+
+    // /ticketlogchannel : configurar canal de logs específico para tickets
+    if (commandName === 'ticketlogchannel') {
+      if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        return interaction.reply({ content: '❌ Solo administradores pueden configurar el canal de logs de tickets.', ephemeral: true });
+      }
+
+      const channel = interaction.options.getChannel('canal');
+      if (!channel || channel.type !== ChannelType.GuildText) {
+        return interaction.reply({ content: '❌ Debes seleccionar un canal de texto válido.', ephemeral: true });
+      }
+
+      const guildConfig = getTicketConfig(interaction.guild.id) || {};
+      guildConfig.ticketLogChannelId = channel.id;
+      setTicketConfig(interaction.guild.id, guildConfig);
+
+      return interaction.reply({ content: `✅ Canal de logs de tickets configurado: ${channel}`, ephemeral: true });
+    }
+
+    // /ticketclose : cerrar el ticket actual desde slash command
+    if (commandName === 'ticketclose') {
+      if (!hasStaffPermission(interaction.member, interaction.guild)) {
+        return interaction.reply({ content: '❌ No tienes permisos para cerrar este ticket.', ephemeral: true });
+      }
+
+      if (!isTicketChannel(interaction.channel)) {
+        return interaction.reply({ content: '❌ Este comando solo funciona dentro de un canal de ticket.', ephemeral: true });
+      }
+
+      await closeTicketChannel(interaction.channel, interaction.member, async (options) => {
+        await interaction.reply(options);
+      });
+      return;
     }
 
     // /addsupportrole [rol] [rol2] [rol3] [rol4] [rol5] : agregar roles adicionales a canales de soporte existentes
@@ -5540,6 +5917,47 @@ client.on('interactionCreate', async (interaction) => {
           ephemeral: true 
         });
       }
+    }
+
+    // /sanctionhistory [usuario] : ver historial de sanciones de un usuario o del servidor
+    if (commandName === 'sanctionhistory') {
+      if (!hasStaffPermission(interaction.member, interaction.guild)) {
+        return interaction.reply({ content: '❌ No tienes permisos para usar este comando.', ephemeral: true });
+      }
+
+      const targetUser = interaction.options.getUser('usuario');
+      const records = getSanctionRecords(interaction.guild.id, targetUser?.id);
+
+      if (!records || records.length === 0) {
+        return interaction.reply({ content: targetUser ? `✅ ${targetUser.tag} no tiene sanciones registradas.` : '✅ No hay sanciones registradas en este servidor.', ephemeral: true });
+      }
+
+      const lines = records.map((record, index) => {
+        const date = new Date(record.timestamp).toLocaleString('es-ES');
+        return `**${index + 1}.** [${date}] ${record.userTag} (${record.userId}) - ${record.reason} - *Sancionado por:* ${record.moderatorTag}`;
+      });
+
+      const title = targetUser ? `Historial de sanciones de ${targetUser.tag}` : `Historial de sanciones del servidor`;
+      const embed = new EmbedBuilder()
+        .setTitle(`📋 ${title}`)
+        .setColor(0xFF6B00)
+        .setTimestamp();
+
+      const text = lines.join('\n\n');
+      if (text.length > 1800 || lines.length > 10) {
+        if (!fs.existsSync(sanctionsFolderPath)) fs.mkdirSync(sanctionsFolderPath, { recursive: true });
+        const outputPath = path.join(sanctionsFolderPath, `sanctionhistory_${interaction.guild.id}_${Date.now()}.txt`);
+        fs.writeFileSync(outputPath, text, 'utf8');
+        try {
+          return interaction.reply({ content: `✅ Historial generado en archivo.`, files: [outputPath], ephemeral: true });
+        } catch (fileError) {
+          console.error('Error enviando archivo de historial:', fileError);
+          return interaction.reply({ content: `✅ Historial generado en: ${outputPath}`, ephemeral: true });
+        }
+      }
+
+      embed.setDescription(text);
+      return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 
     // /voicesupportnextrole [rol] : configurar rol que puede usar el comando !nex
@@ -6470,7 +6888,10 @@ client.on('interactionCreate', async (interaction) => {
         .setDescription("Comandos para el sistema de tickets:")
         .addFields(
           { name: "`/ticketpanel`", value: "Crear panel de tickets", inline: true },
-          { name: "`/generatehtml`", value: "Generar HTML de ticket", inline: true }
+          { name: "`/generatehtml`", value: "Generar HTML de ticket", inline: true },
+          { name: "`/ticketstaffrole`", value: "Configurar rol de staff de tickets", inline: true },
+          { name: "`/ticketlogchannel`", value: "Configurar canal de logs de tickets", inline: true },
+          { name: "`/ticketclose`", value: "Cerrar ticket actual", inline: true }
         )
         .setFooter({ text: "Usa /help para volver al menú principal" })
         .setTimestamp();
@@ -6780,7 +7201,10 @@ client.on('interactionCreate', async (interaction) => {
     // Ticket: crear (con o sin pregunta)
     if (interaction.customId.startsWith('create_ticket')) {
       console.log(`[TICKETS] Botón de ticket presionado por ${interaction.user.tag}`);
-      const match = interaction.customId.match(/^create_ticket(?:_q)?(\d+)$/);
+      const rawCustomId = interaction.customId;
+      const customId = typeof rawCustomId === 'string' ? rawCustomId.trim() : String(rawCustomId).trim();
+      console.log(`[TICKETS] raw customId=${JSON.stringify(rawCustomId)} len=${String(rawCustomId).length} trimmed=${JSON.stringify(customId)} len=${customId.length}`);
+      const match = customId.match(/^create_ticket(?:_q)?(\d+)$/i) || customId.match(/(\d+)/);
       const buttonIndex = match ? match[1] : null;
       
       // Cargar configuración desde el archivo JSON
@@ -6798,38 +7222,40 @@ client.on('interactionCreate', async (interaction) => {
         console.log('[TICKETS] Buscando panel en el servidor...');
         try {
           const textChannels = interaction.guild.channels.cache.filter(ch => ch.type === ChannelType.GuildText);
+          let foundPanel = false;
           for (const [, channel] of textChannels) {
+            if (foundPanel) break;
             try {
               const messages = await channel.messages.fetch({ limit: 50 });
               for (const [, message] of messages) {
                 if (message.embeds.length > 0 && message.embeds[0].title === '🎫 Centro de Soporte') {
                   const components = message.components.flatMap(row => row.components);
                   const ticketButtons = components.filter(c => c.customId?.startsWith('create_ticket'));
-                  
+
                   if (ticketButtons.length > 0) {
                     const buttonConfigs = ticketButtons.map((btn, i) => {
                       const btnMatch = btn.customId.match(/^create_ticket(?:_q)?(\d+)$/);
                       const idx = btnMatch ? btnMatch[1] : '0';
                       return { name: btn.label, index: parseInt(idx) || i, question: null };
                     });
-                    
+
                     // Guardar en archivo JSON
                     const guildConfigToSave = getTicketConfig(interaction.guild.id) || {};
                     guildConfigToSave.panelConfigs = buttonConfigs;
                     guildConfigToSave.panelMessage = message.embeds[0].description?.split('\n\n')[0] || null;
                     setTicketConfig(interaction.guild.id, guildConfigToSave);
-                    
+
                     guildConfig = guildConfigToSave;
                     panelMessageFromConfig = guildConfig.panelMessage || null;
                     if (buttonIndex !== null) {
                       buttonConfig = guildConfig.panelConfigs.find(c => String(c.index) === buttonIndex || (buttonIndex === '' && c.index === 0));
                     }
                     console.log('[TICKETS] Panel encontrado y guardado automáticamente en JSON');
+                    foundPanel = true;
                     break;
                   }
                 }
               }
-              if (configJson) break;
             } catch (e) {
               // Ignorar errores al buscar en canales
             }
@@ -6839,14 +7265,14 @@ client.on('interactionCreate', async (interaction) => {
         }
       }
 
-      if (!buttonIndex) {
+      if (!match) {
         console.warn('[TICKETS] CustomId de ticket inválido:', interaction.customId);
-        return interaction.reply({ content: '❌ Error interno: no pude identificar el botón de ticket.', ephemeral: true });
+        return interaction.reply({ content: '❌ Error interno: no pude identificar el botón de ticket.', flags: 64 });
       }
 
       if (!buttonConfig) {
         console.warn('[TICKETS] No se encontró configuración para el botón:', interaction.customId, 'guild:', interaction.guild.id);
-        return interaction.reply({ content: '❌ No pude cargar la configuración del ticket. Vuelve a crear el panel.', ephemeral: true });
+        return interaction.reply({ content: '❌ No pude cargar la configuración del ticket. Vuelve a crear el panel.', flags: 64 });
       }
 
       if (buttonConfig.question) {
@@ -6872,9 +7298,20 @@ client.on('interactionCreate', async (interaction) => {
           await interaction.showModal(modal);
         } catch (error) {
           console.error('[TICKETS] Error mostrando modal:', error);
-          return interaction.reply({ content: '❌ No pude abrir el formulario. Comprueba los permisos del bot.', ephemeral: true });
+          return interaction.reply({ content: '❌ No pude abrir el formulario. Comprueba los permisos del bot.', flags: 64 });
         }
         return;
+      }
+
+      if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+        console.warn('[TICKETS] El bot no tiene permiso Gestionar Canales en este servidor.');
+        return interaction.reply({ content: '❌ Necesito el permiso "Gestionar Canales" para crear tickets.', flags: 64 });
+      }
+
+      try {
+        await interaction.deferReply({ flags: 64 });
+      } catch (error) {
+        console.error('[TICKETS] Error al deferReply antes de crear el ticket:', error);
       }
 
       try {
@@ -6894,7 +7331,7 @@ client.on('interactionCreate', async (interaction) => {
             console.log(`[TICKETS] ✅ Categoría "${category.name}" creada exitosamente (ID: ${category.id})`);
           } catch (categoryError) {
             console.error(`[TICKETS] ❌ Error creando categoría:`, categoryError);
-            return interaction.reply({ content: '❌ Error al crear la categoría de tickets. Verifica los permisos del bot.', ephemeral: true });
+            return interaction.editReply({ content: '❌ Error al crear la categoría de tickets. Verifica los permisos del bot.' });
           }
         } else {
           console.log(`[TICKETS] Usando categoría existente: ${category.name} (ID: ${category.id})`);
@@ -6902,6 +7339,7 @@ client.on('interactionCreate', async (interaction) => {
         
         const parentId = category.id;
         console.log(`[TICKETS] Creando ticket para ${interaction.user.username} en categoría ${parentId}...`);
+        console.log('[TICKETS] Categoría permisos:', category.permissionOverwrites.cache.map(o => ({ id: o.id, allow: o.allow?.toArray?.(), deny: o.deny?.toArray?.() })));
         
         try {
           // Construir permisos base
@@ -6910,28 +7348,47 @@ client.on('interactionCreate', async (interaction) => {
             { id: interaction.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] }
           ];
           
+          const staffRoleIds = guildConfig?.ticketStaffRoles || [];
+          console.log('[TICKETS] Roles configurados en ticketConfig:', staffRoleIds);
+
           // Añadir roles de staff configurados para que vean los tickets
-          if (guildConfig && guildConfig.ticketStaffRoles && guildConfig.ticketStaffRoles.length > 0) {
-            guildConfig.ticketStaffRoles.forEach(roleId => {
+          if (staffRoleIds.length > 0) {
+            staffRoleIds.forEach(roleId => {
               if (interaction.guild.roles.cache.has(roleId)) {
                 permOverwrites.push({
                   id: roleId,
-                  allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageMessages]
+                  allow: [
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages,
+                    PermissionsBitField.Flags.ReadMessageHistory,
+                    PermissionsBitField.Flags.ManageMessages
+                  ]
                 });
+              } else {
+                console.warn('[TICKETS] Rol configurado no encontrado en guild.roles.cache:', roleId);
               }
             });
           }
           // También añadir el rol de staff principal si existe y no está en la lista
           const mainStaffRoleId = client.ticketStaffRole.get(interaction.guild.id);
+          console.log('[TICKETS] Rol principal de tickets (mainStaffRoleId):', mainStaffRoleId);
           if (mainStaffRoleId && !permOverwrites.find(p => p.id === mainStaffRoleId)) {
             if (interaction.guild.roles.cache.has(mainStaffRoleId)) {
               permOverwrites.push({
                 id: mainStaffRoleId,
-                allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageMessages]
+                allow: [
+                  PermissionsBitField.Flags.ViewChannel,
+                  PermissionsBitField.Flags.SendMessages,
+                  PermissionsBitField.Flags.ReadMessageHistory,
+                  PermissionsBitField.Flags.ManageMessages
+                ]
               });
+            } else {
+              console.warn('[TICKETS] Rol principal de tickets no encontrado en guild.roles.cache:', mainStaffRoleId);
             }
           }
 
+          console.log('[TICKETS] permissionOverwrites antes de crear canal:', permOverwrites);
           const channel = await interaction.guild.channels.create({
             name: `ticket-${interaction.user.id}`,
             type: ChannelType.GuildText,
@@ -6939,6 +7396,7 @@ client.on('interactionCreate', async (interaction) => {
             permissionOverwrites: permOverwrites
           });
           console.log(`[TICKETS] ✅ Ticket creado exitosamente: ${channel.name} (ID: ${channel.id})`);
+          console.log('[TICKETS] Canal permisos tras creación:', channel.permissionOverwrites.cache.map(o => ({ id: o.id, allow: o.allow?.toArray?.(), deny: o.deny?.toArray?.() })));
 
           const closeRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId('close_ticket').setLabel('Cerrar Ticket').setStyle(ButtonStyle.Danger).setEmoji('🔒')
@@ -6951,9 +7409,17 @@ client.on('interactionCreate', async (interaction) => {
               { name: '�📌 Solicitante', value: `${interaction.user}`, inline: false }
             )
             .setColor(0x2ECC71);
-          const staffRoleId = client.ticketStaffRole.get(interaction.guild.id);
-          const mention = staffRoleId ? ` <@&${staffRoleId}>` : '';
-          await channel.send({ content: `${interaction.user}${mention}`, embeds: [embed], components: [closeRow] });
+          const mentionRoleIds = new Set();
+          if (guildConfig && guildConfig.ticketStaffRoles) {
+            guildConfig.ticketStaffRoles.forEach(roleId => mentionRoleIds.add(roleId));
+          }
+          if (mainStaffRoleId) mentionRoleIds.add(mainStaffRoleId);
+          const mention = Array.from(mentionRoleIds)
+            .filter(roleId => interaction.guild.roles.cache.has(roleId))
+            .map(roleId => `<@&${roleId}>`)
+            .join(' ');
+          const mentionText = mention ? ` ${mention}` : '';
+          await channel.send({ content: `${interaction.user}${mentionText}`, embeds: [embed], components: [closeRow] });
           
           // Generar ICO y HTML del ticket al crearlo
           const ticketName = `ticket-${interaction.user.id}`;
@@ -6972,15 +7438,20 @@ client.on('interactionCreate', async (interaction) => {
           await sendSecurityLog(interaction.guild, logEmbed, htmlPath);
           
           console.log(`[TICKETS] ✅ Proceso completo finalizado para ${interaction.user.tag}`);
-          return interaction.reply({ content: `✅ Tu ticket ha sido creado: ${channel}`, ephemeral: true });
+          return interaction.editReply({ content: `✅ Tu ticket ha sido creado: ${channel}` });
         } catch (channelError) {
           console.error(`[TICKETS] ❌ Error creando canal de ticket:`, channelError);
-          return interaction.reply({ content: '❌ Error al crear el ticket. Verifica los permisos del bot.', ephemeral: true });
+          return interaction.editReply({ content: '❌ Error al crear el ticket. Verifica los permisos del bot.' });
         }
       } catch (e) {
         console.error('[TICKETS] ❌ Error general creando ticket:', e);
         console.error('[TICKETS] Stack trace:', e.stack);
-        return interaction.reply({ content: '❌ No pude crear el ticket. Revisa los logs del bot.', ephemeral: true });
+        try {
+          return interaction.editReply({ content: '❌ No pude crear el ticket. Revisa los logs del bot.' });
+        } catch (editError) {
+          console.error('[TICKETS] Error editando reply después de fallo:', editError);
+          return; 
+        }
       }
     }
 
@@ -6996,7 +7467,7 @@ client.on('interactionCreate', async (interaction) => {
           .setColor(0xFFA500);
 
         await ticketChannel.send({ embeds: [closeEmbed] });
-        await interaction.reply({ content: 'El ticket se cerrará en 5 segundos.', ephemeral: true });
+        await interaction.reply({ content: 'El ticket se cerrará en 5 segundos.', flags: 64 });
 
         // Generar HTML y PDF del ticket antes de cerrarlo
         console.log(`🔍 Debug - Iniciando generación de HTML para ticket: ${ticketName}`);
@@ -7889,15 +8360,57 @@ client.on('interactionCreate', async (interaction) => {
         }
 
         const channelName = `ticket-${user.id}-${ticketAnswer.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 20)}`;
+        const permOverwrites = [
+          { id: interaction.guild.roles.everyone.id, deny: [PermissionsBitField.Flags.ViewChannel] },
+          { id: user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] }
+        ];
+
+        const staffRoleIds = guildConfig?.ticketStaffRoles || [];
+        console.log('[TICKETS] ticket_modal staff roles:', staffRoleIds);
+        if (staffRoleIds.length > 0) {
+          staffRoleIds.forEach(roleId => {
+            if (interaction.guild.roles.cache.has(roleId)) {
+              permOverwrites.push({
+                id: roleId,
+                allow: [
+                  PermissionsBitField.Flags.ViewChannel,
+                  PermissionsBitField.Flags.SendMessages,
+                  PermissionsBitField.Flags.ReadMessageHistory,
+                  PermissionsBitField.Flags.ManageMessages
+                ]
+              });
+            } else {
+              console.warn('[TICKETS] ticket_modal rol no encontrado en guild.roles.cache:', roleId);
+            }
+          });
+        }
+
+        const mainStaffRoleId = client.ticketStaffRole.get(interaction.guild.id);
+        console.log('[TICKETS] ticket_modal mainStaffRoleId:', mainStaffRoleId);
+        if (mainStaffRoleId && !permOverwrites.find(p => p.id === mainStaffRoleId)) {
+          if (interaction.guild.roles.cache.has(mainStaffRoleId)) {
+            permOverwrites.push({
+              id: mainStaffRoleId,
+              allow: [
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ReadMessageHistory,
+                PermissionsBitField.Flags.ManageMessages
+              ]
+            });
+          } else {
+            console.warn('[TICKETS] ticket_modal rol principal no encontrado en guild.roles.cache:', mainStaffRoleId);
+          }
+        }
+
+        console.log('[TICKETS] ticket_modal permissionOverwrites antes de crear canal:', permOverwrites);
         const channel = await interaction.guild.channels.create({
           name: channelName,
           type: ChannelType.GuildText,
           parent: category.id,
-          permissionOverwrites: [
-            { id: interaction.guild.roles.everyone.id, deny: [PermissionsBitField.Flags.ViewChannel] },
-            { id: user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] }
-          ]
+          permissionOverwrites: permOverwrites
         });
+        console.log('[TICKETS] ticket_modal canal creado con permisos:', channel.permissionOverwrites.cache.map(o => ({ id: o.id, allow: o.allow?.toArray?.(), deny: o.deny?.toArray?.() })));
 
         const closeRow = new ActionRowBuilder().addComponents(
           new ButtonBuilder().setCustomId('close_ticket').setLabel('Cerrar Ticket').setStyle(ButtonStyle.Danger).setEmoji('🔒')

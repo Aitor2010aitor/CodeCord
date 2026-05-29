@@ -40,6 +40,20 @@ const commands = [
     .addStringOption(opt => opt.setName('mensaje').setDescription('Mensaje que se mostrará en el panel de tickets').setRequired(false))
     .toJSON(),
   new SlashCommandBuilder()
+    .setName('ticketstaffrole')
+    .setDescription('Configurar el rol de staff que puede ver y atender tickets')
+    .addRoleOption(opt => opt.setName('rol').setDescription('Rol de staff para tickets').setRequired(true))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('ticketlogchannel')
+    .setDescription('Configurar el canal de logs para tickets')
+    .addChannelOption(opt => opt.setName('canal').setDescription('Canal de texto para logs de tickets').setRequired(true))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('ticketclose')
+    .setDescription('Cerrar el ticket actual desde slash command')
+    .toJSON(),
+  new SlashCommandBuilder()
     .setName('ban')
     .setDescription('Banear a un usuario')
     .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
@@ -57,6 +71,12 @@ const commands = [
     .setName('rename')
     .setDescription('Renombrar tu sala de voz actual')
     .addStringOption(opt => opt.setName('nombre').setDescription('Nuevo nombre de la sala').setRequired(true))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('nick')
+    .setDescription('Cambiar el apodo de un usuario del servidor')
+    .addStringOption(opt => opt.setName('nuevo_nick').setDescription('Nuevo apodo').setRequired(true))
+    .addUserOption(opt => opt.setName('usuario').setDescription('Usuario cuyo apodo cambiar').setRequired(false))
     .toJSON(),
   new SlashCommandBuilder()
     .setName('staffrole')
@@ -100,6 +120,11 @@ const commands = [
     .setDescription('Sancionar un usuario de soporte de voz')
     .addUserOption(opt => opt.setName('usuario').setDescription('Usuario a sancionar').setRequired(true))
     .addStringOption(opt => opt.setName('motivo').setDescription('Motivo de la sanción').setRequired(false))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('sanctionhistory')
+    .setDescription('Ver historial de sanciones de soporte de voz')
+    .addUserOption(opt => opt.setName('usuario').setDescription('Usuario para ver historial').setRequired(false))
     .toJSON(),
   new SlashCommandBuilder()
     .setName('voiceadmin')
@@ -311,11 +336,6 @@ const commands = [
         { name: '⚽ Deportes', value: 'deportes' },
         { name: '🎲 Random', value: 'random' }
       ))
-    .toJSON(),
-  new SlashCommandBuilder()
-    .setName('sanctionhistory')
-    .setDescription('Ver historial de sanciones de un usuario')
-    .addUserOption(opt => opt.setName('usuario').setDescription('Usuario').setRequired(true))
     .toJSON(),
   new SlashCommandBuilder()
     .setName('sugerencia')
