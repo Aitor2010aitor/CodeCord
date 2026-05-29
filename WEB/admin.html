@@ -2319,14 +2319,17 @@
         }
 
         async function loadMembers(guildId, after = null, reset = false) {
-            if (!guildId) return;
+            if (!guildId) return false;
             if (reset) resetMembersPagination();
             const body = document.getElementById('members-body');
             body.innerHTML = '<tr><td colspan="4" class="loading"><div class="spinner"></div>Cargando miembros...</td></tr>';
             try {
                 const params = new URLSearchParams({ limit: membersPageSize });
-                if (after !== null) params.append('after', after);
+                if (after != null && after !== '') params.append('after', after);
                 const res = await fetch(`/api/guilds/${guildId}/members?${params.toString()}`);
+                if (!res.ok) {
+                    throw new Error(`Error ${res.status}`);
+                }
                 const data = await res.json();
                 const members = Array.isArray(data.members) ? data.members : data;
                 membersPagination.hasMore = data.hasMore || false;
@@ -2337,6 +2340,36 @@
                 } else if (membersPagination.afterStack[membersPagination.afterStack.length - 1] !== after) {
                     membersPagination.afterStack.push(after);
                 }
+                let html = '';
+                members.forEach(m => {
+                    const date = new Date(m.joinedAt).toLocaleDateString('es-ES');
+                    const rolesHtml = (m.roleList || []).slice(0, 4).map(r =>
+                        `<span onclick="showRoleInfo('${guildId}','${r.id}')" style="display:inline-block;background:${r.color === '#000000' ? '#4f545c' : r.color};color:white;font-size:0.7rem;padding:2px 8px;border-radius:10px;margin:2px;cursor:pointer;">${r.name}</span>`
+                    ).join('');
+                    html += `<tr>
+                        <td style="cursor:pointer;" onclick="showMemberProfile('${guildId}','${m.id}')">
+                            <div class="member-row">
+                                <img src="${m.avatar}" class="member-avatar">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--accent);">${m.tag}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">${m.nickname || ''}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="color: var(--text-muted); font-size: 0.85rem;">${m.id}</td>
+                        <td>${rolesHtml}<span style="font-size:0.75rem;color:var(--text-muted);">${m.roles > 4 ? ' +' + (m.roles - 4) + ' más' : ''}</span></td>
+                        <td>${date}</td>
+                    </tr>`;
+                });
+                body.innerHTML = members.length > 0 ? html : '<tr><td colspan="4" style="text-align: center; padding: 20px;">No hay miembros por mostrar</td></tr>';
+                updateMembersPaginationControls();
+                return true;
+            } catch (e) {
+                console.error('Error cargando miembros:', e);
+                body.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--danger);">Error cargando miembros</td></tr>';
+                showToast('❌ Error cargando miembros', 'error');
+                return false;
+            }
                 let html = '';
                 members.forEach(m => {
                     const date = new Date(m.joinedAt).toLocaleDateString('es-ES');
@@ -2371,18 +2404,21 @@
             document.getElementById('members-next-btn').disabled = !membersPagination.hasMore;
         }
 
-        function goMembersNext() {
+        async function goMembersNext() {
             if (!membersPagination.hasMore || !membersPagination.nextAfter) return;
-            membersPagination.page += 1;
-            loadMembers(currentGuildId, membersPagination.nextAfter);
+            const after = membersPagination.nextAfter;
+            const success = await loadMembers(currentGuildId, after);
+            if (success) {
+                membersPagination.page += 1;
+            }
         }
 
-        function goMembersPrev() {
+        async function goMembersPrev() {
             if (membersPagination.page <= 1) return;
             membersPagination.page -= 1;
             membersPagination.afterStack.pop();
             const prevAfter = membersPagination.afterStack[membersPagination.page - 1] || null;
-            loadMembers(currentGuildId, prevAfter);
+            await loadMembers(currentGuildId, prevAfter);
         }
 
         async function showMemberProfile(guildId, memberId) {
