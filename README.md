@@ -1,21 +1,20 @@
 # 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
 
 ---
-
-## 🔧 Versión 3.0
-
-### 🆕 Novedades de esta versión
-
-#### 🎉 Nueva Zona de Sorteos
-
-Hemos añadido un completo sistema de sorteos integrado tanto en Discord como en el Panel Web Administrativo.
-
-#### 👥 Lista de Miembros Mejorada
-
-* Se solucionó un problema en la paginación de la lista de miembros del panel web.
-* Antes, al pasar a la siguiente página, aparecían repetidos los mismos usuarios.
-* Ahora cada página carga correctamente los miembros correspondientes sin duplicados y con una navegación más estable y optimizada.
-
+> [!IMPORTANT]  
+> ## 🔧 Versión 3.0  
+>   
+> ### 🆕 Novedades de esta versión  
+>   
+> #### 🎉 Nueva Zona de Sorteos  
+>   
+> Hemos añadido un completo sistema de sorteos integrado tanto en Discord como en el Panel Web Administrativo.  
+>   
+> #### 👥 Lista de Miembros Mejorada  
+>   
+> * Se solucionó un problema en la paginación de la lista de miembros del panel web.  
+> * Antes, al pasar a la siguiente página, aparecían repetidos los mismos usuarios.  
+> * Ahora cada página carga correctamente los miembros correspondientes sin duplicados y con una navegación más estable y optimizada.  
 
 ---
 
