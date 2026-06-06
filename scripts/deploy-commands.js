@@ -3,9 +3,11 @@ const { SlashCommandBuilder, REST, Routes, PermissionsBitField } = require('disc
 
 // Asegurar valores limpios
 const DEPLOY_CLIENT_ID = (process.env.CLIENT_ID || '').toString().trim();
-// Extraer primera secuencia válida de 17-19 dígitos para evitar duplicados o ruido
-const guildMatch = (process.env.GUILD_ID || '').toString().match(/\d{17,19}/);
-const DEPLOY_GUILD_ID = guildMatch ? guildMatch[0] : (process.env.GUILD_ID || '').toString().trim();
+const GUILD_IDS = [
+  process.env.GUILD_ID_1?.toString().trim(),
+  process.env.GUILD_ID_2?.toString().trim(),
+  process.env.GUILD_ID_3?.toString().trim()
+].filter(Boolean);
 
 const commands = [
   new SlashCommandBuilder()
@@ -349,11 +351,21 @@ const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 (async () => {
   try {
     console.log('Registrando comandos slash...');
-    await rest.put(
-      Routes.applicationGuildCommands(DEPLOY_CLIENT_ID, DEPLOY_GUILD_ID),
-      { body: commands }
-    );
-    console.log('Comandos registrados correctamente.');
+    if (GUILD_IDS.length > 0) {
+      for (const guildId of GUILD_IDS) {
+        await rest.put(
+          Routes.applicationGuildCommands(DEPLOY_CLIENT_ID, guildId),
+          { body: commands }
+        );
+        console.log(`Comandos registrados correctamente en el servidor ${guildId}`);
+      }
+    } else {
+      await rest.put(
+        Routes.applicationCommands(DEPLOY_CLIENT_ID),
+        { body: commands }
+      );
+      console.log('Comandos registrados globalmente.');
+    }
   } catch (error) {
     console.error('Error registrando comandos:', error);
   }

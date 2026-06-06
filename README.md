@@ -1,20 +1,21 @@
 # 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
 
 ---
+
 > [!IMPORTANT]  
-> ## 🔧 Versión 3.0  
+> ## 🔧 Versión 3.5  
 >   
-> ### 🆕 Novedades de esta versión  
+> ### 🔄 Cambios recientes aplicados  
 >   
-> #### 🎉 Nueva Zona de Sorteos  
->   
-> Hemos añadido un completo sistema de sorteos integrado tanto en Discord como en el Panel Web Administrativo.  
->   
-> #### 👥 Lista de Miembros Mejorada  
->   
-> * Se solucionó un problema en la paginación de la lista de miembros del panel web.  
-> * Antes, al pasar a la siguiente página, aparecían repetidos los mismos usuarios.  
-> * Ahora cada página carga correctamente los miembros correspondientes sin duplicados y con una navegación más estable y optimizada.  
+> * Se mejoró el despliegue de comandos slash para que funcione en varios servidores.  
+> * Se corrigió el archivo `.env` para usar `GUILD_ID_1` y `GUILD_ID_2` en lugar de variables duplicadas.  
+> * Se añadió la opción de registrar comandos por servidor rápidamente y también la opción global si no hay IDs definidos.  
+> * Se validó el archivo `scripts/deploy-commands.js` y se confirmó que no tiene errores de sintaxis.  
+> * Se indicó que el token del bot debe ser válido en `BOT_TOKEN` para evitar el error `TokenInvalid`.  
+> * Se corrigió un error de auto-respuestas que aparecía en los logs al guardar triggers.  
+> * Se mejoró la visualización del panel de tickets en el README y en la sección de configuración de tickets.  
+
+
 
 ---
 
@@ -35,8 +36,9 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 
 Se divide en tres pestañas diseñadas para el control total del soporte técnico del servidor:
 
-* **Lista**: Muestra el historial de tickets creados. Permite ver y descargar transcripciones de tickets anteriores directamente en formato **PDF profesional** generado al instante.
-* **Crear Panel**: Permite escribir el mensaje informativo para el canal de soporte, seleccionar el canal de destino del panel y el canal donde irán los logs de tickets. Puedes añadir hasta **5 botones interactivos** y decidir si cada botón abrirá un formulario de pregunta para el usuario. La configuración se guarda de forma persistente.
+* **Lista**: Muestra el historial de tickets creados. Permite ver y descargar transcripciones de tickets anteriores directamente en formato **HTML  profesional** generado al instante.
+* **escribir el mensaje informativo para el canal de soporte, seleccionar el canal de destino del panel y el canal dondeCrear Panel**: Permite  irán los logs de tickets. Puedes añadir hasta **5 botones interactivos** y decidir si cada botón abrirá un formulario de pregunta para el usuario. La configuración se guarda de forma persistente.
+* **Visualización del Panel**: Antes de publicar el panel de tickets, puedes ver una vista previa de cómo quedará el panel dentro de la categoría de tickets, incluyendo los botones añadidos y el diseño final.
 * **Configuración (Roles de Staff)**: Permite asignar qué rol de staff será el principal (mencionado al abrir un soporte) y qué roles adicionales tendrán permisos automáticos de lectura y escritura en los canales de tickets.
 
 ### 3. 🎉 Sistema de Sorteos
@@ -56,6 +58,7 @@ Nueva sección dedicada a la gestión avanzada de giveaways y eventos del servid
 * Permite crear disparadores (triggers) inteligentes para que el bot responda automáticamente cuando un usuario escriba una palabra o frase concreta.
 * **Soporte de Texto o Embed**: Puedes elegir si el bot responderá con un mensaje de texto simple (con soporte para múltiples respuestas aleatorias) o con un **Embed de Discord** completamente estructurado (título, descripción, color de borde, miniaturas, imágenes y pie de página).
 * **Vista Previa en Tiempo Real (Discord Live Preview)**: Recreación interactiva exacta del cliente de Discord para visualizar en tiempo real cómo lucirá tu respuesta (texto o embed) mientras la configuras.
+* **Corrección de errores de logs**: Se ajustó el sistema de auto-respuestas para eliminar el error que aparecía en los registros cuando se guardaba una respuesta automática.
 * **Filtros**: Permite restringir en qué canales de Discord funcionará cada auto-respuesta y qué roles tienen permitido (o denegado) activarla. Seleccionables mediante una interfaz multitarea mejorada (haciendo clic simple para marcar/desmarcar elementos).
 
 ### 5. 📢 Constructor de Embeds (Embed Builder)

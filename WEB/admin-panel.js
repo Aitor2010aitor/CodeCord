@@ -4,6 +4,7 @@
 require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
+const configManager = require('../scripts/config-manager.js');
 const path = require('path');
 const os = require('os');
 
@@ -11,8 +12,8 @@ const os = require('os');
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: 'lik_qui',
-    port: puerto_aqui ,
+    url: '',
+    port: 22300,
     requireDiscordAuth: false
 };
 
@@ -269,7 +270,7 @@ app.use((req, res, next) => {
 });
 
 // Ruta para subir imágenes
-app.post('/api/upload', upload. single('image'), (req, res) => {
+app.post('/api/upload', upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No se subió ninguna imagen' });
     const imageUrl = `/uploads/${req.file.filename}`;
     res.json({ url: imageUrl });
@@ -395,6 +396,129 @@ app.get('/api/tickets', (req, res) => {
     res.json(logs);
 });
 
+// Endpoint: Listar tickets activos (canales abiertos) de un servidor
+app.get('/api/guilds/:guildId/active-tickets', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+
+        const ticketChannels = guild.channels.cache.filter(c =>
+            c.type === 0 && // GuildText
+            c.name.startsWith('ticket-')
+        );
+
+        const allTickets = ticketChannels.map(ch => {
+            // Extraer userId del nombre del canal (ticket-{userId} o ticket-{userId}-{texto})
+            const parts = ch.name.replace('ticket-', '').split('-');
+            const userId = parts[0];
+            const member = guild.members.cache.get(userId);
+            
+            let userAvatar = null;
+            if (member) {
+                userAvatar = member.user.displayAvatarURL({ size: 128 }) || member.user.defaultAvatarURL;
+            } else {
+                userAvatar = `https://cdn.discordapp.com/embed/avatars/0.png`;
+            }
+            
+            return {
+                channelId: ch.id,
+                channelName: ch.name,
+                userId: userId,
+                userName: member ? member.user.tag : `Usuario#${userId}`,
+                userAvatar: userAvatar,
+                categoryName: ch.parent ? ch.parent.name : 'Sin categoría',
+                createdAt: ch.createdAt ? ch.createdAt.toISOString() : null
+            };
+        }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        const total = allTickets.length;
+        const tickets = allTickets.slice(offset, offset + limit);
+        const hasMore = offset + limit < total;
+
+        res.json({
+            tickets: tickets,
+            pagination: {
+                page: page,
+                limit: limit,
+                total: total,
+                hasMore: hasMore,
+                totalPages: Math.ceil(total / limit)
+            }
+        });
+    } catch (e) {
+        console.error('Error obteniendo tickets activos:', e);
+        res.status(500).json({ error: 'Error obteniendo tickets activos' });
+    }
+});
+
+// Endpoint: Cerrar un ticket activo desde el panel de admin
+app.post('/api/guilds/:guildId/close-ticket', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const { channelId } = req.body;
+    if (!channelId) return res.status(400).json({ error: 'channelId requerido' });
+
+    try {
+        const channel = guild.channels.cache.get(channelId);
+        if (!channel) return res.status(404).json({ error: 'Canal de ticket no encontrado' });
+
+        // Generar log del ticket antes de cerrar
+        const { EmbedBuilder } = require('discord.js');
+        try {
+            const messages = await channel.messages.fetch({ limit: 100 });
+            const transcript = messages.reverse().map(m =>
+                `[${m.createdAt.toLocaleString('es-ES')}] ${m.author.tag}: ${m.content || '(embed/archivo)'}`
+            ).join('\n');
+
+            const fs = require('fs');
+            const path = require('path');
+            const ticketsDir = path.join(__dirname, '..', 'tickets');
+            if (!fs.existsSync(ticketsDir)) fs.mkdirSync(ticketsDir, { recursive: true });
+
+            const fileName = `ticket_${channel.name}_${Date.now()}.html`;
+            const htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${channel.name}</title>
+<style>body{font-family:Arial;background:#1a1a2e;color:#eee;padding:20px;max-width:800px;margin:0 auto}
+.msg{margin:8px 0;padding:8px 12px;background:#16213e;border-radius:6px;border-left:3px solid #5865F2}
+.time{color:#888;font-size:0.8rem}.author{color:#5865F2;font-weight:bold}
+h1{color:#5865F2;border-bottom:1px solid #333;padding-bottom:10px}</style></head><body>
+<h1>📋 Transcript: ${channel.name}</h1>
+<p style="color:#888">Cerrado desde el panel de administración - ${new Date().toLocaleString('es-ES')}</p>
+${messages.reverse().map(m => `<div class="msg"><span class="author">${m.author.tag}</span> <span class="time">${m.createdAt.toLocaleString('es-ES')}</span><br>${m.content || '<em>(embed/archivo)</em>'}</div>`).join('')}
+</body></html>`;
+            fs.writeFileSync(path.join(ticketsDir, fileName), htmlContent, 'utf8');
+
+            // Enviar log al canal de logs si está configurado
+            const guildConfig = configManager.loadGuildConfig(guild.id, 'tickets', {});
+            if (guildConfig.ticketLogChannelId) {
+                const logChannel = guild.channels.cache.get(guildConfig.ticketLogChannelId);
+                if (logChannel) {
+                    const logEmbed = new EmbedBuilder()
+                        .setTitle('🔒 Ticket Cerrado (Admin Panel)')
+                        .setDescription(`Canal: **${channel.name}**\nCerrado desde el panel de administración web.`)
+                        .setColor(0xED4245)
+                        .setTimestamp();
+                    await logChannel.send({ embeds: [logEmbed] }).catch(() => {});
+                }
+            }
+        } catch (logErr) {
+            console.error('Error generando log del ticket:', logErr);
+        }
+
+        await channel.delete('Ticket cerrado desde el panel de administración');
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error cerrando ticket:', e);
+        res.status(500).json({ error: 'Error cerrando el ticket' });
+    }
+});
+
 app.get('/api/tickets/:filename', (req, res) => {
     const filePath = path.join(__dirname, '..', 'tickets', req.params.filename);
 
@@ -496,14 +620,12 @@ function saveLogsConfig(config) {
 }
 
 app.get('/api/guilds/:guildId/logs-config', (req, res) => {
-    const config = loadLogsConfig();
-    res.json(config[req.params.guildId] || {});
+    const config = configManager.loadGuildConfig(req.params.guildId, 'logs', {});
+    res.json(config || {});
 });
 
 app.post('/api/guilds/:guildId/logs-config', (req, res) => {
-    const config = loadLogsConfig();
-    config[req.params.guildId] = req.body;
-    saveLogsConfig(config);
+    configManager.saveGuildConfig(req.params.guildId, 'logs', req.body);
     logPanelActivity(req.params.guildId, 'LOGS', 'Configuración de logs granulares actualizada');
     res.json({ success: true });
 });
@@ -527,14 +649,12 @@ function saveWelcomeConfig(config) {
 }
 
 app.get('/api/guilds/:guildId/welcome-config', (req, res) => {
-    const config = loadWelcomeConfig();
-    res.json(config[req.params.guildId] || { enabled: false, channel: '', message: '¡Bienvenido {user} a {server}!', color: '#5865f2' });
+    const config = configManager.loadGuildConfig(req.params.guildId, 'welcome', { enabled: false, channel: '', message: '¡Bienvenido {user} a {server}!', color: '#5865f2' });
+    res.json(config);
 });
 
 app.post('/api/guilds/:guildId/welcome-config', (req, res) => {
-    const config = loadWelcomeConfig();
-    config[req.params.guildId] = req.body;
-    saveWelcomeConfig(config);
+    configManager.saveGuildConfig(req.params.guildId, 'welcome', req.body);
     logPanelActivity(req.params.guildId, 'WELCOME', 'Configuración de bienvenidas actualizada');
     res.json({ success: true });
 });
@@ -589,19 +709,12 @@ function saveGiveawaysConfig(config) {
 }
 
 function getGuildGiveawayData(guildId) {
-    const config = loadGiveawaysConfig();
-    if (!config.guilds) config.guilds = {};
-    if (!config.guilds[guildId]) {
-        config.guilds[guildId] = {
-            giveaways: [],
-            permissions: {
-                canReroll: [],
-                canFinish: [],
-                canEdit: []
-            }
-        };
+    const data = configManager.loadGuildConfig(guildId, 'giveaways', {});
+    if (!data.giveaways) {
+        data.giveaways = [];
+        data.permissions = { canReroll: [], canFinish: [], canEdit: [] };
     }
-    return config.guilds[guildId];
+    return data;
 }
 
 function saveGuildGiveawayData(guildId, guildData) {
@@ -1061,7 +1174,7 @@ app.post('/api/guilds/:guildId/embed', async (req, res) => {
 
 // Endpoint para "Ticket Panel"
 app.post('/api/guilds/:guildId/send-ticket-panel', async (req, res) => {
-    const { channelId, logChannelId, message, buttons } = req.body;
+    const { channelId, logChannelId, message, buttons, maxTicketsPerUser } = req.body;
     if (!botClient) return res.json({ error: 'Bot no conectado' });
 
     const guild = botClient.guilds.cache.get(req.params.guildId);
@@ -1081,7 +1194,7 @@ app.post('/api/guilds/:guildId/send-ticket-panel', async (req, res) => {
 
         // Limitar a un máximo de 5 botones de ticket
         if (buttons && buttons.length > 5) {
-            return res.status(400).json({ error: 'Máximo 5 botones permitidos en el panel de tickets.' });
+            return res.status(400).json({ error: 'Máximo 5 botones permitidos in el panel de tickets.' });
         }
 
         // Agregar botón por defecto si no hay
@@ -1117,23 +1230,45 @@ app.post('/api/guilds/:guildId/send-ticket-panel', async (req, res) => {
             rows.push(row);
         }
 
-        await channel.send({ embeds: [embed], components: rows });
+        let config = configManager.loadGuildConfig(guild.id, 'tickets', {});
+        let edited = false;
+        let sentMessage = null;
+
+        if (config.panelChannelId && config.panelMessageId && config.panelChannelId === channelId) {
+            try {
+                const targetChannel = guild.channels.cache.get(config.panelChannelId) || await guild.channels.fetch(config.panelChannelId).catch(() => null);
+                if (targetChannel) {
+                    const oldMessage = await targetChannel.messages.fetch(config.panelMessageId).catch(() => null);
+                    if (oldMessage) {
+                        await oldMessage.edit({ embeds: [embed], components: rows });
+                        edited = true;
+                        sentMessage = oldMessage;
+                        console.log(`[TICKETS] Panel existente editado en el canal ${channel.name} del servidor ${guild.name}`);
+                    }
+                }
+            } catch (editError) {
+                console.error('[TICKETS] Error al editar el panel de tickets existente:', editError);
+            }
+        }
+
+        if (!edited) {
+            sentMessage = await channel.send({ embeds: [embed], components: rows });
+            console.log(`[TICKETS] Nuevo panel de tickets enviado al canal ${channel.name} del servidor ${guild.name}`);
+        }
 
         // Guardar configuración del panel
-        const ticketsConfigPath = path.join(__dirname, '..', 'config', 'tickets-config.json');
-        let config = { guilds: {} };
-        if (fs.existsSync(ticketsConfigPath)) {
-            try { config = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8')); } catch (e) { }
-        }
-        if (!config.guilds[guild.id]) config.guilds[guild.id] = {};
-        config.guilds[guild.id] = {
-            ...config.guilds[guild.id],
+        config = {
+            ...config,
             panelConfigs: buttonConfigs,
             panelMessage: message || null,
-            ticketLogChannelId: logChannelId
+            ticketLogChannelId: logChannelId,
+            panelChannelId: channelId,
+            panelMessageId: sentMessage.id
         };
-
-        fs.writeFileSync(ticketsConfigPath, JSON.stringify(config, null, 2));
+        if (maxTicketsPerUser !== undefined) {
+            config.maxTicketsPerUser = maxTicketsPerUser;
+        }
+        configManager.saveGuildConfig(guild.id, 'tickets', config);
 
         logPanelActivity(guild.id, 'TICKETS', `Panel de tickets configurado con canal de logs: ${logChannel.name}`);
         res.json({ success: true });
@@ -1374,18 +1509,18 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
                 if (!channelId) {
                     return res.status(400).json({ error: 'Canal de sugerencias no configurado' });
                 }
-                
+
                 const channel = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
                 if (!channel) {
                     return res.status(400).json({ error: 'Canal de sugerencias no encontrado' });
                 }
-                
+
                 // Verificar permisos del bot
                 const botMember = guild.members.me || await guild.members.fetch(botClient.user.id).catch(() => null);
                 if (!botMember || !botMember.permissionsIn(channel).has('SendMessages')) {
                     return res.status(403).json({ error: 'Bot sin permisos para enviar en el canal de sugerencias' });
                 }
-                
+
                 // Enviar comentario al canal
                 const { EmbedBuilder } = require('discord.js');
                 const channelEmbed = new EmbedBuilder()
@@ -1395,7 +1530,7 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
                     .setColor(0x5865F2)
                     .setFooter({ text: `Usuario: ${suggestion.userTag}` })
                     .setTimestamp();
-                
+
                 await channel.send({ embeds: [channelEmbed] });
                 console.log(`✅ Comentario enviado al canal de sugerencias`);
             } catch (e) {
@@ -1415,24 +1550,36 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
 // ===== AUTO-RESPUESTAS =====
 const autoResponsesPath = path.join(__dirname, '..', 'config', 'auto-responses.json');
 
-function loadAutoResponses() {
-    try {
-        if (fs.existsSync(autoResponsesPath)) {
-            return JSON.parse(fs.readFileSync(autoResponsesPath, 'utf8'));
-        }
-    } catch (e) { console.error('Error cargando auto-responses.json:', e); }
+function loadAutoResponses(guildId) {
+    if (guildId) {
+        return { guilds: { [guildId]: configManager.loadGuildConfig(guildId, 'autoresponses', []) } };
+    }
     return { guilds: {} };
 }
 
-function saveAutoResponses(config) {
-    try {
-        fs.writeFileSync(autoResponsesPath, JSON.stringify(config, null, 2), 'utf8');
-    } catch (e) { console.error('Error guardando auto-responses.json:', e); }
+function saveAutoResponses(guildIdOrConfig, config) {
+    // Compatible con llamadas antiguas que pasaban únicamente el objeto `config`
+    if (typeof guildIdOrConfig === 'object' && guildIdOrConfig !== null) {
+        const cfg = guildIdOrConfig;
+        const guilds = cfg.guilds || {};
+        for (const gid of Object.keys(guilds)) {
+            configManager.saveGuildConfig(gid, 'autoresponses', guilds[gid] || []);
+        }
+        return;
+    }
+
+    // Uso normal: (guildId, config)
+    const guildId = guildIdOrConfig;
+    if (!config || !config.guilds) {
+        // nada que guardar
+        return;
+    }
+    configManager.saveGuildConfig(guildId, 'autoresponses', config.guilds[guildId] || []);
 }
 
 // GET: Obtener todas las auto-respuestas de un servidor
 app.get('/api/guilds/:guildId/auto-responses', (req, res) => {
-    const config = loadAutoResponses();
+    const config = loadAutoResponses(req.params.guildId);
     res.json(config.guilds[req.params.guildId] || []);
 });
 
@@ -1499,23 +1646,130 @@ app.delete('/api/guilds/:guildId/auto-responses/:responseId', (req, res) => {
     res.json({ success: true });
 });
 
-// ===== TICKET CONFIG MEJORADO =====
+// GET: Obtener paneles de tickets existentes
+app.get('/api/guilds/:guildId/ticket-panels', (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    try {
+        const config = configManager.loadGuildConfig(guild.id, 'tickets', {});
+        const panelChannelId = config.panelChannelId;
+        const panelMessageId = config.panelMessageId;
+        
+        if (!panelChannelId || !panelMessageId) {
+            return res.json({ panels: [] });
+        }
+
+        const channel = guild.channels.cache.get(panelChannelId);
+        const channelName = channel ? channel.name : 'Desconocido';
+
+        res.json({
+            panels: [{
+                id: panelMessageId,
+                channelId: panelChannelId,
+                channelName: channelName,
+                message: config.panelMessage || '',
+                buttons: config.panelConfigs || [],
+                logChannelId: config.ticketLogChannelId || '',
+                maxTicketsPerUser: config.maxTicketsPerUser !== undefined ? config.maxTicketsPerUser : 1
+            }]
+        });
+    } catch (e) {
+        console.error('Error obteniendo paneles de tickets:', e);
+        res.status(500).json({ error: 'Error obteniendo paneles de tickets' });
+    }
+});
+
+// POST: Actualizar panel existente
+app.post('/api/guilds/:guildId/update-ticket-panel/:messageId', async (req, res) => {
+    const { channelId, logChannelId, message, buttons, maxTicketsPerUser } = req.body;
+    const messageId = req.params.messageId;
+    
+    if (!botClient) return res.json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const channel = guild.channels.cache.get(channelId);
+    if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
+
+    try {
+        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+
+        const discordButtons = [];
+        const buttonConfigs = [];
+
+        if (buttons && buttons.length > 5) {
+            return res.status(400).json({ error: 'Máximo 5 botones permitidos en el panel de tickets.' });
+        }
+
+        if (!buttons || buttons.length === 0) {
+            buttons.push({ name: 'Crear Ticket', question: '' });
+        }
+
+        buttons.forEach((btn, index) => {
+            const i = index + 1;
+            const customId = btn.question && btn.question.trim() !== '' ? `create_ticket_q${i}` : `create_ticket_${i}`;
+            discordButtons.push(
+                new ButtonBuilder()
+                    .setCustomId(customId)
+                    .setLabel(btn.name || `Botón ${i}`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji('🎫')
+            );
+            buttonConfigs.push({
+                name: btn.name || `Botón ${i}`,
+                question: btn.question && btn.question.trim() !== '' ? btn.question.trim() : null,
+                index: i
+            });
+        });
+
+        const embed = new EmbedBuilder()
+            .setTitle('🎫 Centro de Soporte')
+            .setDescription(message || 'Pulsa un botón para abrir un ticket con el staff.')
+            .setColor(0x5865F2);
+
+        const rows = [];
+        for (let i = 0; i < discordButtons.length; i += 5) {
+            const row = new ActionRowBuilder().addComponents(discordButtons.slice(i, i + 5));
+            rows.push(row);
+        }
+
+        // Actualizar el mensaje existente
+        const targetMessage = await channel.messages.fetch(messageId).catch(() => null);
+        if (!targetMessage) return res.status(404).json({ error: 'Mensaje del panel no encontrado' });
+
+        await targetMessage.edit({ embeds: [embed], components: rows });
+
+        // Actualizar configuración
+        let config = configManager.loadGuildConfig(guild.id, 'tickets', {});
+        config = {
+            ...config,
+            panelConfigs: buttonConfigs,
+            panelMessage: message || null,
+            ticketLogChannelId: logChannelId,
+            panelChannelId: channelId,
+            panelMessageId: messageId
+        };
+        if (maxTicketsPerUser !== undefined) {
+            config.maxTicketsPerUser = maxTicketsPerUser;
+        }
+        configManager.saveGuildConfig(guild.id, 'tickets', config);
+
+        logPanelActivity(guild.id, 'TICKETS', 'Panel de tickets actualizado');
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error actualizando panel de tickets:', e);
+        res.status(500).json({ error: 'Error actualizando panel de tickets' });
+    }
+});
+
 // GET: Obtener configuración del panel de tickets (para cargarla en el formulario)
 app.get('/api/guilds/:guildId/ticket-config', (req, res) => {
-    const ticketsConfigPath = path.join(__dirname, '..', 'config', 'tickets-config.json');
-    let config = { guilds: {} };
-    if (fs.existsSync(ticketsConfigPath)) {
-        try { config = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8')); } catch (e) { }
-    }
-    const guildConfig = config.guilds[req.params.guildId] || {};
+    const guildConfig = configManager.loadGuildConfig(req.params.guildId, 'tickets', {});
 
-    // También cargar el staffRoleId desde staff-roles.json
-    const staffRolesPath = path.join(__dirname, '..', 'config', 'staff-roles.json');
-    let staffRoles = {};
-    if (fs.existsSync(staffRolesPath)) {
-        try { staffRoles = JSON.parse(fs.readFileSync(staffRolesPath, 'utf8')); } catch (e) { }
-    }
-    const guildStaff = staffRoles[req.params.guildId] || {};
+    // También cargar el staffRoleId desde staffroles.json usando configManager
+    const guildStaff = configManager.loadGuildConfig(req.params.guildId, 'staffroles', {});
 
     const ticketStaffRoles = guildConfig.ticketStaffRoles || [];
     const staffRoleId = guildStaff.ticketStaffRole || (ticketStaffRoles.length > 0 ? ticketStaffRoles[0] : '');
@@ -1525,49 +1779,43 @@ app.get('/api/guilds/:guildId/ticket-config', (req, res) => {
         panelConfigs: guildConfig.panelConfigs || [],
         ticketLogChannelId: guildConfig.ticketLogChannelId || '',
         ticketStaffRoles: ticketStaffRoles,
-        staffRoleId: staffRoleId
+        staffRoleId: staffRoleId,
+        panelChannelId: guildConfig.panelChannelId || '',
+        maxTicketsPerUser: guildConfig.maxTicketsPerUser !== undefined ? guildConfig.maxTicketsPerUser : 1
     });
 });
 
 // PUT: Actualizar configuración del panel de tickets (sin enviar, solo guardar)
 app.put('/api/guilds/:guildId/ticket-config', (req, res) => {
-    const ticketsConfigPath = path.join(__dirname, '..', 'config', 'tickets-config.json');
-    let config = { guilds: {} };
-    if (fs.existsSync(ticketsConfigPath)) {
-        try { config = JSON.parse(fs.readFileSync(ticketsConfigPath, 'utf8')); } catch (e) { }
-    }
-    if (!config.guilds[req.params.guildId]) config.guilds[req.params.guildId] = {};
+    const guildConfig = configManager.loadGuildConfig(req.params.guildId, 'tickets', {});
 
     // Actualizar solo los campos enviados
-    if (req.body.panelMessage !== undefined) config.guilds[req.params.guildId].panelMessage = req.body.panelMessage;
-    if (req.body.panelConfigs !== undefined) config.guilds[req.params.guildId].panelConfigs = req.body.panelConfigs;
-    if (req.body.ticketLogChannelId !== undefined) config.guilds[req.params.guildId].ticketLogChannelId = req.body.ticketLogChannelId;
-    if (req.body.ticketStaffRoles !== undefined) config.guilds[req.params.guildId].ticketStaffRoles = req.body.ticketStaffRoles;
+    if (req.body.panelMessage !== undefined) guildConfig.panelMessage = req.body.panelMessage;
+    if (req.body.panelConfigs !== undefined) guildConfig.panelConfigs = req.body.panelConfigs;
+    if (req.body.ticketLogChannelId !== undefined) guildConfig.ticketLogChannelId = req.body.ticketLogChannelId;
+    if (req.body.ticketStaffRoles !== undefined) guildConfig.ticketStaffRoles = req.body.ticketStaffRoles;
+    if (req.body.panelChannelId !== undefined) guildConfig.panelChannelId = req.body.panelChannelId;
+    if (req.body.maxTicketsPerUser !== undefined) guildConfig.maxTicketsPerUser = req.body.maxTicketsPerUser;
 
-    fs.writeFileSync(ticketsConfigPath, JSON.stringify(config, null, 2));
+    configManager.saveGuildConfig(req.params.guildId, 'tickets', guildConfig);
 
-    // Si se envían roles de staff, también actualizar en staff-roles.json y en el bot
+    // Si se envían roles de staff, también actualizar en staffroles.json y en el bot
     if (req.body.ticketStaffRoles !== undefined) {
-        const staffRolesPath = path.join(__dirname, '..', 'config', 'staff-roles.json');
-        let staffRoles = {};
-        if (fs.existsSync(staffRolesPath)) {
-            try { staffRoles = JSON.parse(fs.readFileSync(staffRolesPath, 'utf8')); } catch (e) { }
-        }
-        if (!staffRoles[req.params.guildId]) staffRoles[req.params.guildId] = {};
+        const guildStaff = configManager.loadGuildConfig(req.params.guildId, 'staffroles', {});
 
         if (req.body.ticketStaffRoles.length > 0) {
-            staffRoles[req.params.guildId].ticketStaffRole = req.body.ticketStaffRoles[0];
+            guildStaff.ticketStaffRole = req.body.ticketStaffRoles[0];
             if (botClient && botClient.ticketStaffRole) {
                 botClient.ticketStaffRole.set(req.params.guildId, req.body.ticketStaffRoles[0]);
             }
         } else {
-            delete staffRoles[req.params.guildId].ticketStaffRole;
+            delete guildStaff.ticketStaffRole;
             if (botClient && botClient.ticketStaffRole) {
                 botClient.ticketStaffRole.delete(req.params.guildId);
             }
         }
 
-        fs.writeFileSync(staffRolesPath, JSON.stringify(staffRoles, null, 2));
+        configManager.saveGuildConfig(req.params.guildId, 'staffroles', guildStaff);
     }
 
     logPanelActivity(req.params.guildId, 'TICKETS', 'Configuración de tickets actualizada desde el panel');

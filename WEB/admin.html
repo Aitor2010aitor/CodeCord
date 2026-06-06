@@ -241,6 +241,11 @@
             font-size: 0.9rem;
         }
 
+        .view-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Loading */
         .loading {
             text-align: center;
@@ -1261,68 +1266,134 @@
 
             <!-- Tab: Lista de Tickets -->
             <div id="tickets-tab-list">
-                <div id="tickets-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ticket ID</th>
-                                <th>Fecha</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tickets-body">
-                            <!-- Loaded via JS -->
-                        </tbody>
-                    </table>
+                <!-- Sub-tabs: Activos / Cerrados -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                    <button class="view-btn active-tab" onclick="switchTicketListSubTab('active')" id="ticket-sub-active" style="background: var(--accent); color: white; padding: 8px 16px; font-size: 0.85rem;">
+                        <i class="fas fa-headset"></i> Tickets Activos
+                    </button>
+                    <button class="view-btn" onclick="switchTicketListSubTab('closed')" id="ticket-sub-closed" style="background: rgba(255,255,255,0.1); color: white; padding: 8px 16px; font-size: 0.85rem;">
+                        <i class="fas fa-archive"></i> Tickets Cerrados (Logs)
+                    </button>
+                </div>
+
+                <!-- Active tickets -->
+                <div id="tickets-active-container">
+                    <div id="active-tickets-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="loading"><div class="spinner"></div>Cargando tickets activos...</div>
+                    </div>
+                </div>
+
+                <!-- Closed ticket logs -->
+                <div id="tickets-closed-container" style="display: none;">
+                    <div id="tickets-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-body">
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- Tab: Crear Panel -->
             <div id="tickets-tab-create" style="display: none;">
-                <div class="stat-card" style="flex-direction: column; align-items: stretch; max-width: 800px; margin: 0 auto;">
-                    <div style="background: rgba(88,101,242,0.1); border: 1px solid rgba(88,101,242,0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
-                        <p style="font-size: 0.85rem; color: #a5b4fc;"><i class="fas fa-info-circle"></i> La configuración de botones se guarda automáticamente. Puedes añadir o eliminar botones sin perder el resto.</p>
-                    </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+                    <!-- Left: Formulario -->
+                    <div class="stat-card" style="flex-direction: column; align-items: stretch;">
+                        <h3 style="margin-bottom: 16px;">📝 Configurar Panel</h3>
+                        
+                        <div style="background: rgba(88,101,242,0.1); border: 1px solid rgba(88,101,242,0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                            <p style="font-size: 0.85rem; color: #a5b4fc;"><i class="fas fa-info-circle"></i> Los paneles existentes se actualizarán automáticamente en Discord.</p>
+                        </div>
 
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">CANAL DESTINO</label>
-                        <select id="tp-channel" class="log-select">
-                            <option value="">Seleccionar canal...</option>
-                        </select>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📋 CANAL DE LOGS DE TICKETS</label>
-                        <select id="tp-log-channel" class="log-select">
-                            <option value="">Seleccionar canal para logs...</option>
-                        </select>
-                        <small style="color: var(--text-muted); margin-top: 4px; display: block;">Donde se enviará el registro cuando se cierren tickets</small>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">MENSAJE DEL PANEL</label>
-                        <textarea id="tp-message" placeholder="Mensaje que se mostrará en el embed de los tickets..." style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none;"></textarea>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <label style="font-size: 0.9rem; font-weight: 600;">BOTONES (Máximo 5)</label>
-                            <button onclick="addTicketButton()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white; padding: 4px 10px; font-size: 0.8rem;">
-                                <i class="fas fa-plus"></i> Añadir Botón
+                        <div id="existing-panels-list" style="margin-bottom: 20px; display: none;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📌 PANELES EXISTENTES</label>
+                            <div id="panels-select-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                            </div>
+                            <button onclick="resetTicketPanelForm()" class="view-btn" style="width: 100%; background: rgba(255,255,255,0.1); color: white; padding: 8px;">
+                                <i class="fas fa-plus"></i> Crear Nuevo Panel
                             </button>
                         </div>
-                        <div id="tp-buttons-container" style="display: flex; flex-direction: column; gap: 15px;">
-                            <!-- Se carga dinámicamente -->
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">CANAL DESTINO</label>
+                            <select id="tp-channel" class="log-select">
+                                <option value="">Seleccionar canal...</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📋 CANAL DE LOGS DE TICKETS</label>
+                            <select id="tp-log-channel" class="log-select">
+                                <option value="">Seleccionar canal para logs...</option>
+                            </select>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Donde se enviará el registro cuando se cierren tickets</small>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">MENSAJE DEL PANEL</label>
+                            <textarea id="tp-message" placeholder="Mensaje que se mostrará en el embed de los tickets..." style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none;" oninput="updateTicketPreview()"></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">LÍMITE DE TICKETS POR USUARIO</label>
+                            <select id="tp-max-tickets" class="log-select">
+                                <option value="1">1 ticket activo</option>
+                                <option value="2">2 tickets activos</option>
+                                <option value="3">3 tickets activos</option>
+                                <option value="4">4 tickets activos</option>
+                                <option value="5">5 tickets activos</option>
+                                <option value="0">Sin límite</option>
+                            </select>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Número máximo de tickets que un usuario puede abrir simultáneamente.</small>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <label style="font-size: 0.9rem; font-weight: 600;">BOTONES (Máximo 5)</label>
+                                <button onclick="addTicketButton()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white; padding: 4px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-plus"></i> Añadir Botón
+                                </button>
+                            </div>
+                            <div id="tp-buttons-container" style="display: flex; flex-direction: column; gap: 15px;">
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="tp-current-panel-id" value="">
+
+                        <div style="display: flex; gap: 12px;">
+                            <button onclick="saveTicketConfig()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button onclick="sendTicketPanel()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--accent); color: white;">
+                                <i class="fas fa-paper-plane"></i> Enviar
+                            </button>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 12px;">
-                        <button onclick="saveTicketConfig()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
-                            <i class="fas fa-save"></i> Guardar Configuración
-                        </button>
-                        <button onclick="sendTicketPanel()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--accent); color: white;">
-                            <i class="fas fa-paper-plane"></i> Enviar Panel a Discord
-                        </button>
+                    <!-- Right: Preview -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; position: sticky; top: 100px;">
+                        <h3 style="margin-bottom: 16px; color: var(--accent);">👀 Vista Previa (Discord)</h3>
+                        <div id="ticket-preview" style="background: #2c2f33; border-radius: 8px; padding: 16px; border-left: 4px solid #5865f2;">
+                            <div style="margin-bottom: 12px;">
+                                <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">🎫 Centro de Soporte</div>
+                                <div style="color: #b9bbbe; font-size: 0.85rem; margin-top: 8px; line-height: 1.5;" id="preview-message">
+                                    Pulsa un botón para abrir un ticket con el staff.<br><br><strong>Para usuarios aislados:</strong> Si estás en timeout, puedes crear un ticket para comunicarte con los administradores.
+                                </div>
+                            </div>
+                            <div id="preview-buttons" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                                <button style="background: #5865f2; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+                                    🎫 Crear Ticket
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1360,6 +1431,30 @@
                         </button>
                         <button onclick="clearTicketRoles()" class="view-btn" style="padding: 14px; background: var(--danger); color: white;">
                             <i class="fas fa-trash"></i> Eliminar Roles
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Configuración de límite de tickets -->
+                <div class="stat-card" style="flex-direction: column; align-items: stretch; max-width: 800px; margin: 20px auto 0;">
+                    <h3 style="margin-bottom: 20px;"><i class="fas fa-sliders-h" style="color: var(--accent);"></i> Ajustes Generales de Tickets</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🎟️ LÍMITE DE TICKETS POR USUARIO</label>
+                        <select id="tc-max-tickets" class="log-select">
+                            <option value="1">1 ticket activo</option>
+                            <option value="2">2 tickets activos</option>
+                            <option value="3">3 tickets activos</option>
+                            <option value="4">4 tickets activos</option>
+                            <option value="5">5 tickets activos</option>
+                            <option value="0">Sin límite</option>
+                        </select>
+                        <small style="color: var(--text-muted); margin-top: 4px; display: block;">Número máximo de tickets que un usuario puede abrir simultáneamente.</small>
+                    </div>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="saveTicketGeneralConfig()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
+                            <i class="fas fa-save"></i> Guardar Ajustes
                         </button>
                     </div>
                 </div>
@@ -2296,13 +2391,19 @@
         }
 
         async function loadTickets() {
+            // Cargar ambos: activos y cerrados
+            loadActiveTickets();
+            loadClosedTickets();
+        }
+
+        async function loadClosedTickets() {
             const body = document.getElementById('tickets-body');
-            body.innerHTML = '<tr><td colspan="3" class="loading"><div class="spinner"></div>Cargando tickets...</td></tr>';
+            body.innerHTML = '<tr><td colspan="3" class="loading"><div class="spinner"></div>Cargando tickets cerrados...</td></tr>';
             try {
                 const res = await fetch('/api/tickets');
                 const tickets = await res.json();
                 if (tickets.length === 0) {
-                    body.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">No hay tickets registrados</td></tr>';
+                    body.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">No hay tickets cerrados registrados</td></tr>';
                     return;
                 }
                 let html = '';
@@ -2311,11 +2412,124 @@
                     html += `<tr>
                         <td><span class="ticket-badge">${t.name}</span></td>
                         <td>${date}</td>
-                        <td><a href="/api/tickets/${t.file}" target="_blank" class="view-btn">Ver Ticket</a></td>
+                        <td><a href="/api/tickets/${t.file}" target="_blank" class="view-btn"><i class="fas fa-eye"></i> Ver Ticket</a></td>
                     </tr>`;
                 });
                 body.innerHTML = html;
             } catch (e) { body.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--danger);">Error cargando tickets</td></tr>'; }
+        }
+
+        let ticketsPagination = { page: 1, totalPages: 1, hasMore: false };
+
+        async function loadActiveTickets() {
+            if (!currentGuildId) return;
+            const container = document.getElementById('active-tickets-list');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando tickets activos...</div>';
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/active-tickets?page=${ticketsPagination.page}&limit=10`);
+                const data = await res.json();
+                const tickets = data.tickets || data; // Backward compatibility
+                const pagination = data.pagination;
+                
+                if (pagination) {
+                    ticketsPagination.page = pagination.page;
+                    ticketsPagination.totalPages = pagination.totalPages;
+                    ticketsPagination.hasMore = pagination.hasMore;
+                }
+                
+                if (!tickets || tickets.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No hay tickets activos en este servidor</div>';
+                    return;
+                }
+                container.innerHTML = tickets.map(t => {
+                    const date = t.createdAt ? new Date(t.createdAt).toLocaleString('es-ES') : 'Desconocida';
+                    return `<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; transition: background 0.2s;" onmouseover="this.style.background='rgba(88,101,242,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <img src="${t.userAvatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}" style="width:56px;height:56px;border-radius:50%;border:2px solid var(--accent);flex-shrink:0;" title="${t.userName}">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; font-size: 0.95rem; color: var(--accent);">🎫 ${t.channelName}</div>
+                                <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">
+                                    <div><strong>Usuario:</strong> ${t.userName}</div>
+                                    <div><strong>ID:</strong> <code style="background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:4px;font-family:monospace;color:#a5b4fc;">${t.userId}</code></div>
+                                    <div><strong>Categoría:</strong> ${t.categoryName}</div>
+                                    <div><strong>Creado:</strong> ${date}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button onclick="closeTicketFromPanel('${t.channelId}', '${t.channelName}')" class="view-btn" style="background: var(--danger); color: white; padding: 8px 14px; font-size: 0.8rem;">
+                                <i class="fas fa-lock"></i> Cerrar
+                            </button>
+                        </div>
+                    </div>`;
+                }).join('');
+                
+                // Agregar controles de paginación si hay más de una página
+                if (pagination && pagination.totalPages > 1) {
+                    const paginationHtml = `
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <button onclick="goTicketsPrev()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white; padding: 8px 14px; font-size: 0.8rem;" ${pagination.page <= 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </button>
+                            <span style="display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.85rem;">
+                                Página <strong>${pagination.page}</strong> de <strong>${pagination.totalPages}</strong>
+                            </span>
+                            <button onclick="goTicketsNext()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white; padding: 8px 14px; font-size: 0.8rem;" ${!pagination.hasMore ? 'disabled' : ''}>
+                                Siguiente <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.innerHTML += paginationHtml;
+                }
+            } catch (e) {
+                console.error('Error loading active tickets:', e);
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--danger);">Error cargando tickets activos</div>';
+            }
+        }
+        
+        function goTicketsNext() {
+            if (ticketsPagination.hasMore) {
+                ticketsPagination.page += 1;
+                loadActiveTickets();
+                document.getElementById('active-tickets-list').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function goTicketsPrev() {
+            if (ticketsPagination.page > 1) {
+                ticketsPagination.page -= 1;
+                loadActiveTickets();
+                document.getElementById('active-tickets-list').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function closeTicketFromPanel(channelId, channelName) {
+            if (!confirm(`¿Seguro que quieres cerrar el ticket "${channelName}"? Se generará un log y se eliminará el canal.`)) return;
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/close-ticket`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('🔒 Ticket cerrado correctamente');
+                    loadActiveTickets();
+                    loadClosedTickets();
+                } else {
+                    showToast(data.error || '❌ Error cerrando ticket', 'error');
+                }
+            } catch (e) { showToast('❌ Error de conexión', 'error'); }
+        }
+
+        function switchTicketListSubTab(tabId) {
+            document.getElementById('ticket-sub-active').style.background = tabId === 'active' ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('ticket-sub-active').classList.toggle('active-tab', tabId === 'active');
+            document.getElementById('ticket-sub-closed').style.background = tabId === 'closed' ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('ticket-sub-closed').classList.toggle('active-tab', tabId === 'closed');
+            document.getElementById('tickets-active-container').style.display = tabId === 'active' ? 'block' : 'none';
+            document.getElementById('tickets-closed-container').style.display = tabId === 'closed' ? 'block' : 'none';
+            if (tabId === 'active') loadActiveTickets();
+            else loadClosedTickets();
         }
 
         async function loadMembers(guildId, after = null, reset = false) {
@@ -2583,6 +2797,7 @@
                 loadTicketConfig();
             } else if (tabId === 'config') {
                 loadTicketConfigRoles();
+                loadTicketGeneralConfig();
             } else {
                 loadTickets();
             }
@@ -2595,6 +2810,8 @@
                 const config = await res.json();
                 if (config.panelMessage) document.getElementById('tp-message').value = config.panelMessage;
                 if (config.ticketLogChannelId) document.getElementById('tp-log-channel').value = config.ticketLogChannelId;
+                if (config.panelChannelId) document.getElementById('tp-channel').value = config.panelChannelId;
+                if (config.maxTicketsPerUser !== undefined) document.getElementById('tp-max-tickets').value = config.maxTicketsPerUser;
                 const container = document.getElementById('tp-buttons-container');
                 container.innerHTML = '';
                 if (config.panelConfigs && config.panelConfigs.length > 0) {
@@ -2604,6 +2821,8 @@
                 } else {
                     addTicketButtonWithData('Crear Ticket', '', false);
                 }
+                updateTicketPreview();
+                loadTicketPanels();
             } catch (e) { console.error(e); }
         }
 
@@ -2617,11 +2836,11 @@
             div.className = 'tp-button-item';
             div.style = 'background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); position: relative;';
             div.innerHTML = `
-                <button onclick="this.parentElement.remove()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--danger); cursor: pointer;"><i class="fas fa-times"></i></button>
+                <button onclick="this.parentElement.remove(); updateTicketPreview();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--danger); cursor: pointer;"><i class="fas fa-times"></i></button>
                 <div style="display: flex; gap: 15px; margin-bottom: 10px;">
                     <div style="flex: 1;">
                         <label style="display: block; margin-bottom: 4px; font-size: 0.8rem; color: var(--text-muted);">Nombre del Botón</label>
-                        <input type="text" class="log-select tp-btn-name" placeholder="Ej: Solicitar Juego" value="${name}" style="margin: 0;">
+                        <input type="text" class="log-select tp-btn-name" placeholder="Ej: Solicitar Juego" value="${name}" style="margin: 0;" oninput="updateTicketPreview()">
                     </div>
                     <div style="display: flex; align-items: center; padding-top: 20px; gap: 8px;">
                         <label style="font-size: 0.8rem; color: var(--text-muted);">¿Requiere formulario?</label>
@@ -2633,9 +2852,10 @@
                 </div>
                 <div class="tp-question-container" style="display: ${hasForm ? 'block' : 'none'};">
                     <label style="display: block; margin-bottom: 4px; font-size: 0.8rem; color: var(--text-muted);">Pregunta del formulario</label>
-                    <input type="text" class="log-select tp-btn-question" placeholder="Ej: ¿Qué juego quieres solicitar?" value="${question}" style="margin: 0;">
+                    <input type="text" class="log-select tp-btn-question" placeholder="Ej: ¿Qué juego quieres solicitar?" value="${question}" style="margin: 0;" oninput="updateTicketPreview()">
                 </div>`;
             container.appendChild(div);
+            updateTicketPreview();
         }
 
         function addTicketButton() {
@@ -2670,7 +2890,9 @@
             const data = {
                 panelMessage: document.getElementById('tp-message').value,
                 panelConfigs: buttons,
-                ticketLogChannelId: document.getElementById('tp-log-channel').value
+                ticketLogChannelId: document.getElementById('tp-log-channel').value,
+                panelChannelId: document.getElementById('tp-channel').value,
+                maxTicketsPerUser: parseInt(document.getElementById('tp-max-tickets').value) || 1
             };
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/ticket-config`, {
@@ -2691,16 +2913,89 @@
             const buttons = getTicketButtonsData();
             if (buttons.length === 0) return showToast('Añade al menos un botón', 'error');
             if (buttons.length > 5) return showToast('Máximo 5 botones permitidos.', 'error');
+            const messageId = document.getElementById('tp-current-panel-id').value;
+            
             try {
-                const res = await fetch(`/api/guilds/${currentGuildId}/send-ticket-panel`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ channelId, logChannelId, message, buttons })
+                const method = messageId ? 'POST' : 'POST';
+                const url = messageId 
+                    ? `/api/guilds/${currentGuildId}/update-ticket-panel/${messageId}`
+                    : `/api/guilds/${currentGuildId}/send-ticket-panel`;
+                
+                const res = await fetch(url, {
+                    method: method, headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        channelId, 
+                        logChannelId, 
+                        message, 
+                        buttons,
+                        maxTicketsPerUser: parseInt(document.getElementById('tp-max-tickets').value) || 1
+                    })
                 });
                 const data = await res.json();
-                if (data.success) showToast('✅ Panel enviado y guardado');
-                else showToast(data.error || '❌ Error', 'error');
+                if (data.success) {
+                    showToast(messageId ? '✅ Panel actualizado' : '✅ Panel enviado y guardado');
+                    loadTicketPanels();
+                } else showToast(data.error || '❌ Error', 'error');
             } catch (e) { showToast('❌ Error de conexión', 'error'); }
         }
+
+        async function loadTicketPanels() {
+            if (!currentGuildId) return;
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/ticket-panels`);
+                const data = await res.json();
+                const panels = data.panels || [];
+                
+                if (panels.length > 0) {
+                    const container = document.getElementById('panels-select-container');
+                    container.innerHTML = panels.map(p => `
+                        <div style="background:rgba(88,101,242,0.15);border:1px solid rgba(88,101,242,0.3);border-radius:8px;padding:12px;cursor:pointer;transition:0.2s;" onclick="loadTicketPanelData('${p.id}', '${p.channelId}', '${p.channelName}')" onmouseover="this.style.background='rgba(88,101,242,0.25)'" onmouseout="this.style.background='rgba(88,101,242,0.15)'">
+                            <div style="font-weight:600;color:var(--accent);">📌 ${p.channelName}</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);">${p.buttons?.length || 0} botones · ${p.buttons ? p.buttons.map(b => b.name).join(', ') : ''}</div>
+                        </div>
+                    `).join('');
+                    document.getElementById('existing-panels-list').style.display = 'block';
+                } else {
+                    document.getElementById('existing-panels-list').style.display = 'none';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function loadTicketPanelData(messageId, channelId, channelName) {
+            document.getElementById('tp-current-panel-id').value = messageId;
+            document.getElementById('tp-channel').value = channelId;
+            // Scroll to form
+            document.getElementById('tp-message').scrollIntoView({ behavior: 'smooth' });
+            showToast(`✏️ Editando panel en #${channelName}`, 'info');
+        }
+
+        function resetTicketPanelForm() {
+            document.getElementById('tp-current-panel-id').value = '';
+            document.getElementById('tp-channel').value = '';
+            document.getElementById('tp-log-channel').value = '';
+            document.getElementById('tp-message').value = '';
+            document.getElementById('tp-max-tickets').value = '1';
+            const container = document.getElementById('tp-buttons-container');
+            container.innerHTML = '';
+            addTicketButton();
+            showToast('Formulario listo para nuevo panel', 'info');
+        }
+
+        function updateTicketPreview() {
+            const message = document.getElementById('tp-message').value || 'Pulsa un botón para abrir un ticket con el staff.\n\nPara usuarios aislados: Si estás en timeout, puedes crear un ticket para comunicarte con los administradores.';
+            const buttons = getTicketButtonsData();
+            
+            document.getElementById('preview-message').innerHTML = message.split('\n').join('<br>');
+            
+            let previewButtons = '';
+            buttons.forEach(btn => {
+                previewButtons += `<button style="background: #5865f2; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🎫 ${btn.name}</button>`;
+            });
+            document.getElementById('preview-buttons').innerHTML = previewButtons || `<button style="background: #5865f2; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🎫 Crear Ticket</button>`;
+        }
+
+        // Variable para guardar ID del panel siendo editado
+        let ticketPanelMode = 'create'; // 'create' o 'edit'
 
         async function loadTicketConfigRoles() {
             if (!currentGuildId) return;
