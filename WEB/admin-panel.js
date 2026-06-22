@@ -13,7 +13,7 @@ const os = require('os');
 // =====================================================================
 let panelConfig = {
     url: '',
-    port: ,
+    port: 22300,
     requireDiscordAuth: false
 };
 
