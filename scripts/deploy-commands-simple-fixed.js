@@ -73,6 +73,12 @@ const commands = [
     .addUserOption(opt => opt.setName('usuario').setDescription('Usuario a desbanear').setRequired(true))
     .addStringOption(opt => opt.setName('razon').setDescription('Razón del desbaneo').setRequired(false))
     .toJSON(),
+  new SlashCommandBuilder()
+    .setName('baninfo')
+    .setDescription('Ver si un usuario fue baneado o expulsado')
+    .addUserOption(opt => opt.setName('usuario').setDescription('Usuario a consultar').setRequired(false))
+    .addStringOption(opt => opt.setName('id').setDescription('ID del usuario si no está en el servidor').setRequired(false))
+    .toJSON(),
   // Comandos de administración (solo para administradores)
   new SlashCommandBuilder()
     .setName('setup')

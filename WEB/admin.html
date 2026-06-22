@@ -658,6 +658,9 @@
             <a href="#welcome" class="nav-link" onclick="showSection('welcome')">
                 <i class="fas fa-door-open"></i> <span>Bienvenidas</span>
             </a>
+            <a href="#moderation" class="nav-link" onclick="showSection('moderation')">
+                <i class="fas fa-shield-alt"></i> <span>Moderación / AutoMod</span>
+            </a>
             <a href="#say" class="nav-link" onclick="showSection('say')">
                 <i class="fas fa-comment-dots"></i> <span>Enviar Mensaje</span>
             </a>
@@ -756,6 +759,203 @@
                 <div class="loading">
                     <div class="spinner"></div>Cargando actividad...
                 </div>
+            </div>
+        </div>
+
+        <!-- Moderation & AutoMod Section -->
+        <div id="moderation" class="section">
+            <div class="section-header" style="margin-bottom: 8px;">
+                <span class="section-title">🛡️ Moderación y AutoMod</span>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="loadModerationConfig()" class="view-btn"
+                        style="background: rgba(255,255,255,0.1);">
+                        <i class="fas fa-sync"></i> Recargar
+                    </button>
+                    <button onclick="saveModerationConfig()" class="view-btn"
+                        style="background: var(--success); color: #181825; font-weight: 700;">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem;">Configura los filtros de
+                AutoMod para censurar mayúsculas, palabras prohibidas, imágenes y las acciones automáticas al banear o
+                expulsar miembros.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 22px;">
+
+                <!-- BLOQUE 1: Filtros AutoMod -->
+                <div
+                    style="background: rgba(88,101,242,0.06); border: 1px solid rgba(88,101,242,0.22); border-radius: 14px; padding: 22px;">
+                    <div
+                        style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+                        <div style="background: rgba(88,101,242,0.2); border-radius: 8px; padding: 8px 11px;"><i
+                                class="fas fa-robot" style="color: var(--accent);"></i></div>
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem; display: block;">Filtros de AutoMod</span>
+                            <small style="color: var(--text-muted);">Activa y configura cada tipo de censura
+                                automática.</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+
+                        <div
+                            style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <div>
+                                    <span style="font-weight: 600; font-size: 0.95rem; display: block;"><i
+                                            class="fas fa-font" style="margin-right: 8px; color: var(--accent);"></i>
+                                        Censura de Mayúsculas</span>
+                                    <small style="color: var(--text-muted);">Detecta y borra mensajes con exceso de
+                                        mayúsculas.</small>
+                                </div>
+                                <label class="switch"><input type="checkbox" id="mod-caps-enabled"><span
+                                        class="slider"></span></label>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Porcentaje
+                                        mínimo (%)</label>
+                                    <input type="number" id="mod-caps-pct" min="10" max="100" class="log-select"
+                                        style="margin:0;" placeholder="70">
+                                </div>
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Longitud
+                                        mínima msg</label>
+                                    <input type="number" id="mod-caps-min" min="1" max="100" class="log-select"
+                                        style="margin:0;" placeholder="3">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <div>
+                                    <span style="font-weight: 600; font-size: 0.95rem; display: block;"><i
+                                            class="fas fa-ban" style="margin-right: 8px; color: var(--danger);"></i>
+                                        Palabras Prohibidas</span>
+                                    <small style="color: var(--text-muted);">Detecta y borra palabras o frases
+                                        prohibidas.</small>
+                                </div>
+                                <label class="switch"><input type="checkbox" id="mod-words-enabled"><span
+                                        class="slider"></span></label>
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Lista
+                                    de palabras (separadas por comas)</label>
+                                <textarea id="mod-blocked-words" placeholder="malo, tonto, spam..." class="log-select"
+                                    style="margin:0; height:90px; font-family:monospace; resize:vertical;"></textarea>
+                            </div>
+                        </div>
+
+                        <div
+                            style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-weight: 600; font-size: 0.95rem; display: block;"><i
+                                            class="fas fa-image" style="margin-right: 8px; color: var(--success);"></i>
+                                        Censura de Imágenes</span>
+                                    <small style="color: var(--text-muted);">Elimina enlaces de imágenes y archivos
+                                        adjuntos.</small>
+                                </div>
+                                <label class="switch"><input type="checkbox" id="mod-images-enabled"><span
+                                        class="slider"></span></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- BLOQUE 2: Canales -->
+                <div
+                    style="background: rgba(240,180,41,0.05); border: 1px solid rgba(240,180,41,0.22); border-radius: 14px; padding: 22px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <div style="background: rgba(240,180,41,0.18); border-radius: 8px; padding: 8px 11px;"><i
+                                class="fas fa-hashtag" style="color: var(--warning);"></i></div>
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem; display: block;">Canales donde aplicar la
+                                censura</span>
+                            <small style="color: var(--text-muted);">Si no seleccionas ninguno, se aplica en todo el
+                                servidor. Mantén Ctrl para seleccionar varios.</small>
+                        </div>
+                    </div>
+                    <select id="mod-channels" class="log-select" multiple
+                        style="height: 130px; width: 100%; margin: 0;"></select>
+                </div>
+
+                <!-- BLOQUE 3: Acciones al detectar -->
+                <div
+                    style="background: rgba(88,101,242,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; padding: 22px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                        <div style="background: rgba(88,101,242,0.18); border-radius: 8px; padding: 8px 11px;"><i
+                                class="fas fa-bell" style="color: var(--accent);"></i></div>
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem; display: block;">Acciones al Detectar
+                                Infracción</span>
+                            <small style="color: var(--text-muted);">Qué hace el bot cuando censura un mensaje.</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label
+                            style="display:flex; align-items:center; gap:12px; font-size:0.9rem; cursor:pointer; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                            <input type="checkbox" id="mod-alert-channel" checked>
+                            <span>⚠️ Alerta temporal en el canal <span
+                                    style="color:var(--text-muted);font-size:0.8rem;">(se elimina en 5
+                                    segundos)</span></span>
+                        </label>
+                        <label
+                            style="display:flex; align-items:center; gap:12px; font-size:0.9rem; cursor:pointer; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                            <input type="checkbox" id="mod-alert-dm">
+                            <span>✉️ Enviar Mensaje Directo (DM) explicativo al infractor</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 4: Acciones ban/kick -->
+                <div
+                    style="background: rgba(237,66,69,0.05); border: 1px solid rgba(237,66,69,0.22); border-radius: 14px; padding: 22px;">
+                    <div
+                        style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+                        <div style="background: rgba(237,66,69,0.18); border-radius: 8px; padding: 8px 11px;"><i
+                                class="fas fa-gavel" style="color: var(--danger);"></i></div>
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem; display: block;">Acciones de
+                                Moderación</span>
+                            <small style="color: var(--text-muted);">Comportamiento del bot al ejecutar comandos de ban
+                                o kick.</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px 18px;">
+                            <div>
+                                <span style="font-weight:600; font-size:0.95rem; display:block;">🔨 Eliminar mensajes al
+                                    banear</span>
+                                <small style="color:var(--text-muted);">Elimina el historial de mensajes de los últimos
+                                    7 días del usuario al banearlo.</small>
+                            </div>
+                            <label class="switch"><input type="checkbox" id="mod-delete-ban"><span
+                                    class="slider"></span></label>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px 18px;">
+                            <div>
+                                <span style="font-weight:600; font-size:0.95rem; display:block;">👢 Eliminar mensajes al
+                                    expulsar (kick)</span>
+                                <small style="color:var(--text-muted);">Elimina los mensajes recientes del usuario en el
+                                    canal al expulsarlo.</small>
+                            </div>
+                            <label class="switch"><input type="checkbox" id="mod-delete-kick"><span
+                                    class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -1040,16 +1240,23 @@
 
             <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom: 22px;">
                 <div style="flex:1; min-width:260px;">
-                    <label style="display:block; margin-bottom:8px; font-size:0.9rem; font-weight:600; color:var(--text-muted);">Canal común para todos los logs</label>
-                    <select id="logs-global-channel" class="log-select"><option value="">Cargando canales...</option></select>
+                    <label
+                        style="display:block; margin-bottom:8px; font-size:0.9rem; font-weight:600; color:var(--text-muted);">Canal
+                        común para todos los logs</label>
+                    <select id="logs-global-channel" class="log-select">
+                        <option value="">Cargando canales...</option>
+                    </select>
                 </div>
-                <button onclick="applyCommonLogChannel()" class="view-btn" style="background: var(--accent); color: white;">
+                <button onclick="applyCommonLogChannel()" class="view-btn"
+                    style="background: var(--accent); color: white;">
                     <i class="fas fa-link"></i> Aplicar canal a todos
                 </button>
-                <button onclick="enableAllLogEvents()" class="view-btn" style="background: #22c55e; color: #181825; font-weight: 700;">
+                <button onclick="enableAllLogEvents()" class="view-btn"
+                    style="background: #22c55e; color: #181825; font-weight: 700;">
                     <i class="fas fa-toggle-on"></i> Activar todos
                 </button>
-                <button onclick="disableAllLogEvents()" class="view-btn" style="background: #f87171; color: #181825; font-weight: 700;">
+                <button onclick="disableAllLogEvents()" class="view-btn"
+                    style="background: #f87171; color: #181825; font-weight: 700;">
                     <i class="fas fa-toggle-off"></i> Desactivar todos
                 </button>
             </div>
@@ -1066,10 +1273,12 @@
             <div class="section-header" style="margin-bottom: 20px;">
                 <span class="section-title">🤖 Auto Respuestas</span>
                 <div style="display: flex; gap: 10px;">
-                    <button onclick="loadAutoResponses()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white;">
+                    <button onclick="loadAutoResponses()" class="view-btn"
+                        style="background: rgba(255,255,255,0.1); color: white;">
                         <i class="fas fa-sync-alt"></i> Actualizar
                     </button>
-                    <button onclick="openAutoResponseModal()" class="view-btn" style="background: var(--success); color: #181825; font-weight: 700;">
+                    <button onclick="openAutoResponseModal()" class="view-btn"
+                        style="background: var(--success); color: #181825; font-weight: 700;">
                         <i class="fas fa-plus"></i> Añadir Respuesta
                     </button>
                 </div>
@@ -1083,15 +1292,21 @@
         </div>
 
         <!-- Modal: Crear/Editar Auto Respuesta -->
-        <div id="ar-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-            <div style="background:#1e1e2e;border-radius:16px;padding:28px;width:95%;max-width:700px;max-height:90vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.1);">
-                <button onclick="document.getElementById('ar-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
+        <div id="ar-modal"
+            style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;"
+            onclick="if(event.target===this)this.style.display='none'">
+            <div
+                style="background:#1e1e2e;border-radius:16px;padding:28px;width:95%;max-width:700px;max-height:90vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.1);">
+                <button onclick="document.getElementById('ar-modal').style.display='none'"
+                    style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
                 <h3 style="margin-bottom: 20px; color: white;" id="ar-modal-title">AÑADIR RESPUESTA</h3>
                 <input type="hidden" id="ar-edit-id">
 
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">DESENCADENANTE</label>
-                    <input type="text" id="ar-trigger" placeholder="Palabra o frase que activa la respuesta..." class="log-select" style="margin:0;">
+                    <label
+                        style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">DESENCADENANTE</label>
+                    <input type="text" id="ar-trigger" placeholder="Palabra o frase que activa la respuesta..."
+                        class="log-select" style="margin:0;">
                 </div>
 
                 <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
@@ -1099,21 +1314,27 @@
                         <input type="checkbox" id="ar-wildcard"> <span>🎯 Comodín</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
-                        <input type="checkbox" id="ar-reply" onchange="toggleReplyPingVisibility()"> <span>↩️ Enviar como respuesta</span>
+                        <input type="checkbox" id="ar-reply" onchange="toggleReplyPingVisibility()"> <span>↩️ Enviar
+                            como respuesta</span>
                     </label>
-                    <label id="ar-reply-ping-wrapper" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; transition: opacity 0.2s;">
+                    <label id="ar-reply-ping-wrapper"
+                        style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; transition: opacity 0.2s;">
                         <input type="checkbox" id="ar-reply-ping" checked> <span>🔔 Mencionar (Ping)</span>
                     </label>
                 </div>
 
                 <!-- Selector de tipo de respuesta (Texto vs Embed) -->
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">TIPO DE RESPUESTA</label>
+                    <label
+                        style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">TIPO
+                        DE RESPUESTA</label>
                     <div style="display: flex; gap: 10px;">
-                        <button type="button" id="ar-type-text-btn" onclick="selectArType('text')" class="view-btn" style="flex: 1; background: var(--accent); color: white; padding: 10px; font-weight: 600;">
+                        <button type="button" id="ar-type-text-btn" onclick="selectArType('text')" class="view-btn"
+                            style="flex: 1; background: var(--accent); color: white; padding: 10px; font-weight: 600;">
                             📝 Mensaje de Texto
                         </button>
-                        <button type="button" id="ar-type-embed-btn" onclick="selectArType('embed')" class="view-btn" style="flex: 1; background: rgba(255,255,255,0.05); color: white; padding: 10px; font-weight: 600;">
+                        <button type="button" id="ar-type-embed-btn" onclick="selectArType('embed')" class="view-btn"
+                            style="flex: 1; background: rgba(255,255,255,0.05); color: white; padding: 10px; font-weight: 600;">
                             🖼️ Embed de Discord
                         </button>
                     </div>
@@ -1123,14 +1344,20 @@
                 <!-- Campos para Tipo Texto -->
                 <div id="ar-text-fields-wrapper">
                     <div style="margin-bottom: 16px;">
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">RESPUESTA</label>
-                        <textarea id="ar-response" placeholder="Texto de la respuesta..." style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;" oninput="updateArPreview()"></textarea>
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">RESPUESTA</label>
+                        <textarea id="ar-response" placeholder="Texto de la respuesta..."
+                            style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"
+                            oninput="updateArPreview()"></textarea>
                     </div>
 
                     <div style="margin-bottom: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">RESPUESTAS ALEATORIAS</label>
-                            <button onclick="addRandomResponse()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white; padding: 4px 10px; font-size: 0.75rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">RESPUESTAS
+                                ALEATORIAS</label>
+                            <button onclick="addRandomResponse()" class="view-btn"
+                                style="background: rgba(255,255,255,0.1); color: white; padding: 4px 10px; font-size: 0.75rem;">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
@@ -1139,61 +1366,99 @@
                 </div>
 
                 <!-- Campos para Tipo Embed -->
-                <div id="ar-embed-fields-wrapper" style="display: none; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-bottom: 16px; flex-direction: column; gap: 12px;">
+                <div id="ar-embed-fields-wrapper"
+                    style="display: none; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-bottom: 16px; flex-direction: column; gap: 12px;">
                     <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">TÍTULO DEL EMBED</label>
-                        <input type="text" id="ar-embed-title" placeholder="Título del Embed..." class="log-select" style="margin:0;" oninput="updateArPreview()">
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">TÍTULO
+                            DEL EMBED</label>
+                        <input type="text" id="ar-embed-title" placeholder="Título del Embed..." class="log-select"
+                            style="margin:0;" oninput="updateArPreview()">
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">DESCRIPCIÓN DEL EMBED</label>
-                        <textarea id="ar-embed-desc" placeholder="Descripción o contenido del Embed..." style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;" oninput="updateArPreview()"></textarea>
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">DESCRIPCIÓN
+                            DEL EMBED</label>
+                        <textarea id="ar-embed-desc" placeholder="Descripción o contenido del Embed..."
+                            style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"
+                            oninput="updateArPreview()"></textarea>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">COLOR DEL EMBED</label>
-                            <input type="color" id="ar-embed-color" value="#5865F2" style="width: 100%; height: 40px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; padding: 4px;" oninput="updateArPreview()">
+                            <label
+                                style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">COLOR
+                                DEL EMBED</label>
+                            <input type="color" id="ar-embed-color" value="#5865F2"
+                                style="width: 100%; height: 40px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; padding: 4px;"
+                                oninput="updateArPreview()">
                         </div>
                         <div>
-                            <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">MINIATURA (THUMBNAIL URL)</label>
-                            <input type="text" id="ar-embed-thumbnail" placeholder="https://..." class="log-select" style="margin:0;" oninput="updateArPreview()">
+                            <label
+                                style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">MINIATURA
+                                (THUMBNAIL URL)</label>
+                            <input type="text" id="ar-embed-thumbnail" placeholder="https://..." class="log-select"
+                                style="margin:0;" oninput="updateArPreview()">
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">IMAGEN PRINCIPAL (IMAGE URL)</label>
-                            <input type="text" id="ar-embed-image" placeholder="https://..." class="log-select" style="margin:0;" oninput="updateArPreview()">
+                            <label
+                                style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">IMAGEN
+                                PRINCIPAL (IMAGE URL)</label>
+                            <input type="text" id="ar-embed-image" placeholder="https://..." class="log-select"
+                                style="margin:0;" oninput="updateArPreview()">
                         </div>
                         <div>
-                            <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">PIE DE PÁGINA (FOOTER)</label>
-                            <input type="text" id="ar-embed-footer" placeholder="Texto del footer..." class="log-select" style="margin:0;" oninput="updateArPreview()">
+                            <label
+                                style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">PIE
+                                DE PÁGINA (FOOTER)</label>
+                            <input type="text" id="ar-embed-footer" placeholder="Texto del footer..." class="log-select"
+                                style="margin:0;" oninput="updateArPreview()">
                         </div>
                     </div>
                 </div>
 
                 <!-- Vista Previa Discord -->
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">VISTA PREVIA EN DISCORD</label>
-                    <div style="background: #313338; border-radius: 12px; padding: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.2);">
+                    <label
+                        style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">VISTA
+                        PREVIA EN DISCORD</label>
+                    <div
+                        style="background: #313338; border-radius: 12px; padding: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.2);">
                         <div style="display: flex; gap: 12px;">
-                            <img id="ar-preview-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.05);" />
+                            <img id="ar-preview-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png"
+                                style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.05);" />
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <span id="ar-preview-botname" style="color: #f2f3f5; font-weight: 600; font-size: 0.95rem;">RTXSERVERBOT</span>
-                                    <span style="background: #5865F2; color: white; font-size: 0.625rem; padding: 2px 5px; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">BOT</span>
+                                    <span id="ar-preview-botname"
+                                        style="color: #f2f3f5; font-weight: 600; font-size: 0.95rem;">RTXSERVERBOT</span>
+                                    <span
+                                        style="background: #5865F2; color: white; font-size: 0.625rem; padding: 2px 5px; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">BOT</span>
                                     <span style="color: #949ba4; font-size: 0.75rem;">Hoy a las 16:00</span>
                                 </div>
-                                
+
                                 <!-- Vista previa texto -->
-                                <div id="ar-preview-text" style="color: #dbdee1; font-size: 0.95rem; white-space: pre-wrap; word-break: break-all;"></div>
-                                
+                                <div id="ar-preview-text"
+                                    style="color: #dbdee1; font-size: 0.95rem; white-space: pre-wrap; word-break: break-all;">
+                                </div>
+
                                 <!-- Vista previa embed -->
-                                <div id="ar-preview-embed" style="display: none; border-left: 4px solid #5865f2; background: #2b2d31; border-radius: 4px; padding: 12px 16px; margin-top: 8px; max-width: 520px; position: relative;">
-                                    <img id="ar-preview-embed-thumbnail" src="" style="display: none; width: 80px; height: 80px; border-radius: 4px; object-fit: cover; position: absolute; top: 12px; right: 12px;" />
+                                <div id="ar-preview-embed"
+                                    style="display: none; border-left: 4px solid #5865f2; background: #2b2d31; border-radius: 4px; padding: 12px 16px; margin-top: 8px; max-width: 520px; position: relative;">
+                                    <img id="ar-preview-embed-thumbnail" src=""
+                                        style="display: none; width: 80px; height: 80px; border-radius: 4px; object-fit: cover; position: absolute; top: 12px; right: 12px;" />
                                     <div style="margin-right: 90px;" id="ar-preview-embed-main">
-                                        <div id="ar-preview-embed-title" style="color: #ffffff; font-weight: 600; font-size: 1rem; margin-bottom: 6px; word-break: break-word;"></div>
-                                        <div id="ar-preview-embed-desc" style="color: #dbdee1; font-size: 0.875rem; white-space: pre-wrap; word-break: break-word;"></div>
-                                        <img id="ar-preview-embed-image" src="" style="display: none; width: 100%; border-radius: 4px; margin-top: 8px; max-height: 250px; object-fit: cover;" />
-                                        <div id="ar-preview-embed-footer" style="color: #949ba4; font-size: 0.75rem; margin-top: 8px; word-break: break-word;"></div>
+                                        <div id="ar-preview-embed-title"
+                                            style="color: #ffffff; font-weight: 600; font-size: 1rem; margin-bottom: 6px; word-break: break-word;">
+                                        </div>
+                                        <div id="ar-preview-embed-desc"
+                                            style="color: #dbdee1; font-size: 0.875rem; white-space: pre-wrap; word-break: break-word;">
+                                        </div>
+                                        <img id="ar-preview-embed-image" src=""
+                                            style="display: none; width: 100%; border-radius: 4px; margin-top: 8px; max-height: 250px; object-fit: cover;" />
+                                        <div id="ar-preview-embed-footer"
+                                            style="color: #949ba4; font-size: 0.75rem; margin-top: 8px; word-break: break-word;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1201,46 +1466,72 @@
                     </div>
                 </div>
 
-                <div style="background: rgba(88,101,242,0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(88,101,242,0.2);">
-                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--accent); display: block; margin-bottom: 6px;">VARIABLES</label>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
-                        <span><code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#a6e3a1;">{user}</code> Menciona al usuario que activó la respuesta</span>
-                        <span><code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#a6e3a1;">{username}</code> Muestra el nombre del usuario, sin mencionarlo</span>
-                        <span><code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#a6e3a1;">{server}</code> Nombre del servidor</span>
+                <div
+                    style="background: rgba(88,101,242,0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(88,101,242,0.2);">
+                    <label
+                        style="font-size: 0.75rem; font-weight: 600; color: var(--accent); display: block; margin-bottom: 6px;">VARIABLES</label>
+                    <div
+                        style="font-size: 0.8rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+                        <span><code
+                                style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#a6e3a1;">{user}</code>
+                            Menciona al usuario que activó la respuesta</span>
+                        <span><code
+                                style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#a6e3a1;">{username}</code>
+                            Muestra el nombre del usuario, sin mencionarlo</span>
+                        <span><code
+                                style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#a6e3a1;">{server}</code>
+                            Nombre del servidor</span>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                     <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">ROLES HABILITADOS</label>
-                        <select id="ar-enabled-roles" class="log-select" multiple style="height: 80px; margin: 0;"></select>
-                        <small style="color: var(--text-muted); font-size: 0.7rem;">Ctrl+Click para seleccionar varios. Vacío = todos</small>
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">ROLES
+                            HABILITADOS</label>
+                        <select id="ar-enabled-roles" class="log-select" multiple
+                            style="height: 80px; margin: 0;"></select>
+                        <small style="color: var(--text-muted); font-size: 0.7rem;">Ctrl+Click para seleccionar varios.
+                            Vacío = todos</small>
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">ROLES DESHABILITADOS</label>
-                        <select id="ar-disabled-roles" class="log-select" multiple style="height: 80px; margin: 0;"></select>
-                        <small style="color: var(--text-muted); font-size: 0.7rem;">Estos roles NO activarán la respuesta</small>
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">ROLES
+                            DESHABILITADOS</label>
+                        <select id="ar-disabled-roles" class="log-select" multiple
+                            style="height: 80px; margin: 0;"></select>
+                        <small style="color: var(--text-muted); font-size: 0.7rem;">Estos roles NO activarán la
+                            respuesta</small>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                     <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">CANALES HABILITADOS</label>
-                        <select id="ar-enabled-channels" class="log-select" multiple style="height: 80px; margin: 0;"></select>
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">CANALES
+                            HABILITADOS</label>
+                        <select id="ar-enabled-channels" class="log-select" multiple
+                            style="height: 80px; margin: 0;"></select>
                         <small style="color: var(--text-muted); font-size: 0.7rem;">Vacío = todos los canales</small>
                     </div>
                     <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">CANALES DESHABILITADOS</label>
-                        <select id="ar-disabled-channels" class="log-select" multiple style="height: 80px; margin: 0;"></select>
-                        <small style="color: var(--text-muted); font-size: 0.7rem;">Estos canales NO activarán la respuesta</small>
+                        <label
+                            style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">CANALES
+                            DESHABILITADOS</label>
+                        <select id="ar-disabled-channels" class="log-select" multiple
+                            style="height: 80px; margin: 0;"></select>
+                        <small style="color: var(--text-muted); font-size: 0.7rem;">Estos canales NO activarán la
+                            respuesta</small>
                     </div>
                 </div>
 
                 <div style="display: flex; gap: 10px;">
-                    <button onclick="saveAutoResponse()" class="view-btn" style="flex: 1; background: var(--success); color: #181825; padding: 12px; font-weight: 700;">
+                    <button onclick="saveAutoResponse()" class="view-btn"
+                        style="flex: 1; background: var(--success); color: #181825; padding: 12px; font-weight: 700;">
                         <i class="fas fa-save"></i> Guardar Cambios
                     </button>
-                    <button onclick="document.getElementById('ar-modal').style.display='none'" class="view-btn" style="flex: 1; background: rgba(255,255,255,0.1); color: white; padding: 12px;">
+                    <button onclick="document.getElementById('ar-modal').style.display='none'" class="view-btn"
+                        style="flex: 1; background: rgba(255,255,255,0.1); color: white; padding: 12px;">
                         Cancelar
                     </button>
                 </div>
@@ -1252,13 +1543,16 @@
             <div class="section-header" style="margin-bottom: 20px;">
                 <span class="section-title">🎫 Gestión de Tickets</span>
                 <div style="display: flex; gap: 10px;" id="tickets-tabs">
-                    <button class="view-btn active-tab" onclick="switchTicketTab('list')" style="background: var(--accent); color: white;" id="tab-btn-list">
+                    <button class="view-btn active-tab" onclick="switchTicketTab('list')"
+                        style="background: var(--accent); color: white;" id="tab-btn-list">
                         <i class="fas fa-list"></i> Ver Tickets
                     </button>
-                    <button class="view-btn" onclick="switchTicketTab('create')" style="background: rgba(255,255,255,0.1); color: white;" id="tab-btn-create">
+                    <button class="view-btn" onclick="switchTicketTab('create')"
+                        style="background: rgba(255,255,255,0.1); color: white;" id="tab-btn-create">
                         <i class="fas fa-plus"></i> Crear Panel
                     </button>
-                    <button class="view-btn" onclick="switchTicketTab('config')" style="background: rgba(255,255,255,0.1); color: white;" id="tab-btn-config">
+                    <button class="view-btn" onclick="switchTicketTab('config')"
+                        style="background: rgba(255,255,255,0.1); color: white;" id="tab-btn-config">
                         <i class="fas fa-cog"></i> Configuración
                     </button>
                 </div>
@@ -1268,10 +1562,13 @@
             <div id="tickets-tab-list">
                 <!-- Sub-tabs: Activos / Cerrados -->
                 <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    <button class="view-btn active-tab" onclick="switchTicketListSubTab('active')" id="ticket-sub-active" style="background: var(--accent); color: white; padding: 8px 16px; font-size: 0.85rem;">
+                    <button class="view-btn active-tab" onclick="switchTicketListSubTab('active')"
+                        id="ticket-sub-active"
+                        style="background: var(--accent); color: white; padding: 8px 16px; font-size: 0.85rem;">
                         <i class="fas fa-headset"></i> Tickets Activos
                     </button>
-                    <button class="view-btn" onclick="switchTicketListSubTab('closed')" id="ticket-sub-closed" style="background: rgba(255,255,255,0.1); color: white; padding: 8px 16px; font-size: 0.85rem;">
+                    <button class="view-btn" onclick="switchTicketListSubTab('closed')" id="ticket-sub-closed"
+                        style="background: rgba(255,255,255,0.1); color: white; padding: 8px 16px; font-size: 0.85rem;">
                         <i class="fas fa-archive"></i> Tickets Cerrados (Logs)
                     </button>
                 </div>
@@ -1279,7 +1576,9 @@
                 <!-- Active tickets -->
                 <div id="tickets-active-container">
                     <div id="active-tickets-list" style="display: flex; flex-direction: column; gap: 10px;">
-                        <div class="loading"><div class="spinner"></div>Cargando tickets activos...</div>
+                        <div class="loading">
+                            <div class="spinner"></div>Cargando tickets activos...
+                        </div>
                     </div>
                 </div>
 
@@ -1308,42 +1607,58 @@
                     <!-- Left: Formulario -->
                     <div class="stat-card" style="flex-direction: column; align-items: stretch;">
                         <h3 style="margin-bottom: 16px;">📝 Configurar Panel</h3>
-                        
-                        <div style="background: rgba(88,101,242,0.1); border: 1px solid rgba(88,101,242,0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
-                            <p style="font-size: 0.85rem; color: #a5b4fc;"><i class="fas fa-info-circle"></i> Los paneles existentes se actualizarán automáticamente en Discord.</p>
+
+                        <div
+                            style="background: rgba(88,101,242,0.1); border: 1px solid rgba(88,101,242,0.3); border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                            <p style="font-size: 0.85rem; color: #a5b4fc;"><i class="fas fa-info-circle"></i> Los
+                                paneles existentes se actualizarán automáticamente en Discord.</p>
                         </div>
 
                         <div id="existing-panels-list" style="margin-bottom: 20px; display: none;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📌 PANELES EXISTENTES</label>
-                            <div id="panels-select-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📌
+                                PANELES EXISTENTES</label>
+                            <div id="panels-select-container"
+                                style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
                             </div>
-                            <button onclick="resetTicketPanelForm()" class="view-btn" style="width: 100%; background: rgba(255,255,255,0.1); color: white; padding: 8px;">
+                            <button onclick="resetTicketPanelForm()" class="view-btn"
+                                style="width: 100%; background: rgba(255,255,255,0.1); color: white; padding: 8px;">
                                 <i class="fas fa-plus"></i> Crear Nuevo Panel
                             </button>
                         </div>
 
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">CANAL DESTINO</label>
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">CANAL
+                                DESTINO</label>
                             <select id="tp-channel" class="log-select">
                                 <option value="">Seleccionar canal...</option>
                             </select>
                         </div>
 
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📋 CANAL DE LOGS DE TICKETS</label>
+                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">📋
+                                CANAL DE LOGS DE TICKETS</label>
                             <select id="tp-log-channel" class="log-select">
                                 <option value="">Seleccionar canal para logs...</option>
                             </select>
-                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Donde se enviará el registro cuando se cierren tickets</small>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Donde se enviará
+                                el registro cuando se cierren tickets</small>
                         </div>
 
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">MENSAJE DEL PANEL</label>
-                            <textarea id="tp-message" placeholder="Mensaje que se mostrará en el embed de los tickets..." style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none;" oninput="updateTicketPreview()"></textarea>
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">MENSAJE
+                                DEL PANEL</label>
+                            <textarea id="tp-message"
+                                placeholder="Mensaje que se mostrará en el embed de los tickets..."
+                                style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none;"
+                                oninput="updateTicketPreview()"></textarea>
                         </div>
 
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">LÍMITE DE TICKETS POR USUARIO</label>
+                            <label
+                                style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">LÍMITE
+                                DE TICKETS POR USUARIO</label>
                             <select id="tp-max-tickets" class="log-select">
                                 <option value="1">1 ticket activo</option>
                                 <option value="2">2 tickets activos</option>
@@ -1352,13 +1667,16 @@
                                 <option value="5">5 tickets activos</option>
                                 <option value="0">Sin límite</option>
                             </select>
-                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Número máximo de tickets que un usuario puede abrir simultáneamente.</small>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Número máximo de
+                                tickets que un usuario puede abrir simultáneamente.</small>
                         </div>
 
                         <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                 <label style="font-size: 0.9rem; font-weight: 600;">BOTONES (Máximo 5)</label>
-                                <button onclick="addTicketButton()" class="view-btn" style="background: rgba(255,255,255,0.1); color: white; padding: 4px 10px; font-size: 0.8rem;">
+                                <button onclick="addTicketButton()" class="view-btn"
+                                    style="background: rgba(255,255,255,0.1); color: white; padding: 4px 10px; font-size: 0.8rem;">
                                     <i class="fas fa-plus"></i> Añadir Botón
                                 </button>
                             </div>
@@ -1369,27 +1687,37 @@
                         <input type="hidden" id="tp-current-panel-id" value="">
 
                         <div style="display: flex; gap: 12px;">
-                            <button onclick="saveTicketConfig()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
+                            <button onclick="saveTicketConfig()" class="view-btn"
+                                style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
                                 <i class="fas fa-save"></i> Guardar
                             </button>
-                            <button onclick="sendTicketPanel()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--accent); color: white;">
+                            <button onclick="sendTicketPanel()" class="view-btn"
+                                style="flex: 1; padding: 14px; font-weight: 700; background: var(--accent); color: white;">
                                 <i class="fas fa-paper-plane"></i> Enviar
                             </button>
                         </div>
                     </div>
 
                     <!-- Right: Preview -->
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; position: sticky; top: 100px;">
+                    <div
+                        style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; position: sticky; top: 100px;">
                         <h3 style="margin-bottom: 16px; color: var(--accent);">👀 Vista Previa (Discord)</h3>
-                        <div id="ticket-preview" style="background: #2c2f33; border-radius: 8px; padding: 16px; border-left: 4px solid #5865f2;">
+                        <div id="ticket-preview"
+                            style="background: #2c2f33; border-radius: 8px; padding: 16px; border-left: 4px solid #5865f2;">
                             <div style="margin-bottom: 12px;">
-                                <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">🎫 Centro de Soporte</div>
-                                <div style="color: #b9bbbe; font-size: 0.85rem; margin-top: 8px; line-height: 1.5;" id="preview-message">
-                                    Pulsa un botón para abrir un ticket con el staff.<br><br><strong>Para usuarios aislados:</strong> Si estás en timeout, puedes crear un ticket para comunicarte con los administradores.
+                                <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">🎫 Centro de Soporte
+                                </div>
+                                <div style="color: #b9bbbe; font-size: 0.85rem; margin-top: 8px; line-height: 1.5;"
+                                    id="preview-message">
+                                    Pulsa un botón para abrir un ticket con el staff.<br><br><strong>Para usuarios
+                                        aislados:</strong> Si estás en timeout, puedes crear un ticket para comunicarte
+                                    con los administradores.
                                 </div>
                             </div>
-                            <div id="preview-buttons" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
-                                <button style="background: #5865f2; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+                            <div id="preview-buttons"
+                                style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                                <button
+                                    style="background: #5865f2; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
                                     🎫 Crear Ticket
                                 </button>
                             </div>
@@ -1400,47 +1728,60 @@
 
             <!-- Tab: Configuración de Tickets -->
             <div id="tickets-tab-config" style="display: none;">
-                <div class="stat-card" style="flex-direction: column; align-items: stretch; max-width: 800px; margin: 0 auto;">
-                    <h3 style="margin-bottom: 20px;"><i class="fas fa-shield-alt" style="color: var(--accent);"></i> Roles que pueden ver y gestionar tickets</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Selecciona los roles que tendrán acceso para ver y cerrar los tickets de soporte. El rol principal se usará para mencionar al staff cuando se abra un ticket.</p>
+                <div class="stat-card"
+                    style="flex-direction: column; align-items: stretch; max-width: 800px; margin: 0 auto;">
+                    <h3 style="margin-bottom: 20px;"><i class="fas fa-shield-alt" style="color: var(--accent);"></i>
+                        Roles que pueden ver y gestionar tickets</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Selecciona los roles
+                        que tendrán acceso para ver y cerrar los tickets de soporte. El rol principal se usará para
+                        mencionar al staff cuando se abra un ticket.</p>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🔑 ROL PRINCIPAL DE TICKETS (se mencionará)</label>
+                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🔑 ROL
+                            PRINCIPAL DE TICKETS (se mencionará)</label>
                         <select id="tc-staff-role" class="log-select">
                             <option value="">Seleccionar rol...</option>
                         </select>
                     </div>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">👥 ROLES ADICIONALES QUE PUEDEN VER TICKETS</label>
+                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">👥 ROLES
+                            ADICIONALES QUE PUEDEN VER TICKETS</label>
                         <select id="tc-extra-roles" class="log-select" multiple style="height: 100px;">
                         </select>
-                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">Ctrl+Click para seleccionar varios</small>
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">Ctrl+Click para
+                            seleccionar varios</small>
                     </div>
 
                     <div style="margin-bottom: 20px;">
-                        <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">ROLES CONFIGURADOS ACTUALMENTE:</div>
+                        <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">ROLES CONFIGURADOS
+                            ACTUALMENTE:</div>
                         <div id="tc-current-roles" style="display: flex; flex-wrap: wrap; gap: 8px;">
                             <span style="color: var(--text-muted); font-size: 0.85rem;">Ninguno configurado</span>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 12px;">
-                        <button onclick="saveTicketRoles()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
+                        <button onclick="saveTicketRoles()" class="view-btn"
+                            style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
                             <i class="fas fa-save"></i> Guardar Roles de Tickets
                         </button>
-                        <button onclick="clearTicketRoles()" class="view-btn" style="padding: 14px; background: var(--danger); color: white;">
+                        <button onclick="clearTicketRoles()" class="view-btn"
+                            style="padding: 14px; background: var(--danger); color: white;">
                             <i class="fas fa-trash"></i> Eliminar Roles
                         </button>
                     </div>
                 </div>
 
                 <!-- Configuración de límite de tickets -->
-                <div class="stat-card" style="flex-direction: column; align-items: stretch; max-width: 800px; margin: 20px auto 0;">
-                    <h3 style="margin-bottom: 20px;"><i class="fas fa-sliders-h" style="color: var(--accent);"></i> Ajustes Generales de Tickets</h3>
-                    
+                <div class="stat-card"
+                    style="flex-direction: column; align-items: stretch; max-width: 800px; margin: 20px auto 0;">
+                    <h3 style="margin-bottom: 20px;"><i class="fas fa-sliders-h" style="color: var(--accent);"></i>
+                        Ajustes Generales de Tickets</h3>
+
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🎟️ LÍMITE DE TICKETS POR USUARIO</label>
+                        <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🎟️
+                            LÍMITE DE TICKETS POR USUARIO</label>
                         <select id="tc-max-tickets" class="log-select">
                             <option value="1">1 ticket activo</option>
                             <option value="2">2 tickets activos</option>
@@ -1449,11 +1790,13 @@
                             <option value="5">5 tickets activos</option>
                             <option value="0">Sin límite</option>
                         </select>
-                        <small style="color: var(--text-muted); margin-top: 4px; display: block;">Número máximo de tickets que un usuario puede abrir simultáneamente.</small>
+                        <small style="color: var(--text-muted); margin-top: 4px; display: block;">Número máximo de
+                            tickets que un usuario puede abrir simultáneamente.</small>
                     </div>
 
                     <div style="display: flex; gap: 12px;">
-                        <button onclick="saveTicketGeneralConfig()" class="view-btn" style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
+                        <button onclick="saveTicketGeneralConfig()" class="view-btn"
+                            style="flex: 1; padding: 14px; font-weight: 700; background: var(--success); color: #181825;">
                             <i class="fas fa-save"></i> Guardar Ajustes
                         </button>
                     </div>
@@ -1465,31 +1808,37 @@
         <div id="suggestions" class="section">
             <div class="section-header" style="margin-bottom: 20px;">
                 <span class="section-title">💡 Gestión de Sugerencias</span>
-                <button class="view-btn" onclick="loadSuggestions()" style="background: rgba(255,255,255,0.1); color: white;">
+                <button class="view-btn" onclick="loadSuggestions()"
+                    style="background: rgba(255,255,255,0.1); color: white;">
                     <i class="fas fa-sync-alt"></i> Actualizar
                 </button>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🎯 CANAL DE SUGERENCIAS APROBADAS</label>
+                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🎯 CANAL DE
+                    SUGERENCIAS APROBADAS</label>
                 <div style="display: flex; gap: 10px;">
                     <select id="sg-channel" class="log-select" style="flex: 1;">
                         <option value="">Seleccionar canal...</option>
                     </select>
-                    <button onclick="saveSuggestionsChannel()" class="view-btn" style="background: var(--success); color: white; padding: 8px 16px;">
+                    <button onclick="saveSuggestionsChannel()" class="view-btn"
+                        style="background: var(--success); color: white; padding: 8px 16px;">
                         <i class="fas fa-save"></i> Guardar
                     </button>
                 </div>
             </div>
 
             <div id="suggestions-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="view-btn" onclick="switchSuggestionsTab('pending')" style="background: var(--accent); color: white;" id="sg-tab-pending">
+                <button class="view-btn" onclick="switchSuggestionsTab('pending')"
+                    style="background: var(--accent); color: white;" id="sg-tab-pending">
                     <i class="fas fa-hourglass-half"></i> Pendientes
                 </button>
-                <button class="view-btn" onclick="switchSuggestionsTab('approved')" style="background: rgba(255,255,255,0.1); color: white;" id="sg-tab-approved">
+                <button class="view-btn" onclick="switchSuggestionsTab('approved')"
+                    style="background: rgba(255,255,255,0.1); color: white;" id="sg-tab-approved">
                     <i class="fas fa-check-circle"></i> Aprobadas
                 </button>
-                <button class="view-btn" onclick="switchSuggestionsTab('rejected')" style="background: rgba(255,255,255,0.1); color: white;" id="sg-tab-rejected">
+                <button class="view-btn" onclick="switchSuggestionsTab('rejected')"
+                    style="background: rgba(255,255,255,0.1); color: white;" id="sg-tab-rejected">
                     <i class="fas fa-times-circle"></i> Rechazadas
                 </button>
             </div>
@@ -1516,10 +1865,12 @@
             <div class="section-header" style="flex-wrap:wrap; gap:12px;">
                 <span class="section-title">🎁 Gestión de Sorteos</span>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="view-btn" onclick="loadGiveaways()" style="background: rgba(255,255,255,0.1); color: white;">
+                    <button class="view-btn" onclick="loadGiveaways()"
+                        style="background: rgba(255,255,255,0.1); color: white;">
                         <i class="fas fa-sync-alt"></i> Actualizar
                     </button>
-                    <button class="view-btn" onclick="createGiveaway()" style="background: var(--success); color: #181825; font-weight:700;">
+                    <button class="view-btn" onclick="createGiveaway()"
+                        style="background: var(--success); color: #181825; font-weight:700;">
                         <i class="fas fa-plus-circle"></i> Crear Sorteo
                     </button>
                 </div>
@@ -1530,92 +1881,125 @@
                     <form id="gw-form" style="display:grid;gap:18px;">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                             <div>
-                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Premio</label>
-                            <input id="gw-prize" type="text" placeholder="Ej: Giftcard 20€" class="log-select" style="margin:0;">
+                                <label
+                                    style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Premio</label>
+                                <input id="gw-prize" type="text" placeholder="Ej: Giftcard 20€" class="log-select"
+                                    style="margin:0;">
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Canal
+                                    del sorteo</label>
+                                <select id="gw-channel" class="log-select" style="margin:0;">
+                                    <option value="">Seleccionar canal...</option>
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Canal del sorteo</label>
-                            <select id="gw-channel" class="log-select" style="margin:0;"><option value="">Seleccionar canal...</option></select>
-                        </div>
-                    </div>
 
-                    <div>
-                        <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Detalles del sorteo</label>
-                        <textarea id="gw-details" rows="4" placeholder="Descripción del premio y reglas del sorteo" style="width:100%;background:#181825;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;padding:12px;resize:none;font-family:inherit;"></textarea>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                         <div>
-                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Inicio</label>
-                            <input id="gw-start" type="datetime-local" class="log-select" style="margin:0;">
+                            <label
+                                style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Detalles
+                                del sorteo</label>
+                            <textarea id="gw-details" rows="4" placeholder="Descripción del premio y reglas del sorteo"
+                                style="width:100%;background:#181825;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;padding:12px;resize:none;font-family:inherit;"></textarea>
                         </div>
-                        <div>
-                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Fin</label>
-                            <input id="gw-end" type="datetime-local" class="log-select" style="margin:0;">
-                        </div>
-                    </div>
-                    <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px;margin-bottom:0;">Si dejas el fin vacío, el sorteo quedará abierto hasta cerrarlo manualmente. La hora se toma de tu navegador.</p>
 
-                    <div>
-                        <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Imagen del sorteo</label>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <input id="gw-image" type="text" placeholder="URL de imagen o sube una" class="log-select" style="flex:1;margin:0;">
-                            <button onclick="document.getElementById('gw-image-upload').click()" class="view-btn" style="padding:0 12px;height:44px;background:var(--bg-sidebar);border:1px solid rgba(255,255,255,0.1);">
-                                <i class="fas fa-upload"></i>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <label
+                                    style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Inicio</label>
+                                <input id="gw-start" type="datetime-local" class="log-select" style="margin:0;">
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Fin</label>
+                                <input id="gw-end" type="datetime-local" class="log-select" style="margin:0;">
+                            </div>
+                        </div>
+                        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:4px;margin-bottom:0;">Si dejas el
+                            fin vacío, el sorteo quedará abierto hasta cerrarlo manualmente. La hora se toma de tu
+                            navegador.</p>
+
+                        <div>
+                            <label
+                                style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;">Imagen
+                                del sorteo</label>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <input id="gw-image" type="text" placeholder="URL de imagen o sube una"
+                                    class="log-select" style="flex:1;margin:0;">
+                                <button onclick="document.getElementById('gw-image-upload').click()" class="view-btn"
+                                    style="padding:0 12px;height:44px;background:var(--bg-sidebar);border:1px solid rgba(255,255,255,0.1);">
+                                    <i class="fas fa-upload"></i>
+                                </button>
+                                <input id="gw-image-upload" type="file" accept="image/*" style="display:none;"
+                                    onchange="uploadGiveawayImage(this)">
+                            </div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <label
+                                    style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Roles
+                                    que pueden rerollear</label>
+                                <select id="gw-roles-reroll" class="log-select" multiple style="height:100px;">
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Roles
+                                    que pueden terminar/edit</label>
+                                <select id="gw-roles-finish" class="log-select" multiple style="height:100px;">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <input id="gw-mention-everyone" type="checkbox" style="width:16px;height:16px;">
+                            <label for="gw-mention-everyone" style="color:var(--text-muted);font-size:0.9rem;">Mencionar
+                                @everyone al cerrar el sorteo</label>
+                        </div>
+
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                            <button onclick="saveGiveawayPermissions()" class="view-btn"
+                                style="background: var(--accent); color:white; padding:12px;">
+                                <i class="fas fa-user-check"></i> Guardar permisos
                             </button>
-                            <input id="gw-image-upload" type="file" accept="image/*" style="display:none;" onchange="uploadGiveawayImage(this)">
+                            <button onclick="clearGiveawayForm()" class="view-btn"
+                                style="background: rgba(255,255,255,0.1); color:white; padding:12px;">
+                                <i class="fas fa-eraser"></i> Limpiar formulario
+                            </button>
                         </div>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                        <div>
-                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Roles que pueden rerollear</label>
-                            <select id="gw-roles-reroll" class="log-select" multiple style="height:100px;">
-                            </select>
-                        </div>
-                        <div>
-                            <label style="display:block;margin-bottom:8px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Roles que pueden terminar/edit</label>
-                            <select id="gw-roles-finish" class="log-select" multiple style="height:100px;">
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <input id="gw-mention-everyone" type="checkbox" style="width:16px;height:16px;">
-                        <label for="gw-mention-everyone" style="color:var(--text-muted);font-size:0.9rem;">Mencionar @everyone al cerrar el sorteo</label>
-                    </div>
-
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                        <button onclick="saveGiveawayPermissions()" class="view-btn" style="background: var(--accent); color:white; padding:12px;">
-                            <i class="fas fa-user-check"></i> Guardar permisos
-                        </button>
-                        <button onclick="clearGiveawayForm()" class="view-btn" style="background: rgba(255,255,255,0.1); color:white; padding:12px;">
-                            <i class="fas fa-eraser"></i> Limpiar formulario
-                        </button>
-                    </div>
                     </form>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.03); padding:24px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);">
+                <div
+                    style="background: rgba(255,255,255,0.03); padding:24px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);">
                     <h3 style="margin-bottom:16px;">Información rápida</h3>
                     <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
-                        Crea un sorteo con premio, canal, imagen y permisos. Si no pones fecha de fin, el sorteo se mantendrá abierto hasta cerrarlo manualmente.
+                        Crea un sorteo con premio, canal, imagen y permisos. Si no pones fecha de fin, el sorteo se
+                        mantendrá abierto hasta cerrarlo manualmente.
                     </p>
                     <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;">
-                        El bot genera un embed visual en Discord y anuncia el ganador en el canal cuando termina el sorteo.
+                        El bot genera un embed visual en Discord y anuncia el ganador en el canal cuando termina el
+                        sorteo.
                     </p>
                     <div style="margin-top:20px;display:grid;gap:12px;">
                         <div style="background:rgba(88,101,242,0.08);padding:12px;border-radius:10px;">
                             <strong>Estados:</strong>
                             <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
-                                <span style="background:#22c55e;color:#0b1220;padding:4px 10px;border-radius:999px;font-size:0.8rem;">Entregado</span>
-                                <span style="background:#facc15;color:#1f2937;padding:4px 10px;border-radius:999px;font-size:0.8rem;">Pendiente</span>
-                                <span style="background:#f87171;color:#1f2937;padding:4px 10px;border-radius:999px;font-size:0.8rem;">No respondió</span>
+                                <span
+                                    style="background:#22c55e;color:#0b1220;padding:4px 10px;border-radius:999px;font-size:0.8rem;">Entregado</span>
+                                <span
+                                    style="background:#facc15;color:#1f2937;padding:4px 10px;border-radius:999px;font-size:0.8rem;">Pendiente</span>
+                                <span
+                                    style="background:#f87171;color:#1f2937;padding:4px 10px;border-radius:999px;font-size:0.8rem;">No
+                                    respondió</span>
                             </div>
                         </div>
                         <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:10px;">
                             <strong>Historial:</strong>
-                            <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">Se guardan todos los ganadores y rerolls con fecha y quién ejecutó cada acción.</p>
+                            <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">Se guardan todos los
+                                ganadores y rerolls con fecha y quién ejecutó cada acción.</p>
                         </div>
                     </div>
                 </div>
@@ -1623,18 +2007,24 @@
 
             <div style="margin-top:30px;">
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="view-btn active-tab" id="gw-tab-active" onclick="switchGiveawayTab('active')" style="background: var(--accent); color:white;">
+                    <button class="view-btn active-tab" id="gw-tab-active" onclick="switchGiveawayTab('active')"
+                        style="background: var(--accent); color:white;">
                         <i class="fas fa-play"></i> Sorteos Activos
                     </button>
-                    <button class="view-btn" id="gw-tab-ended" onclick="switchGiveawayTab('ended')" style="background: rgba(255,255,255,0.1); color:white;">
+                    <button class="view-btn" id="gw-tab-ended" onclick="switchGiveawayTab('ended')"
+                        style="background: rgba(255,255,255,0.1); color:white;">
                         <i class="fas fa-check-circle"></i> Sorteos Terminados
                     </button>
                 </div>
                 <div id="giveaway-active-container" style="margin-top:20px;">
-                    <div class="loading"><div class="spinner"></div>Cargando sorteos activos...</div>
+                    <div class="loading">
+                        <div class="spinner"></div>Cargando sorteos activos...
+                    </div>
                 </div>
                 <div id="giveaway-ended-container" style="display:none;margin-top:20px;">
-                    <div class="loading"><div class="spinner"></div>Cargando sorteos terminados...</div>
+                    <div class="loading">
+                        <div class="spinner"></div>Cargando sorteos terminados...
+                    </div>
                 </div>
             </div>
         </div>
@@ -1661,10 +2051,13 @@
                     </tbody>
                 </table>
             </div>
-            <div id="members-pagination" style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:16px;">
-                <button id="members-prev-btn" onclick="goMembersPrev()" disabled style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:white;cursor:pointer;">Anterior</button>
+            <div id="members-pagination"
+                style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:16px;">
+                <button id="members-prev-btn" onclick="goMembersPrev()" disabled
+                    style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:white;cursor:pointer;">Anterior</button>
                 <span id="members-page-info" style="color:var(--text-muted);font-size:0.95rem;">Página 1</span>
-                <button id="members-next-btn" onclick="goMembersNext()" disabled style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:white;cursor:pointer;">Siguiente</button>
+                <button id="members-next-btn" onclick="goMembersNext()" disabled
+                    style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:white;cursor:pointer;">Siguiente</button>
             </div>
         </div>
 
@@ -1705,23 +2098,23 @@
 
     <script>
         // Permitir selección múltiple haciendo clic simple sin necesidad de presionar la tecla Ctrl
-        document.addEventListener('mousedown', function(e) {
+        document.addEventListener('mousedown', function (e) {
             if (e.target.tagName === 'OPTION' && e.target.parentNode.multiple) {
                 e.preventDefault();
                 const select = e.target.parentNode;
                 const option = e.target;
-                
+
                 // Guardar la posición de scroll actual
                 const scrollTop = select.scrollTop;
-                
+
                 // Alternar el estado seleccionado
                 option.selected = !option.selected;
-                
+
                 // Restaurar la posición de scroll para evitar saltos molestos
                 setTimeout(() => {
                     select.scrollTop = scrollTop;
                 }, 0);
-                
+
                 // Disparar eventos para actualizar cualquier enlace
                 select.dispatchEvent(new Event('change', { bubbles: true }));
             }
@@ -1761,6 +2154,7 @@
             if (!currentGuildId) return;
             if (sectionId === 'logs-config') loadLogsConfig();
             if (sectionId === 'welcome') loadWelcomeConfig();
+            if (sectionId === 'moderation') loadModerationConfig();
             if (sectionId === 'say') loadChannelsForSay();
             if (sectionId === 'embed-builder') loadChannelsForEB();
             if (sectionId === 'members') loadMembers(currentGuildId, null, true);
@@ -1784,6 +2178,7 @@
                 'dashboard': 'Panel de Control',
                 'logs-config': 'Configuración de Logs',
                 'welcome': 'Configuración de Bienvenidas',
+                'moderation': 'Moderación y AutoMod',
                 'say': 'Enviar Mensaje Directo',
                 'embed-builder': 'Constructor de Embeds',
                 'auto-responses': 'Auto Respuestas',
@@ -1964,8 +2359,10 @@
             const details = document.getElementById('gw-details').value.trim();
             const channelId = document.getElementById('gw-channel').value;
             const image = document.getElementById('gw-image').value.trim();
-            const startTime = document.getElementById('gw-start').value;
-            const endTime = document.getElementById('gw-end').value;
+            const startTimeRaw = document.getElementById('gw-start').value;
+            const endTimeRaw = document.getElementById('gw-end').value;
+            const startTime = startTimeRaw ? new Date(startTimeRaw).toISOString() : null;
+            const endTime = endTimeRaw ? new Date(endTimeRaw).toISOString() : null;
             const permissions = {
                 canReroll: Array.from(document.getElementById('gw-roles-reroll').selectedOptions).map(opt => opt.value),
                 canFinish: Array.from(document.getElementById('gw-roles-finish').selectedOptions).map(opt => opt.value),
@@ -2030,6 +2427,89 @@
             let options = '<option value="">Seleccionar canal...</option>';
             guildChannels.forEach(c => { options += `<option value="${c.id}"># ${c.name}</option>`; });
             ebSelect.innerHTML = options;
+        }
+
+        async function loadModerationConfig() {
+            const channelsSelect = document.getElementById('mod-channels');
+            let options = '';
+            guildChannels.forEach(c => { options += `<option value="${c.id}"># ${c.name}</option>`; });
+            channelsSelect.innerHTML = options;
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/moderation-config`);
+                const config = await res.json();
+
+                const censorship = config.censorship || {};
+                const actions = config.actions || {};
+
+                document.getElementById('mod-caps-enabled').checked = censorship.capsEnabled || false;
+                document.getElementById('mod-caps-pct').value = censorship.capsPercentage !== undefined ? censorship.capsPercentage : 70;
+                document.getElementById('mod-caps-min').value = censorship.capsMinLength !== undefined ? censorship.capsMinLength : 3;
+                document.getElementById('mod-words-enabled').checked = censorship.wordsEnabled || false;
+
+                const wordsList = censorship.blockedWords || [];
+                document.getElementById('mod-blocked-words').value = wordsList.join(', ');
+
+                document.getElementById('mod-images-enabled').checked = censorship.imagesEnabled || false;
+                document.getElementById('mod-alert-channel').checked = censorship.alertChannel !== false;
+                document.getElementById('mod-alert-dm').checked = censorship.alertDM || false;
+
+                document.getElementById('mod-delete-ban').checked = actions.deleteOnBan || false;
+                document.getElementById('mod-delete-kick').checked = actions.deleteOnKick || false;
+
+                const selectedChannels = censorship.channels || [];
+                for (let option of channelsSelect.options) {
+                    option.selected = selectedChannels.includes(option.value);
+                }
+            } catch (e) {
+                console.error("Error cargando configuración de moderación:", e);
+                showToast("❌ Error al cargar configuración de moderación", "error");
+            }
+        }
+
+        async function saveModerationConfig() {
+            const channelsSelect = document.getElementById('mod-channels');
+            const selectedChannels = Array.from(channelsSelect.selectedOptions).map(opt => opt.value);
+
+            const rawWords = document.getElementById('mod-blocked-words').value;
+            const blockedWords = rawWords.split(',')
+                .map(w => w.trim())
+                .filter(w => w.length > 0);
+
+            const config = {
+                censorship: {
+                    capsEnabled: document.getElementById('mod-caps-enabled').checked,
+                    capsPercentage: parseInt(document.getElementById('mod-caps-pct').value) || 70,
+                    capsMinLength: parseInt(document.getElementById('mod-caps-min').value) || 3,
+                    wordsEnabled: document.getElementById('mod-words-enabled').checked,
+                    blockedWords: blockedWords,
+                    imagesEnabled: document.getElementById('mod-images-enabled').checked,
+                    channels: selectedChannels,
+                    alertChannel: document.getElementById('mod-alert-channel').checked,
+                    alertDM: document.getElementById('mod-alert-dm').checked
+                },
+                actions: {
+                    deleteOnBan: document.getElementById('mod-delete-ban').checked,
+                    deleteOnKick: document.getElementById('mod-delete-kick').checked
+                }
+            };
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/moderation-config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast("✅ Configuración de moderación guardada correctamente", "success");
+                } else {
+                    showToast("❌ Error al guardar configuración", "error");
+                }
+            } catch (e) {
+                console.error("Error al guardar configuración:", e);
+                showToast("❌ Error al guardar configuración de moderación", "error");
+            }
         }
 
         async function loadWelcomeConfig() {
@@ -2430,13 +2910,13 @@
                 const data = await res.json();
                 const tickets = data.tickets || data; // Backward compatibility
                 const pagination = data.pagination;
-                
+
                 if (pagination) {
                     ticketsPagination.page = pagination.page;
                     ticketsPagination.totalPages = pagination.totalPages;
                     ticketsPagination.hasMore = pagination.hasMore;
                 }
-                
+
                 if (!tickets || tickets.length === 0) {
                     container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted);"><i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No hay tickets activos en este servidor</div>';
                     return;
@@ -2463,7 +2943,7 @@
                         </div>
                     </div>`;
                 }).join('');
-                
+
                 // Agregar controles de paginación si hay más de una página
                 if (pagination && pagination.totalPages > 1) {
                     const paginationHtml = `
@@ -2486,7 +2966,7 @@
                 container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--danger);">Error cargando tickets activos</div>';
             }
         }
-        
+
         function goTicketsNext() {
             if (ticketsPagination.hasMore) {
                 ticketsPagination.page += 1;
@@ -2494,7 +2974,7 @@
                 document.getElementById('active-tickets-list').scrollIntoView({ behavior: 'smooth' });
             }
         }
-        
+
         function goTicketsPrev() {
             if (ticketsPagination.page > 1) {
                 ticketsPagination.page -= 1;
@@ -2622,8 +3102,8 @@
                 const rolesHtml = m.roles.map(r =>
                     `<span onclick="showRoleInfo('${guildId}','${r.id}')" style="background:${r.color === '#000000' ? '#4f545c' : r.color};color:white;font-size:0.75rem;padding:3px 10px;border-radius:10px;cursor:pointer;display:inline-block;margin:3px;">@${r.name}</span>`
                 ).join('') || '<span style="color:var(--text-muted)">Sin roles</span>';
-                const permsHtml = m.permissions.slice(0,12).map(p =>
-                    `<span style="background:rgba(88,101,242,0.2);border:1px solid rgba(88,101,242,0.4);color:#a5b4fc;font-size:0.7rem;padding:2px 8px;border-radius:6px;display:inline-block;margin:2px;">${p.replace(/_/g,' ')}</span>`
+                const permsHtml = m.permissions.slice(0, 12).map(p =>
+                    `<span style="background:rgba(88,101,242,0.2);border:1px solid rgba(88,101,242,0.4);color:#a5b4fc;font-size:0.7rem;padding:2px 8px;border-radius:6px;display:inline-block;margin:2px;">${p.replace(/_/g, ' ')}</span>`
                 ).join('');
                 document.getElementById('member-modal-content').innerHTML = `
                     <div style="text-align:center;margin-bottom:20px;">
@@ -2652,7 +3132,7 @@
                         <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">🔑 PERMISOS PRINCIPALES</div>
                         <div>${permsHtml}</div>
                     </div>`;
-            } catch(e) {
+            } catch (e) {
                 document.getElementById('member-modal-content').innerHTML = '<p style="color:var(--danger)">Error cargando perfil</p>';
             }
         }
@@ -2666,7 +3146,7 @@
                 const permsHtml = r.permissions.map(p =>
                     `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
                         <i class="fas fa-check" style="color:var(--success);font-size:0.75rem;"></i>
-                        <span style="font-size:0.85rem;">${p.replace(/_/g,' ')}</span>
+                        <span style="font-size:0.85rem;">${p.replace(/_/g, ' ')}</span>
                     </div>`
                 ).join('') || '<p style="color:var(--text-muted)">Sin permisos especiales</p>';
                 document.getElementById('role-modal-content').innerHTML = `
@@ -2695,7 +3175,7 @@
                     </div>
                     <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">🔑 PERMISOS (${r.permissions.length})</div>
                     <div style="max-height:250px;overflow-y:auto;">${permsHtml}</div>`;
-            } catch(e) {
+            } catch (e) {
                 document.getElementById('role-modal-content').innerHTML = '<p style="color:var(--danger)">Error cargando rol</p>';
             }
         }
@@ -2782,11 +3262,11 @@
             const activeBtn = document.getElementById('tab-btn-' + tabId);
             activeBtn.classList.add('active-tab');
             activeBtn.style.background = 'var(--accent)';
-            
+
             document.getElementById('tickets-tab-list').style.display = tabId === 'list' ? 'block' : 'none';
             document.getElementById('tickets-tab-create').style.display = tabId === 'create' ? 'block' : 'none';
             document.getElementById('tickets-tab-config').style.display = tabId === 'config' ? 'block' : 'none';
-            
+
             if (tabId === 'create') {
                 const tpChannel = document.getElementById('tp-channel');
                 const tpLogChannel = document.getElementById('tp-log-channel');
@@ -2914,19 +3394,19 @@
             if (buttons.length === 0) return showToast('Añade al menos un botón', 'error');
             if (buttons.length > 5) return showToast('Máximo 5 botones permitidos.', 'error');
             const messageId = document.getElementById('tp-current-panel-id').value;
-            
+
             try {
                 const method = messageId ? 'POST' : 'POST';
-                const url = messageId 
+                const url = messageId
                     ? `/api/guilds/${currentGuildId}/update-ticket-panel/${messageId}`
                     : `/api/guilds/${currentGuildId}/send-ticket-panel`;
-                
+
                 const res = await fetch(url, {
                     method: method, headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        channelId, 
-                        logChannelId, 
-                        message, 
+                    body: JSON.stringify({
+                        channelId,
+                        logChannelId,
+                        message,
                         buttons,
                         maxTicketsPerUser: parseInt(document.getElementById('tp-max-tickets').value) || 1
                     })
@@ -2945,7 +3425,7 @@
                 const res = await fetch(`/api/guilds/${currentGuildId}/ticket-panels`);
                 const data = await res.json();
                 const panels = data.panels || [];
-                
+
                 if (panels.length > 0) {
                     const container = document.getElementById('panels-select-container');
                     container.innerHTML = panels.map(p => `
@@ -2984,9 +3464,9 @@
         function updateTicketPreview() {
             const message = document.getElementById('tp-message').value || 'Pulsa un botón para abrir un ticket con el staff.\n\nPara usuarios aislados: Si estás en timeout, puedes crear un ticket para comunicarte con los administradores.';
             const buttons = getTicketButtonsData();
-            
+
             document.getElementById('preview-message').innerHTML = message.split('\n').join('<br>');
-            
+
             let previewButtons = '';
             buttons.forEach(btn => {
                 previewButtons += `<button style="background: #5865f2; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">🎫 ${btn.name}</button>`;
@@ -3124,14 +3604,14 @@
             document.getElementById('ar-reply').checked = editData ? editData.reply : false;
             document.getElementById('ar-reply-ping').checked = editData ? (editData.replyPing !== false) : true;
             toggleReplyPingVisibility();
-            
+
             // Cargar campos normales
             document.getElementById('ar-response').value = editData ? (editData.response || '') : '';
             document.getElementById('ar-random-container').innerHTML = '';
             if (editData && editData.randomResponses) {
                 editData.randomResponses.forEach(r => addRandomResponse(r));
             }
-            
+
             // Cargar campos de embed
             document.getElementById('ar-embed-title').value = editData ? (editData.embedTitle || '') : '';
             document.getElementById('ar-embed-desc').value = editData ? (editData.embedDesc || '') : '';
@@ -3153,7 +3633,7 @@
             guildChannels.forEach(c => { chOpts += `<option value="${c.id}"># ${c.name}</option>`; });
             document.getElementById('ar-enabled-channels').innerHTML = chOpts;
             document.getElementById('ar-disabled-channels').innerHTML = chOpts;
-            
+
             // Set selected if editing
             if (editData) {
                 setMultiSelect('ar-enabled-roles', editData.enabledRoles || []);
@@ -3166,7 +3646,7 @@
                 setMultiSelect('ar-enabled-channels', []);
                 setMultiSelect('ar-disabled-channels', []);
             }
-            
+
             updateArPreview();
             document.getElementById('ar-modal').style.display = 'flex';
         }
@@ -3223,12 +3703,12 @@
 
         function updateArPreview() {
             const type = document.getElementById('ar-type').value;
-            
+
             // Info del bot en el preview
             const botName = document.getElementById('sidebar-bot-name').innerText || 'RTXSERVERBOT';
             const botAvatarLogo = document.querySelector('#sidebar-bot-logo img');
             const botAvatar = botAvatarLogo ? botAvatarLogo.src : 'https://cdn.discordapp.com/embed/avatars/0.png';
-            
+
             document.getElementById('ar-preview-botname').innerText = botName;
             document.getElementById('ar-preview-avatar').src = botAvatar;
 
@@ -3238,7 +3718,7 @@
             if (type === 'text') {
                 previewText.style.display = 'block';
                 previewEmbed.style.display = 'none';
-                
+
                 let rawText = document.getElementById('ar-response').value || 'Texto de la respuesta...';
                 let cleanText = rawText
                     .replace(/\{user\}/g, '@Usuario')
@@ -3311,7 +3791,7 @@
         async function saveAutoResponse() {
             const editId = document.getElementById('ar-edit-id').value;
             const type = document.getElementById('ar-type').value;
-            
+
             const data = {
                 trigger: document.getElementById('ar-trigger').value,
                 type: type,
@@ -3331,14 +3811,14 @@
                 enabledChannels: Array.from(document.getElementById('ar-enabled-channels').selectedOptions).map(o => o.value),
                 disabledChannels: Array.from(document.getElementById('ar-disabled-channels').selectedOptions).map(o => o.value)
             };
-            
+
             if (!data.trigger) return showToast('Escribe un desencadenante', 'error');
             if (type === 'text') {
                 if (!data.response && data.randomResponses.length === 0) return showToast('Escribe al menos una respuesta', 'error');
             } else {
                 if (!data.embedTitle && !data.embedDesc) return showToast('Escribe un título o descripción para el Embed', 'error');
             }
-            
+
             try {
                 const url = editId ? `/api/guilds/${currentGuildId}/auto-responses/${editId}` : `/api/guilds/${currentGuildId}/auto-responses`;
                 const method = editId ? 'PUT' : 'POST';
@@ -3381,20 +3861,20 @@
         // Funciones para Sugerencias
         async function loadSuggestions() {
             if (!currentGuildId) return;
-            
+
             try {
                 // Cargar lista de canales para selector
                 const sgChannel = document.getElementById('sg-channel');
                 let options = '<option value="">Seleccionar canal...</option>';
-                guildChannels.forEach(c => { 
-                    options += `<option value="${c.id}"># ${c.name}</option>`; 
+                guildChannels.forEach(c => {
+                    options += `<option value="${c.id}"># ${c.name}</option>`;
                 });
                 sgChannel.innerHTML = options;
 
                 // Obtener sugerencias
                 const res = await fetch(`/api/guilds/${currentGuildId}/suggestions`);
                 const data = await res.json();
-                
+
                 if (data.success) {
                     renderSuggestions(data.suggestions);
                     if (data.suggestionsChannelId) {
@@ -3418,18 +3898,18 @@
 
         function renderSuggestionsTab(status, suggestions) {
             const container = document.getElementById(`suggestions-${status}-container`);
-            
+
             if (suggestions.length === 0) {
                 container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted);">No hay sugerencias ${status === 'pending' ? 'pendientes' : status === 'approved' ? 'aprobadas' : 'rechazadas'}</div>`;
                 return;
             }
 
             let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">';
-            
+
             suggestions.forEach(s => {
                 const dateStr = new Date(s.createdAt).toLocaleDateString('es-ES');
                 const statusColor = status === 'pending' ? '#FFA500' : status === 'approved' ? '#00FF00' : '#FF0000';
-                
+
                 html += `
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; border-left: 4px solid ${statusColor};">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
@@ -3444,7 +3924,7 @@
                         </div>
                         ${status === 'pending' ? `
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button onclick="openCommentModal(${s.id}, '${s.userTag.replace(/'/g, "\\'")}', ${s.userId})" class="view-btn" style="flex: 1; background: var(--accent); padding: 6px; font-size: 0.85rem;">
+                                <button onclick="openCommentModal(${s.id}, '${s.userTag.replace(/'/g, "\\'")}')" class="view-btn" style="flex: 1; background: var(--accent); padding: 6px; font-size: 0.85rem;">
                                     <i class="fas fa-comment"></i> Comentar
                                 </button>
                                 <button onclick="updateSuggestionStatus(${s.id}, 'approved')" class="view-btn" style="flex: 1; background: var(--success); padding: 6px; font-size: 0.85rem;">
@@ -3453,14 +3933,22 @@
                                 <button onclick="updateSuggestionStatus(${s.id}, 'rejected')" class="view-btn" style="flex: 1; background: var(--danger); padding: 6px; font-size: 0.85rem;">
                                     <i class="fas fa-times"></i> Rechazar
                                 </button>
+                                <button onclick="deleteSuggestion(${s.id})" class="view-btn" style="flex: 1; background: #ff4d4f; padding: 6px; font-size: 0.85rem;">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
                             </div>
                         ` : `
-                            ${s.approvedBy ? `<div style="font-size: 0.85rem; color: var(--text-muted);">Revisado por: ${s.approvedBy}</div>` : ''}
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                ${s.approvedBy ? `<div style="font-size: 0.85rem; color: var(--text-muted);">Revisado por: ${s.approvedBy}</div>` : ''}
+                                <button onclick="deleteSuggestion(${s.id})" class="view-btn" style="background: #ff4d4f; padding: 6px; font-size: 0.85rem;">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
                         `}
                     </div>
                 `;
             });
-            
+
             html += '</div>';
             container.innerHTML = html;
         }
@@ -3470,7 +3958,7 @@
                 b.style.background = 'rgba(255,255,255,0.1)';
             });
             document.querySelector(`#sg-tab-${status}`).style.background = 'var(--accent)';
-            
+
             document.getElementById('suggestions-pending-container').style.display = status === 'pending' ? 'block' : 'none';
             document.getElementById('suggestions-approved-container').style.display = status === 'approved' ? 'block' : 'none';
             document.getElementById('suggestions-rejected-container').style.display = status === 'rejected' ? 'block' : 'none';
@@ -3526,7 +4014,26 @@
             }
         }
 
-        function openCommentModal(suggestionId, userTag, userId) {
+        async function deleteSuggestion(suggestionId) {
+            if (!confirm('¿Estás seguro de eliminar esta sugerencia? Esta acción también intentará borrar el mensaje en Discord.')) return;
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/suggestions/${suggestionId}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('success', 'Sugerencia eliminada');
+                    loadSuggestions();
+                } else {
+                    showToast('error', data.error || 'Error al eliminar sugerencia');
+                }
+            } catch (e) {
+                showToast('error', 'Error de conexión');
+            }
+        }
+
+        function openCommentModal(suggestionId, userTag) {
             document.getElementById('comment-suggestion-id').value = suggestionId;
             document.getElementById('comment-user-tag').innerText = userTag;
             document.getElementById('comment-text').value = '';
@@ -3547,7 +4054,7 @@
                 const res = await fetch(`/api/guilds/${currentGuildId}/suggestions/${suggestionId}/comment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         comment: commentText,
                         postInChannel: postInChannel
                     })
@@ -3555,7 +4062,7 @@
 
                 const data = await res.json();
                 if (data.success) {
-                    const message = postInChannel 
+                    const message = postInChannel
                         ? '✅ Comentario enviado al usuario y al canal'
                         : '✅ Comentario enviado al usuario por MD';
                     showToast('success', message);
@@ -3577,46 +4084,64 @@
     </script>
 
     <!-- Modal: Perfil de Miembro -->
-    <div id="member-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-        <div style="background:#1e1e2e;border-radius:16px;padding:28px;width:90%;max-width:520px;max-height:85vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.1);">
-            <button onclick="document.getElementById('member-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
+    <div id="member-modal"
+        style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;"
+        onclick="if(event.target===this)this.style.display='none'">
+        <div
+            style="background:#1e1e2e;border-radius:16px;padding:28px;width:90%;max-width:520px;max-height:85vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.1);">
+            <button onclick="document.getElementById('member-modal').style.display='none'"
+                style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
             <div id="member-modal-content"></div>
         </div>
     </div>
 
     <!-- Modal: Info de Rol -->
-    <div id="role-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-        <div style="background:#1e1e2e;border-radius:16px;padding:28px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.1);">
-            <button onclick="document.getElementById('role-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
+    <div id="role-modal"
+        style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;"
+        onclick="if(event.target===this)this.style.display='none'">
+        <div
+            style="background:#1e1e2e;border-radius:16px;padding:28px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.1);">
+            <button onclick="document.getElementById('role-modal').style.display='none'"
+                style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
             <div id="role-modal-content"></div>
         </div>
     </div>
 
     <!-- Modal: Comentar en Sugerencia -->
-    <div id="comment-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-        <div style="background:#1e1e2e;border-radius:16px;padding:28px;width:90%;max-width:500px;position:relative;border:1px solid rgba(255,255,255,0.1);">
-            <button onclick="document.getElementById('comment-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
+    <div id="comment-modal"
+        style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;"
+        onclick="if(event.target===this)this.style.display='none'">
+        <div
+            style="background:#1e1e2e;border-radius:16px;padding:28px;width:90%;max-width:500px;position:relative;border:1px solid rgba(255,255,255,0.1);">
+            <button onclick="document.getElementById('comment-modal').style.display='none'"
+                style="position:absolute;top:12px;right:16px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">✕</button>
             <input type="hidden" id="comment-suggestion-id">
-            <h3 style="margin-bottom: 16px; color: white;">📝 Enviar comentario a <span id="comment-user-tag"></span></h3>
-            <textarea id="comment-text" placeholder="Escribe tu comentario..." style="width: 100%; height: 120px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: vertical;"></textarea>
-            
+            <h3 style="margin-bottom: 16px; color: white;">📝 Enviar comentario a <span id="comment-user-tag"></span>
+            </h3>
+            <textarea id="comment-text" placeholder="Escribe tu comentario..."
+                style="width: 100%; height: 120px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: vertical;"></textarea>
+
             <!-- NUEVA OPCIÓN: Enviar al canal de sugerencias -->
-            <div style="display: flex; align-items: center; gap: 10px; margin: 16px 0; background: rgba(88,101,242,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(88,101,242,0.2);">
+            <div
+                style="display: flex; align-items: center; gap: 10px; margin: 16px 0; background: rgba(88,101,242,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(88,101,242,0.2);">
                 <label class="switch" style="margin: 0;">
                     <input type="checkbox" id="comment-post-in-channel">
                     <span class="slider"></span>
                 </label>
                 <div>
                     <div style="font-weight: 600; color: white; font-size: 0.9rem;">Enviar también al canal 📢</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">El comentario se publicará en el canal de sugerencias (el MD siempre se envía)</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">El comentario se publicará en el canal de
+                        sugerencias (el MD siempre se envía)</div>
                 </div>
             </div>
-            
+
             <div style="display: flex; gap: 10px; margin-top: 16px;">
-                <button onclick="sendCommentAndNotify()" class="view-btn" style="flex: 1; background: var(--success); color: white; padding: 10px;">
+                <button onclick="sendCommentAndNotify()" class="view-btn"
+                    style="flex: 1; background: var(--success); color: white; padding: 10px;">
                     <i class="fas fa-paper-plane"></i> Enviar
                 </button>
-                <button onclick="document.getElementById('comment-modal').style.display='none'" class="view-btn" style="flex: 1; background: rgba(255,255,255,0.1); color: white; padding: 10px;">
+                <button onclick="document.getElementById('comment-modal').style.display='none'" class="view-btn"
+                    style="flex: 1; background: rgba(255,255,255,0.1); color: white; padding: 10px;">
                     Cancelar
                 </button>
             </div>

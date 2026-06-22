@@ -1,0 +1,37 @@
+{
+  "panelMessage": "📌 Finalidad del canal\nBienvenido al canal de tickets de LUGGAMES COMMUNITY.\n\nEste canal está destinado a la apertura de tickets privados con el equipo de Staff para atender de manera organizada y eficiente los siguientes casos:\n\n🐞 Reporte de fallos en la web.\n🚨 Reporte de conducta inapropiada de un usuario.\n🔗 Enlaces o links que no funcionan.\n🎮 Problemas relacionados con los juegos.\n❓ Otras consultas o incidencias.\n\n---\n\n⚠️ Normas de uso\nPara garantizar una atención adecuada, se deben respetar las siguientes normas:\n\nUtilizar los tickets exclusivamente para temas serios y relacionados con la comunidad.\nNo enviar mensajes repetitivos (spam).\nMantener siempre el respeto hacia el Staff y demás usuarios.\nIncluir pruebas, capturas o evidencias relevantes cuando sea necesario.\n\n---\n\n🛠️ Cómo abrir un ticket\nPresiona el botón 🎫 Abrir Ticket.\nSe creará un canal privado visible únicamente para ti y el Staff.\nExplica detalladamente el problema o reporte.\nAdjunta pruebas o información adicional si corresponde.\nUna vez resuelto el caso, el ticket será cerrado por el Staff.\n\n---\n\n🙏 Gracias por tu colaboración\nAgradecemos tu ayuda para mantener la comunidad organizada, segura y profesional.\n\nLUGGAMES COMMUNITY",
+  "panelConfigs": [
+    {
+      "name": "REPORTAR USUARIO",
+      "question": "QUIEN Y POR QUE",
+      "index": 1
+    },
+    {
+      "name": "PROBLEMAS EN LA WEP",
+      "question": "ADONDE",
+      "index": 2
+    },
+    {
+      "name": "SOLICITAR JUEGO",
+      "question": "QUE JUEGO SOLICITAS",
+      "index": 3
+    },
+    {
+      "name": "LINK NO FUNCIONANDO",
+      "question": "NOMBRE DEL JUEGO",
+      "index": 4
+    },
+    {
+      "name": "PROBLEMAS DE JUEGOS",
+      "question": null,
+      "index": 5
+    }
+  ],
+  "ticketLogChannelId": "1505596272755867819",
+  "panelChannelId": "1491063750655086714",
+  "maxTicketsPerUser": 1,
+  "panelMessageId": "1512768043942412449",
+  "ticketStaffRoles": [
+    "1506018659573825766"
+  ]
+}

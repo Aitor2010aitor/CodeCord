@@ -1,0 +1,21 @@
+{
+  "censorship": {
+    "capsEnabled": true,
+    "capsPercentage": 70,
+    "capsMinLength": 3,
+    "wordsEnabled": true,
+    "blockedWords": [
+      "A"
+    ],
+    "imagesEnabled": false,
+    "channels": [
+      "1480234824210841782"
+    ],
+    "alertChannel": true,
+    "alertDM": false
+  },
+  "actions": {
+    "deleteOnBan": true,
+    "deleteOnKick": true
+  }
+}

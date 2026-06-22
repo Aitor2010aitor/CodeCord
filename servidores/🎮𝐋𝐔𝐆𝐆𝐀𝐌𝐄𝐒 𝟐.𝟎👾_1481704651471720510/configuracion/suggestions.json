@@ -1,0 +1,41 @@
+{
+  "suggestionsChannelId": "1510265191143837817",
+  "suggestions": [
+    {
+      "id": 1780978087569,
+      "userId": "1461780912034545686",
+      "username": "papapapapablo",
+      "userTag": "papapapapablo",
+      "userAvatar": "https://cdn.discordapp.com/avatars/1461780912034545686/edd8d8f3ac459111a7e6bd4f6c02a90a.webp",
+      "text": "no se si se puede hacer pero que haya una IA en la web ala q le puedas preguntar comos e descargan juegos y eso y te lo explique detalladamente y que también te diga que son errores que te aparecen consejos y eso",
+      "status": "pending",
+      "createdAt": "2026-06-09T04:08:07.569Z",
+      "approvedAt": null,
+      "approvedBy": null,
+      "comments": [],
+      "reactions": {
+        "thumbsUp": 0,
+        "thumbsDown": 0
+      },
+      "messageId": "1513756558188613732"
+    },
+    {
+      "id": 1781189710636,
+      "userId": "1280034781626634309",
+      "username": "elpapuxd0776",
+      "userTag": "elpapuxd0776",
+      "userAvatar": "https://cdn.discordapp.com/avatars/1280034781626634309/e0652caf10cb99e85a81c1dbfe0843d9.webp",
+      "text": "poner un canal donde suban todas las versiones de minecraft bedrock xd",
+      "status": "pending",
+      "createdAt": "2026-06-11T14:55:10.636Z",
+      "approvedAt": null,
+      "approvedBy": null,
+      "comments": [],
+      "reactions": {
+        "thumbsUp": 0,
+        "thumbsDown": 0
+      },
+      "messageId": "1514644170147364935"
+    }
+  ]
+}

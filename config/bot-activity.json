@@ -1,1 +1,302 @@
-[]
+[
+  {
+    "guildId": "1481704651471720510",
+    "type": "guildMemberRemove",
+    "message": "👋 Usuario Salió",
+    "timestamp": "2026-06-22T16:36:05.969Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T16:35:29.658Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "guildMemberAdd",
+    "message": "👋 Usuario se Unió",
+    "timestamp": "2026-06-22T16:35:22.773Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T16:34:58.069Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_AUTO_RESPONSE",
+    "message": "Auto-respuesta eliminada: \"HOLA \"",
+    "timestamp": "2026-06-22T15:41:43.168Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:37:39.679Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:37:32.740Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:37:12.015Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:37:01.549Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:36:48.216Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:36:47.319Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:36:33.756Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:36:27.854Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:36:23.452Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:36:11.759Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:36:01.561Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:31:49.998Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleRemove",
+    "message": "➖ Rol Removido",
+    "timestamp": "2026-06-22T15:31:46.651Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:31:45.602Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleRemove",
+    "message": "➖ Rol Removido",
+    "timestamp": "2026-06-22T15:31:43.251Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleRemove",
+    "message": "➖ Rol Removido",
+    "timestamp": "2026-06-22T15:31:43.071Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:31:42.765Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:31:42.048Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-06-22T15:31:33.606Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "guildMemberAdd",
+    "message": "👋 Usuario se Unió",
+    "timestamp": "2026-06-22T15:31:33.430Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:31:00.809Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "guildBanAdd",
+    "message": "🔨 Miembro baneado",
+    "timestamp": "2026-06-22T15:30:59.707Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "guildBanAdd",
+    "message": "🔨 Usuario Baneado",
+    "timestamp": "2026-06-22T15:30:59.152Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:30:45.050Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:29:59.558Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:29:59.268Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:29:11.727Z"
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:29:11.448Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:27:49.409Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:27:49.404Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:27:22.950Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:27:19.549Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:27:14.311Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:26:51.129Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:26:48.477Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:26:44.287Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:26:44.283Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:26:34.464Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:26:22.600Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:26:19.366Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:26:13.392Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:26:13.230Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "PANEL_MODERATION",
+    "message": "Configuración de moderación y AutoMod actualizada",
+    "timestamp": "2026-06-22T15:26:13.070Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:26:05.404Z"
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-06-22T15:26:02.297Z"
+  }
+]

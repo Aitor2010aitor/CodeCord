@@ -6,7 +6,8 @@ const DEPLOY_CLIENT_ID = (process.env.CLIENT_ID || '').toString().trim();
 const GUILD_IDS = [
   process.env.GUILD_ID_1?.toString().trim(),
   process.env.GUILD_ID_2?.toString().trim(),
-  process.env.GUILD_ID_3?.toString().trim()
+  process.env.GUILD_ID_3?.toString().trim(),
+  process.env.GUILD_ID?.toString().trim()
 ].filter(Boolean);
 
 const commands = [
@@ -68,6 +69,13 @@ const commands = [
     .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
     .addUserOption(opt => opt.setName('usuario').setDescription('Usuario a desbanear').setRequired(true))
     .addStringOption(opt => opt.setName('razon').setDescription('Razón del desbaneo').setRequired(false))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('baninfo')
+    .setDescription('Ver si un usuario fue baneado o expulsado')
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
+    .addUserOption(opt => opt.setName('usuario').setDescription('Usuario a consultar').setRequired(false))
+    .addStringOption(opt => opt.setName('id').setDescription('ID del usuario si no está en el servidor').setRequired(false))
     .toJSON(),
   new SlashCommandBuilder()
     .setName('rename')

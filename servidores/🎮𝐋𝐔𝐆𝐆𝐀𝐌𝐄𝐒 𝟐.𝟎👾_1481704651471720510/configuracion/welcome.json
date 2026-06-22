@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "channel": "1481707864295735316",
+  "title": "¡Bienvenido {user} A  {server}",
+  "message": "¡Bienvenido {user} a {server}!",
+  "color": "#5865f2",
+  "background": ""
+}

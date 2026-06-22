@@ -771,6 +771,33 @@ function saveStaffConfig() {
     }
 }
 
+function loadLogChannelConfig() {
+    try {
+        for (const guild of client.guilds.cache.values()) {
+            const logsConfig = configManager.loadGuildConfig(guild.id, 'logs', {});
+            if (!logsConfig || typeof logsConfig !== 'object') continue;
+
+            let channelId = null;
+
+            // Buscar el canal en los eventos configurados
+            for (const eventKey in logsConfig) {
+                const eventConfig = logsConfig[eventKey];
+                if (eventConfig && typeof eventConfig === 'object' && typeof eventConfig.channel === 'string' && eventConfig.enabled) {
+                    channelId = eventConfig.channel;
+                    break;
+                }
+            }
+
+            if (channelId) {
+                client.antiRaid.logChannel.set(guild.id, channelId);
+                console.log(`✅ Canal de logs cargado para ${guild.name}: ${channelId}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando canales de logs al iniciar:', error);
+    }
+}
+
 // Función para sancionar un usuario de soporte de voz
 async function sanctionSupportUser(guild, userId, reason, sanctionedBy = null) {
     try {
@@ -970,15 +997,16 @@ function onClientReady() {
     console.log(`📊 Servidores detectados (${client.guilds.cache.size}): ${client.guilds.cache.map(g => g.name).join(', ')}`);
     console.log('🛡️ Sistema Anti-Raid activado');
 
-    // Iniciar panel de administración
-    startAdminPanel(client);
-
-    // Initialize config manager and migrate configs
+    // Initialize config manager and migrate configs before arrancar el panel
     configManager.setClient(client);
     configManager.migrateExistingConfigs();
 
+    // Iniciar panel de administración
+    startAdminPanel(client);
+
     // Cargar roles de staff y configuración de automod al iniciar
     loadStaffConfig();
+    loadLogChannelConfig();
 }
 client.once('ready', onClientReady);
 client.once('clientReady', onClientReady);
@@ -1155,18 +1183,20 @@ client.on('interactionCreate', async (interaction) => {
         // Comando /sugerencia
         if (interaction.commandName === 'sugerencia') {
             try {
+                // ✅ RESPONDER INMEDIATAMENTE (dentro de 3 segundos)
+                await interaction.deferReply({ ephemeral: true });
+
                 const suggestionText = interaction.options.getString('texto');
 
                 // Cargar configuración de sugerencias
                 let guildSuggestionsConfig = configManager.loadGuildConfig(interaction.guild.id, 'suggestions', { suggestionsChannelId: '', suggestions: [] });
-                const suggestionsConfig = { guilds: { [interaction.guild.id]: guildSuggestionsConfig } };
-                if (!suggestionsConfig.guilds[interaction.guild.id]) {
-                    suggestionsConfig.guilds[interaction.guild.id] = { suggestionsChannelId: '', suggestions: [] };
+                if (!guildSuggestionsConfig.suggestions) {
+                    guildSuggestionsConfig.suggestions = [];
                 }
 
                 // Auto-crear canal de sugerencias si no existe
                 let suggestionsChannel = null;
-                const existingChannelId = suggestionsConfig.guilds[interaction.guild.id].suggestionsChannelId;
+                const existingChannelId = guildSuggestionsConfig.suggestionsChannelId;
 
                 if (existingChannelId) {
                     suggestionsChannel = interaction.guild.channels.cache.get(existingChannelId);
@@ -1188,7 +1218,8 @@ client.on('interactionCreate', async (interaction) => {
                             reason: 'Canal automático para sugerencias'
                         });
 
-                        suggestionsConfig.guilds[interaction.guild.id].suggestionsChannelId = suggestionsChannel.id;
+                        guildSuggestionsConfig.suggestionsChannelId = suggestionsChannel.id;
+                        configManager.saveGuildConfig(interaction.guild.id, 'suggestions', guildSuggestionsConfig);
                         console.log(`✅ Canal de sugerencias creado: ${suggestionsChannel.name}`);
                     } catch (e) {
                         console.error('Error creando canal de sugerencias:', e);
@@ -1211,9 +1242,10 @@ client.on('interactionCreate', async (interaction) => {
                     reactions: { thumbsUp: 0, thumbsDown: 0 }
                 };
 
-                // Guardar sugerencia
-                suggestionsConfig.guilds[interaction.guild.id].suggestions.push(suggestion);
-                (function () { const gId = (typeof message !== 'undefined' ? message.guild?.id : (typeof interaction !== 'undefined' ? interaction.guild?.id : null)); if (gId) configManager.saveGuildConfig(gId, 'suggestions', suggestionsConfig.guilds[gId] || suggestionsConfig); })();
+                // Guardar sugerencia en config
+                guildSuggestionsConfig.suggestions.push(suggestion);
+                configManager.saveGuildConfig(interaction.guild.id, 'suggestions', guildSuggestionsConfig);
+                console.log(`💾 Sugerencia guardada en config para servidor ${interaction.guild.id}`);
 
                 // Publicar la sugerencia en el canal de sugerencias (si existe) y guardar messageId
                 if (suggestionsChannel) {
@@ -1231,13 +1263,15 @@ client.on('interactionCreate', async (interaction) => {
 
                         // Guardar messageId para referencia
                         suggestion.messageId = sent.id;
-                        (function () { const gId = (typeof message !== 'undefined' ? message.guild?.id : (typeof interaction !== 'undefined' ? interaction.guild?.id : null)); if (gId) configManager.saveGuildConfig(gId, 'suggestions', suggestionsConfig.guilds[gId] || suggestionsConfig); })();
+                        guildSuggestionsConfig.suggestions[guildSuggestionsConfig.suggestions.length - 1].messageId = sent.id;
+                        configManager.saveGuildConfig(interaction.guild.id, 'suggestions', guildSuggestionsConfig);
+                        console.log(`📝 Sugerencia publicada en canal: ${suggestionsChannel.name}`);
                     } catch (e) {
                         console.error('Error publicando sugerencia en canal:', e);
                     }
                 }
 
-                // Responder al usuario
+                // Actualizar respuesta diferida
                 const embed = new EmbedBuilder()
                     .setTitle('✅ Sugerencia Enviada')
                     .setDescription(`Tu sugerencia ha sido registrada y será revisada por el staff.\n\n**Tu sugerencia:**\n${suggestionText}`)
@@ -1245,11 +1279,15 @@ client.on('interactionCreate', async (interaction) => {
                     .setFooter({ text: `ID: ${suggestion.id}` })
                     .setTimestamp();
 
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                await interaction.editReply({ embeds: [embed] });
                 console.log(`📝 Nueva sugerencia de ${interaction.user.tag}: ${suggestionText}`);
             } catch (err) {
                 console.error('Error con comando /sugerencia:', err);
-                await interaction.reply({ content: '❌ Error al enviar la sugerencia.', ephemeral: true });
+                try {
+                    await interaction.editReply({ content: '❌ Error al enviar la sugerencia.' });
+                } catch (e) {
+                    console.error('Error editando respuesta:', e);
+                }
             }
         }
     } catch (err) {
@@ -2948,7 +2986,7 @@ client.on('messageCreate', async (message) => {
 
         if (sameLetterMessages.length >= 3) {
             console.log(`🚨 REPETICIÓN DETECTADA: ${message.author.tag} repitió "${message.content}" 3 veces`);
-            // Eliminar mensajes repetidos - ACTIVADO (sin castigos)
+            // Eliminar mensajes repetidos
             try {
                 const messagesToDelete = sameLetterMessages.slice(-3);
                 for (const msgData of messagesToDelete) {
@@ -2963,9 +3001,8 @@ client.on('messageCreate', async (message) => {
 
             // Verificar si ya está aislado ANTES de contar infracciones
             if (message.member.communicationDisabledUntil && message.member.communicationDisabledUntil > Date.now()) {
-                // Si ya está aislado, NO contar más infracciones
                 console.log(`⚠️ Usuario ${message.author.tag} ya aislado - NO se cuenta infracción adicional`);
-                return; // Salir sin contar infracciones
+                return;
             }
 
             // APLICAR CASTIGO PROGRESIVO POR REPETIR LETRAS
@@ -2983,16 +3020,16 @@ client.on('messageCreate', async (message) => {
 
             // Castigos progresivos (10 niveles)
             const punishments = [
-                { time: 60000, label: '1 minuto', action: 'timeout' },       // 1ra vez
-                { time: 120000, label: '2 minutos', action: 'timeout' },     // 2da vez
-                { time: 300000, label: '5 minutos', action: 'timeout' },     // 3ra vez
-                { time: 600000, label: '10 minutos', action: 'timeout' },    // 4ta vez
-                { time: 900000, label: '15 minutos', action: 'timeout' },    // 5ta vez
-                { time: 1800000, label: '30 minutos', action: 'timeout' },   // 6ta vez
-                { time: 3600000, label: '1 hora', action: 'timeout' },       // 7ma vez
-                { time: 7200000, label: '2 horas', action: 'timeout' },      // 8va vez
-                { time: 86400000, label: '1 día', action: 'timeout' },       // 9na vez
-                { time: 0, label: 'BAN PERMANENTE', action: 'ban' }          // 10ma vez
+                { time: 60000, label: '1 minuto', action: 'timeout' },
+                { time: 120000, label: '2 minutos', action: 'timeout' },
+                { time: 300000, label: '5 minutos', action: 'timeout' },
+                { time: 600000, label: '10 minutos', action: 'timeout' },
+                { time: 900000, label: '15 minutos', action: 'timeout' },
+                { time: 1800000, label: '30 minutos', action: 'timeout' },
+                { time: 3600000, label: '1 hora', action: 'timeout' },
+                { time: 7200000, label: '2 horas', action: 'timeout' },
+                { time: 86400000, label: '1 día', action: 'timeout' },
+                { time: 0, label: 'BAN PERMANENTE', action: 'ban' }
             ];
 
             const punishmentIndex = Math.min(infractions.count - 1, punishments.length - 1);
@@ -3000,29 +3037,39 @@ client.on('messageCreate', async (message) => {
 
             let actionText = '';
 
-            // SISTEMA DE CASTIGOS DESACTIVADO - Otro bot se encarga de los castigos
-            // if (punishment.action === 'ban') {
-            //   await message.member.ban({ reason: `Repetición de letras reiterada - Anti-Raid (${infractions.count}ª infracción - BAN)` });
-            //   actionText = `**BANEADO PERMANENTEMENTE** del servidor (${infractions.count}ª infracción)`;
-            //   client.antiRaid.infractions.delete(infractionKey);
-            // } else {
-            //   // Verificar si ya está en timeout
-            //   if (message.member.communicationDisabledUntil && message.member.communicationDisabledUntil > Date.now()) {
-            //     // Ya está aislado, no aplicar más castigos
-            //     actionText = `**YA AISLADO** - No se aplicó castigo adicional (${infractions.count}ª infracción)`;
-            //   } else {
-            //     try {
-            //       await message.member.timeout(punishment.time, `Repetición de letras detectada - Anti-Raid (${infractions.count}ª infracción)`);
-            //       actionText = `Timeout de **${punishment.label}** (${infractions.count}ª infracción)`;
-            //     } catch (e) {
-            //       console.error('Error aplicando timeout:', e);
-            //       actionText = `**ERROR** - No se pudo aplicar timeout (${infractions.count}ª infracción)`;
-            //     }
-            //   }
-            // }
+            // SISTEMA DE CASTIGOS ACTIVADO
+            if (punishment.action === 'ban') {
+                try {
+                    await message.member.ban({ reason: `Repetición de letras reiterada - Bot Moderación (${infractions.count}ª infracción - BAN)` });
+                    actionText = `**BANEADO PERMANENTEMENTE** del servidor (${infractions.count}ª infracción)`;
+                    client.antiRaid.infractions.delete(infractionKey);
+                } catch (e) {
+                    console.error('Error baneando usuario:', e);
+                    actionText = `**ERROR** al banear (${infractions.count}ª infracción)`;
+                }
+            } else {
+                if (message.member.communicationDisabledUntil && message.member.communicationDisabledUntil > Date.now()) {
+                    actionText = `**YA AISLADO** - No se aplicó castigo adicional (${infractions.count}ª infracción)`;
+                } else {
+                    try {
+                        await message.member.timeout(punishment.time, `Repetición de letras detectada - Bot Moderación (${infractions.count}ª infracción)`);
+                        actionText = `Timeout de **${punishment.label}** (${infractions.count}ª infracción)`;
+                    } catch (e) {
+                        console.error('Error aplicando timeout:', e);
+                        actionText = `**ERROR** - No se pudo aplicar timeout (${infractions.count}ª infracción)`;
+                    }
+                }
+            }
 
-            // Solo registrar la detección sin aplicar castigos
-            actionText = `**DETECTADO** - Repetición de letras (${infractions.count}ª vez) - Otro bot se encarga de los castigos`;
+            // Aviso visible en el canal para que el usuario sepa que fue el bot
+            const warnEmbed = new EmbedBuilder()
+                .setTitle('🛡️ Mensaje eliminado por Bot Moderación')
+                .setDescription(`${message.author}, tu mensaje ha sido eliminado por **repetición de letras**.\n\n**Acción aplicada:** ${actionText}`)
+                .setColor(0xFF4444)
+                .setFooter({ text: 'Bot de Moderación del Servidor' })
+                .setTimestamp();
+            const warnMsg = await message.channel.send({ embeds: [warnEmbed] }).catch(() => null);
+            if (warnMsg) setTimeout(() => warnMsg.delete().catch(() => {}), 8000);
 
             // Log de infracción
             const logEmbed = new EmbedBuilder()
@@ -3050,7 +3097,7 @@ client.on('messageCreate', async (message) => {
     if (recentMessages.length > settings.maxMessages) {
         console.log(`🚨 SPAM DETECTADO: ${message.author.tag} envió ${recentMessages.length} mensajes en ${settings.timeWindow / 1000}s`);
         try {
-            // Eliminar todos los mensajes recientes del spammer - ACTIVADO (sin castigos)
+            // Eliminar todos los mensajes recientes del spammer
             try {
                 const messagesToDelete = recentMessages.map(msg => msg.messageId);
                 for (const messageId of messagesToDelete) {
@@ -3065,9 +3112,8 @@ client.on('messageCreate', async (message) => {
 
             // Verificar si ya está aislado ANTES de contar infracciones
             if (message.member.communicationDisabledUntil && message.member.communicationDisabledUntil > Date.now()) {
-                // Si ya está aislado, NO contar más infracciones
                 console.log(`⚠️ Usuario ${message.author.tag} ya aislado - NO se cuenta infracción adicional por spam`);
-                return; // Salir sin contar infracciones
+                return;
             }
 
             // Sistema de castigos progresivos
@@ -3085,16 +3131,16 @@ client.on('messageCreate', async (message) => {
 
             // Castigos progresivos (10 niveles)
             const punishments = [
-                { time: 60000, label: '1 minuto', action: 'timeout' },       // 1ra vez
-                { time: 120000, label: '2 minutos', action: 'timeout' },     // 2da vez
-                { time: 300000, label: '5 minutos', action: 'timeout' },     // 3ra vez
-                { time: 600000, label: '10 minutos', action: 'timeout' },    // 4ta vez
-                { time: 900000, label: '15 minutos', action: 'timeout' },    // 5ta vez
-                { time: 1800000, label: '30 minutos', action: 'timeout' },   // 6ta vez
-                { time: 3600000, label: '1 hora', action: 'timeout' },       // 7ma vez
-                { time: 7200000, label: '2 horas', action: 'timeout' },      // 8va vez
-                { time: 86400000, label: '1 día', action: 'timeout' },       // 9na vez
-                { time: 0, label: 'BAN PERMANENTE', action: 'ban' }          // 10ma vez
+                { time: 60000, label: '1 minuto', action: 'timeout' },
+                { time: 120000, label: '2 minutos', action: 'timeout' },
+                { time: 300000, label: '5 minutos', action: 'timeout' },
+                { time: 600000, label: '10 minutos', action: 'timeout' },
+                { time: 900000, label: '15 minutos', action: 'timeout' },
+                { time: 1800000, label: '30 minutos', action: 'timeout' },
+                { time: 3600000, label: '1 hora', action: 'timeout' },
+                { time: 7200000, label: '2 horas', action: 'timeout' },
+                { time: 86400000, label: '1 día', action: 'timeout' },
+                { time: 0, label: 'BAN PERMANENTE', action: 'ban' }
             ];
 
             const punishmentIndex = Math.min(infractions.count - 1, punishments.length - 1);
@@ -3102,29 +3148,39 @@ client.on('messageCreate', async (message) => {
 
             let actionText = '';
 
-            // SISTEMA DE CASTIGOS DESACTIVADO - Otro bot se encarga de los castigos
-            // if (punishment.action === 'ban') {
-            //   await message.member.ban({ reason: `Spam reiterado - Anti-Raid (${infractions.count}ª infracción - BAN)` });
-            //   actionText = `**BANEADO PERMANENTEMENTE** del servidor (${infractions.count}ª infracción)`;
-            //   client.antiRaid.infractions.delete(infractionKey);
-            // } else {
-            //   // Verificar si ya está en timeout
-            //   if (message.member.communicationDisabledUntil && message.member.communicationDisabledUntil > Date.now()) {
-            //     // Ya está aislado, no aplicar más castigos
-            //     actionText = `**YA AISLADO** - No se aplicó castigo adicional (${infractions.count}ª infracción)`;
-            //   } else {
-            //     try {
-            //       await message.member.timeout(punishment.time, `Spam detectado - Anti-Raid (${infractions.count}ª infracción)`);
-            //       actionText = `Timeout de **${punishment.label}** (${infractions.count}ª infracción)`;
-            //     } catch (e) {
-            //       console.error('Error aplicando timeout:', e);
-            //       actionText = `**ERROR** - No se pudo aplicar timeout (${infractions.count}ª infracción)`;
-            //     }
-            //   }
-            // }
+            // SISTEMA DE CASTIGOS ACTIVADO
+            if (punishment.action === 'ban') {
+                try {
+                    await message.member.ban({ reason: `Spam reiterado - Bot Moderación (${infractions.count}ª infracción - BAN)` });
+                    actionText = `**BANEADO PERMANENTEMENTE** del servidor (${infractions.count}ª infracción)`;
+                    client.antiRaid.infractions.delete(infractionKey);
+                } catch (e) {
+                    console.error('Error baneando usuario por spam:', e);
+                    actionText = `**ERROR** al banear (${infractions.count}ª infracción)`;
+                }
+            } else {
+                if (message.member.communicationDisabledUntil && message.member.communicationDisabledUntil > Date.now()) {
+                    actionText = `**YA AISLADO** - No se aplicó castigo adicional (${infractions.count}ª infracción)`;
+                } else {
+                    try {
+                        await message.member.timeout(punishment.time, `Spam detectado - Bot Moderación (${infractions.count}ª infracción)`);
+                        actionText = `Timeout de **${punishment.label}** (${infractions.count}ª infracción)`;
+                    } catch (e) {
+                        console.error('Error aplicando timeout por spam:', e);
+                        actionText = `**ERROR** - No se pudo aplicar timeout (${infractions.count}ª infracción)`;
+                    }
+                }
+            }
 
-            // Solo registrar la detección sin aplicar castigos
-            actionText = `**DETECTADO** - Spam masivo (${infractions.count}ª vez) - Otro bot se encarga de los castigos`;
+            // Aviso visible en el canal para que el usuario sepa que fue el bot
+            const warnEmbed = new EmbedBuilder()
+                .setTitle('🛡️ Mensaje eliminado por Bot Moderación')
+                .setDescription(`${message.author}, tus mensajes han sido eliminados por **spam**.\n\n**Acción aplicada:** ${actionText}`)
+                .setColor(0xFF4444)
+                .setFooter({ text: 'Bot de Moderación del Servidor' })
+                .setTimestamp();
+            const warnMsg = await message.channel.send({ embeds: [warnEmbed] }).catch(() => null);
+            if (warnMsg) setTimeout(() => warnMsg.delete().catch(() => {}), 8000);
 
             const logEmbed = new EmbedBuilder()
                 .setTitle('🛡️ Anti-Spam: Castigo Progresivo')
@@ -3163,6 +3219,140 @@ client.on('messageCreate', async (message) => {
                 }
             }
         }
+    }
+
+    // ===== SISTEMA DE AUTOMOD Y CENSURA PERSONALIZADO =====
+    try {
+        const modConfig = configManager.loadGuildConfig(message.guild.id, 'moderation', null);
+        if (modConfig && modConfig.censorship) {
+            const censorship = modConfig.censorship;
+
+            // Verificar si el canal está bajo censura
+            const hasChannelsConfigured = censorship.channels && censorship.channels.length > 0;
+            const applyCensorship = !hasChannelsConfigured || censorship.channels.includes(message.channel.id);
+
+            if (applyCensorship) {
+                // El staff queda exento de la censura (administradores o con rol de automod)
+                const isExempt = canManageAutoMod(message.member, message.guild);
+
+                if (!isExempt) {
+                    let censored = false;
+                    let reason = "";
+                    let detail = "";
+
+                    // 1. Filtro de Mayúsculas
+                    if (censorship.capsEnabled) {
+                        const minLength = censorship.capsMinLength !== undefined ? censorship.capsMinLength : 3;
+                        const pctThreshold = censorship.capsPercentage !== undefined ? censorship.capsPercentage : 70;
+                        const textOnly = message.content.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+
+                        if (textOnly.length >= minLength) {
+                            let capsCount = 0;
+                            for (let i = 0; i < textOnly.length; i++) {
+                                if (textOnly[i] === textOnly[i].toUpperCase() && textOnly[i] !== textOnly[i].toLowerCase()) {
+                                    capsCount++;
+                                }
+                            }
+                            const pct = (capsCount / textOnly.length) * 100;
+                            if (pct >= pctThreshold) {
+                                censored = true;
+                                reason = "Exceso de Mayúsculas";
+                                detail = `Mensaje con ${Math.round(pct)}% de mayúsculas (límite: ${pctThreshold}%)`;
+                            }
+                        }
+                    }
+
+                    // 2. Filtro de Palabras Prohibidas
+                    if (!censored && censorship.wordsEnabled && censorship.blockedWords && censorship.blockedWords.length > 0) {
+                        const contentLower = message.content.toLowerCase();
+                        const triggeredWord = censorship.blockedWords.find(word => {
+                            const cleanWord = word.trim().toLowerCase();
+                            if (!cleanWord) return false;
+                            return contentLower.includes(cleanWord);
+                        });
+
+                        if (triggeredWord) {
+                            censored = true;
+                            reason = "Palabra Prohibida";
+                            detail = `Contiene la palabra censurada: "${triggeredWord}"`;
+                        }
+                    }
+
+                    // 3. Filtro de Imágenes
+                    if (!censored && censorship.imagesEnabled) {
+                        const hasImageAttachment = message.attachments.some(att => att.contentType?.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(att.name || ''));
+                        const hasImageUrl = /https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp)/i.test(message.content);
+
+                        if (hasImageAttachment || hasImageUrl) {
+                            censored = true;
+                            reason = "Imagen No Permitida";
+                            detail = hasImageAttachment ? "Contiene archivo de imagen adjunto" : "Contiene enlace a una imagen";
+                        }
+                    }
+
+                    // Si ha sido censurado, ejecutar acciones
+                    if (censored) {
+                        try {
+                            // Borrar mensaje
+                            await message.delete().catch(() => { });
+
+                            // Alerta en canal (se borra en 8 segundos)
+                            if (censorship.alertChannel !== false) {
+                                const alertEmbed = new EmbedBuilder()
+                                    .setTitle('🛡️ Bot Moderación')
+                                    .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
+                                    .setDescription(`🚫 <@${message.author.id}>, tu mensaje ha sido eliminado.\n\n**Razón:** ${reason}\n**Canal:** ${message.channel}`)
+                                    .setColor(0xED4245)
+                                    .setFooter({ text: 'Bot Moderación del Servidor • Este mensaje se eliminará en 8 segundos.' })
+                                    .setTimestamp();
+
+                                const alertMsg = await message.channel.send({ embeds: [alertEmbed] });
+                                setTimeout(() => alertMsg.delete().catch(() => { }), 8000);
+                            }
+
+                            // Enviar DM al usuario
+                            if (censorship.alertDM) {
+                                try {
+                                    const dmEmbed = new EmbedBuilder()
+                                        .setTitle('🛡️ Bot Moderación — Mensaje Eliminado')
+                                        .setDescription(`Hola **${message.author.username}**, el **Bot Moderación** del servidor **${message.guild.name}** ha eliminado tu mensaje automáticamente por infringir las normas de moderación.`)
+                                        .addFields(
+                                            { name: '📍 Canal', value: `<#${message.channel.id}>`, inline: true },
+                                            { name: '🛡️ Razón', value: reason, inline: true },
+                                            { name: '📝 Detalles', value: detail || 'N/A', inline: false },
+                                            { name: '💬 Contenido original', value: message.content ? `\`\`\`${message.content.substring(0, 1000)}\`\`\`` : '*Sin contenido de texto*' }
+                                        )
+                                        .setColor(0xED4245)
+                                        .setFooter({ text: `Bot Moderación • ${message.guild.name}` })
+                                        .setTimestamp();
+
+                                    await message.author.send({ embeds: [dmEmbed] });
+                                } catch (dmErr) {
+                                    console.log(`No se pudo enviar MD a ${message.author.tag} por censura:`, dmErr.message);
+                                }
+                            }
+
+                            // Enviar registro al canal de logs de seguridad
+                            const logEmbed = new EmbedBuilder()
+                                .setTitle('🛡️ Bot Moderación: Mensaje Censurado')
+                                .setDescription(`**Usuario:** ${message.author.tag} (${message.author.id})\n**Canal:** ${message.channel}\n**Filtro activado:** ${reason}\n**Detalle:** ${detail}`)
+                                .addFields({ name: '📝 Contenido', value: message.content ? message.content.substring(0, 1024) : '*Sin contenido de texto (posiblemente imagen adjunta)*' })
+                                .setColor(0xED4245)
+                                .setFooter({ text: 'Bot Moderación del Servidor' })
+                                .setTimestamp();
+
+                            await sendSecurityLog(message.guild, logEmbed);
+
+                            return; // Terminar ejecución para no aplicar otros filtros
+                        } catch (actionErr) {
+                            console.error('Error al procesar acciones de AutoMod:', actionErr);
+                        }
+                    }
+                }
+            }
+        }
+    } catch (modErr) {
+        console.error('Error en el sistema de AutoMod:', modErr);
     }
 });
 
@@ -3609,19 +3799,25 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 
 // LOG: Ban
 client.on('guildBanAdd', async (ban) => {
-    let executor = 'Desconocido';
+    let executorName = 'Desconocido';
+    let executorId = null;
     let reason = ban.reason || 'Sin razón';
     try {
         const auditLogs = await ban.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanAdd });
         const entry = auditLogs.entries.first();
         if (entry && entry.target.id === ban.user.id) {
-            executor = entry.executor.tag;
+            executorName = entry.executor?.tag || 'Desconocido';
+            executorId = entry.executor?.id || null;
             reason = entry.reason || reason;
         }
     } catch (e) { }
+    const banDescription = [`**Usuario:** ${ban.user.tag} (${ban.user.id})`, `**Mención:** <@${ban.user.id}>`, `**Baneado por:** ${executorName}`];
+    if (executorId) banDescription.push(`**Mención ejecutor:** <@${executorId}>`);
+    banDescription.push(`**Razón:** ${reason}`);
+
     const embed = new EmbedBuilder()
         .setTitle('🔨 Miembro baneado')
-        .setDescription(`**Usuario:** ${ban.user.tag} (${ban.user.id})\n**Baneado por:** ${executor}\n**Razón:** ${reason}`)
+        .setDescription(banDescription.join('\n'))
         .setThumbnail(ban.user.displayAvatarURL())
         .setColor(0xFF0000)
         .setTimestamp();
@@ -3630,15 +3826,23 @@ client.on('guildBanAdd', async (ban) => {
 
 // LOG: Unban
 client.on('guildBanRemove', async (ban) => {
-    let executor = 'Desconocido';
+    let executorName = 'Desconocido';
+    let executorId = null;
     try {
         const auditLogs = await ban.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanRemove });
         const entry = auditLogs.entries.first();
-        if (entry && entry.target.id === ban.user.id) executor = entry.executor.tag;
+        if (entry && entry.target.id === ban.user.id) {
+            executorName = entry.executor?.tag || 'Desconocido';
+            executorId = entry.executor?.id || null;
+        }
     } catch (e) { }
+
+    const unbanDescription = [`**Usuario:** ${ban.user.tag} (${ban.user.id})`, `**Mención:** <@${ban.user.id}>`, `**Desbaneado por:** ${executorName}`];
+    if (executorId) unbanDescription.push(`**Mención ejecutor:** <@${executorId}>`);
+
     const embed = new EmbedBuilder()
         .setTitle('🔓 Miembro desbaneado')
-        .setDescription(`**Usuario:** ${ban.user.tag} (${ban.user.id})\n**Desbaneado por:** ${executor}`)
+        .setDescription(unbanDescription.join('\n'))
         .setThumbnail(ban.user.displayAvatarURL())
         .setColor(0x00FF00)
         .setTimestamp();
@@ -4444,7 +4648,7 @@ client.on('interactionCreate', async (interaction) => {
                     },
                     {
                         name: "🛡️ Moderación",
-                        value: "`/ban` - Banear usuarios\n`/kick` - Expulsar usuarios\n`/timeout` - Silenciar usuarios\n`/unban` - Desbanear usuarios\n`/clear` - Eliminar mensajes\n`/warn` - Advertir usuario\n`/warnings` - Ver advertencias\n`/slowmode` - Modo lento",
+                        value: "`/ban` - Banear usuarios\n`/baninfo` - Ver ban/expulsión de un usuario\n`/kick` - Expulsar usuarios\n`/timeout` - Silenciar usuarios\n`/unban` - Desbanear usuarios\n`/clear` - Eliminar mensajes\n`/warn` - Advertir usuario\n`/warnings` - Ver advertencias\n`/slowmode` - Modo lento",
                         inline: false
                     },
                     {
@@ -4551,9 +4755,7 @@ client.on('interactionCreate', async (interaction) => {
                 return interaction.reply({ content: '❌ No tienes permisos de staff para usar este comando.', ephemeral: true });
             }
             try {
-                const member = await interaction.guild.members.fetch(user.id);
-
-                // Enviar MD al usuario antes de banearlo
+                // Enviar MD al usuario antes de banearlo (si está en el servidor)
                 try {
                     const dmEmbed = new EmbedBuilder()
                         .setTitle('🔨 Has sido baneado del servidor')
@@ -4566,25 +4768,39 @@ client.on('interactionCreate', async (interaction) => {
                     await user.send({ embeds: [dmEmbed] });
                     console.log(`✅ MD enviado a ${user.tag} antes del ban`);
                 } catch (dmError) {
-                    console.log(`⚠️ No se pudo enviar MD a ${user.tag}:`, dmError.message);
+                    console.log(`⚠️ No se pudo enviar MD a ${user.tag}: ${dmError.message}`);
                 }
 
-                // Banear al usuario
-                await member.ban({ reason });
+                // Banear al usuario directamente usando guild.bans.create() 
+                // Esto permite banear usuarios que NO están en el servidor
+                let deleteMessageSeconds = 0;
+                try {
+                    const modConfig = configManager.loadGuildConfig(interaction.guild.id, 'moderation', {});
+                    if (modConfig.actions?.deleteOnBan) {
+                        deleteMessageSeconds = 604800; // 7 días en segundos
+                    }
+                } catch (configErr) {
+                    console.error('Error al cargar config de moderación en ban:', configErr);
+                }
+
+                await interaction.guild.bans.create(user.id, { deleteMessageSeconds, reason });
 
                 // Crear embed bonito para el ban
                 const banEmbed = new EmbedBuilder()
                     .setTitle('🔨 Usuario Baneado')
-                    .setDescription(`**Usuario:** ${user.tag} (${user.id})\n**Baneado por:** ${interaction.user.tag}\n**Razón:** ${reason}`)
+                    .setDescription(`**Usuario:** ${user.tag} (${user.id})\n**Mención:** <@${user.id}>\n**Baneado por:** ${interaction.user.tag}\n**Mención ejecutor:** <@${interaction.user.id}>\n**Razón:** ${reason}`)
                     .setThumbnail(user.displayAvatarURL())
                     .setColor(0x8B0000)
                     .setFooter({ text: `Baneado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}` })
                     .setTimestamp();
-                await sendLogEmbed(interaction.guild, banEmbed);
+
+                // Enviar log al canal configurado directamente
+                await sendLogEmbed(interaction.guild, banEmbed, 'guildBanAdd');
+
                 return interaction.reply({ embeds: [banEmbed] });
             } catch (e) {
                 console.error('Error al banear:', e);
-                return interaction.reply({ content: 'No pude banear a ese usuario.', ephemeral: true });
+                return interaction.reply({ content: '❌ No pude banear a ese usuario. Verifica que exista o que tenga menor rango que yo.', ephemeral: true });
             }
         }
 
@@ -4617,11 +4833,79 @@ client.on('interactionCreate', async (interaction) => {
                     .setColor(0x00FF00)
                     .setFooter({ text: `Desbaneado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}` })
                     .setTimestamp();
-                await sendLogEmbed(interaction.guild, unbanEmbed);
                 return interaction.reply({ embeds: [unbanEmbed] });
             } catch (e) {
                 console.error('Error al desbanear:', e);
                 return interaction.reply({ content: 'No pude desbanear a ese usuario.', ephemeral: true });
+            }
+        }
+
+        if (commandName === 'baninfo') {
+            const userOption = interaction.options.getUser('usuario');
+            const userId = interaction.options.getString('id');
+            let targetUser = userOption;
+
+            if (!targetUser && userId) {
+                try {
+                    targetUser = await interaction.client.users.fetch(userId);
+                } catch {
+                    targetUser = null;
+                }
+            }
+
+            if (!targetUser) {
+                return interaction.reply({ content: '❌ Debes indicar un usuario o una ID de usuario válida.', ephemeral: true });
+            }
+
+            if (!hasStaffPermission(interaction.member, interaction.guild)) {
+                return interaction.reply({ content: '❌ No tienes permisos de staff para usar este comando.', ephemeral: true });
+            }
+
+            try {
+                const bans = await interaction.guild.bans.fetch();
+                const banInfo = bans.get(targetUser.id);
+
+                if (banInfo) {
+                    const banLogs = await interaction.guild.fetchAuditLogs({ type: AuditLogEvent.MemberBanAdd, limit: 20 });
+                    const banEntry = banLogs.entries.find(e => e.targetId === targetUser.id);
+                    const banReason = banEntry?.reason || banInfo.reason || 'Sin razón';
+                    const banExecutor = banEntry?.executor?.tag || 'Desconocido';
+                    const banDate = banEntry?.createdTimestamp ? `<t:${Math.floor(banEntry.createdTimestamp / 1000)}:F>` : 'No disponible';
+
+                    const embed = new EmbedBuilder()
+                        .setTitle('🔨 Información de Ban')
+                        .setDescription(`**Usuario:** ${targetUser.tag} (${targetUser.id})\n**Estado:** Baneado`)
+                        .addFields(
+                            { name: '🔖 Razón', value: `${banReason}`, inline: false },
+                            { name: '👮 Baneado por', value: `${banExecutor}`, inline: false },
+                            { name: '🕒 Fecha', value: `${banDate}`, inline: false }
+                        )
+                        .setColor(0xFF0000)
+                        .setTimestamp();
+                    return interaction.reply({ embeds: [embed], ephemeral: true });
+                }
+
+                const auditLogs = await interaction.guild.fetchAuditLogs({ type: AuditLogEvent.MemberKick, limit: 50 });
+                const kickEntry = auditLogs.entries.find(e => e.targetId === targetUser.id);
+
+                if (kickEntry) {
+                    const embed = new EmbedBuilder()
+                        .setTitle('👢 Información de Expulsión')
+                        .setDescription(`**Usuario:** ${targetUser.tag} (${targetUser.id})\n**Estado:** Expulsado`)
+                        .addFields(
+                            { name: '🔖 Razón', value: `${kickEntry.reason || 'Sin razón'}`, inline: false },
+                            { name: '👮 Expulsado por', value: `${kickEntry.executor?.tag || 'Desconocido'}`, inline: false },
+                            { name: '🕒 Fecha', value: `<t:${Math.floor(kickEntry.createdTimestamp / 1000)}:F>`, inline: false }
+                        )
+                        .setColor(0xFFA500)
+                        .setTimestamp();
+                    return interaction.reply({ embeds: [embed], ephemeral: true });
+                }
+
+                return interaction.reply({ content: 'ℹ️ No se encontró información de ban ni expulsión reciente para ese usuario.', ephemeral: true });
+            } catch (error) {
+                console.error('Error en baninfo:', error);
+                return interaction.reply({ content: '❌ Ocurrió un error al buscar la información. Intenta de nuevo.', ephemeral: true });
             }
         }
 
@@ -4660,6 +4944,21 @@ client.on('interactionCreate', async (interaction) => {
                 // Expulsar al usuario
                 await member.kick(reason);
 
+                // Eliminar mensajes si la opción deleteOnKick está activa
+                try {
+                    const modConfig = configManager.loadGuildConfig(interaction.guild.id, 'moderation', {});
+                    if (modConfig.actions?.deleteOnKick) {
+                        const channelMessages = await interaction.channel.messages.fetch({ limit: 100 });
+                        const userMessages = channelMessages.filter(m => m.author.id === user.id);
+                        for (const msg of userMessages.values()) {
+                            await msg.delete().catch(() => { });
+                        }
+                        console.log(`✅ Mensajes recientes del usuario expulsado ${user.tag} eliminados del canal.`);
+                    }
+                } catch (configErr) {
+                    console.error('Error al cargar config o eliminar mensajes de usuario kickeado:', configErr);
+                }
+
                 // Embed de confirmación
                 const kickEmbed = new EmbedBuilder()
                     .setTitle('👢 Usuario Expulsado')
@@ -4668,7 +4967,7 @@ client.on('interactionCreate', async (interaction) => {
                     .setColor(0xFFA500)
                     .setFooter({ text: `Expulsado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}` })
                     .setTimestamp();
-                await sendLogEmbed(interaction.guild, kickEmbed);
+                await sendLogEmbed(interaction.guild, kickEmbed, 'guildMemberKick');
                 return interaction.reply({ embeds: [kickEmbed] });
             } catch (e) {
                 console.error('Error al expulsar:', e);
@@ -7070,8 +7369,8 @@ client.on('interactionCreate', async (interaction) => {
             // Verificar límite de tickets del usuario antes de proceder
             const maxTickets = guildConfig && guildConfig.maxTicketsPerUser !== undefined ? guildConfig.maxTicketsPerUser : 1;
             if (maxTickets > 0) {
-                const userTickets = interaction.guild.channels.cache.filter(c => 
-                    c.type === ChannelType.GuildText && 
+                const userTickets = interaction.guild.channels.cache.filter(c =>
+                    c.type === ChannelType.GuildText &&
                     c.name.startsWith(`ticket-${interaction.user.id}`)
                 );
                 if (userTickets.size >= maxTickets) {
@@ -7310,16 +7609,13 @@ client.on('interactionCreate', async (interaction) => {
                     console.log(`🔍 Generando ICO para ticket creado: ${ticketName}`);
                     const icoPath = await generateTicketICO(channel, ticketName);
 
-                    console.log(`🔍 Generando HTML para ticket creado: ${ticketName}`);
-                    const htmlPath = await generateTicketHTML(channel, ticketName, interaction.user.tag);
-
-                    // LOG: Ticket abierto con HTML adjunto
+                    // LOG: Ticket abierto sin HTML automático
                     const logEmbed = new EmbedBuilder()
                         .setTitle('🎫 Ticket Abierto')
-                        .setDescription(`**Usuario:** ${interaction.user.tag}\n**Canal:** ${channel}\n**ID del ticket:** ${channel.id}\n**HTML generado:** ${htmlPath ? '✅ Sí' : '❌ No'}`)
+                        .setDescription(`**Usuario:** ${interaction.user.tag}\n**Canal:** ${channel}\n**ID del ticket:** ${channel.id}`)
                         .setColor(0x00FF00)
                         .setTimestamp();
-                    await sendSecurityLog(interaction.guild, logEmbed, htmlPath);
+                    await sendSecurityLog(interaction.guild, logEmbed);
 
                     console.log(`[TICKETS] ✅ Proceso completo finalizado para ${interaction.user.tag}`);
                     return interaction.editReply({ content: `✅ Tu ticket ha sido creado: ${channel}` });
@@ -8251,8 +8547,8 @@ client.on('interactionCreate', async (interaction) => {
             // Verificar límite de tickets del usuario antes de proceder
             const maxTickets = guildConfig && guildConfig.maxTicketsPerUser !== undefined ? guildConfig.maxTicketsPerUser : 1;
             if (maxTickets > 0) {
-                const userTickets = interaction.guild.channels.cache.filter(c => 
-                    c.type === ChannelType.GuildText && 
+                const userTickets = interaction.guild.channels.cache.filter(c =>
+                    c.type === ChannelType.GuildText &&
                     c.name.startsWith(`ticket-${user.id}`)
                 );
                 if (userTickets.size >= maxTickets) {
@@ -8355,14 +8651,13 @@ client.on('interactionCreate', async (interaction) => {
 
                 const ticketName = channelName;
                 const icoPath = await generateTicketICO(channel, ticketName);
-                const htmlPath = await generateTicketHTML(channel, ticketName, user.tag);
 
                 const logEmbed = new EmbedBuilder()
                     .setTitle('🎫 Ticket Abierto')
                     .setDescription(`**Usuario:** ${user.tag}\n**Canal:** ${channel}\n**Tipo:** ${ticketAnswer}${buttonConfig?.question ? `\n**Pregunta:** ${buttonConfig.question}` : ''}`)
                     .setColor(0x00FF00)
                     .setTimestamp();
-                await sendSecurityLog(interaction.guild, logEmbed, htmlPath);
+                await sendSecurityLog(interaction.guild, logEmbed);
 
                 return;
             } catch (error) {

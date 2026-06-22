@@ -1,0 +1,336 @@
+{
+  "giveaways": [
+    {
+      "id": "gw_1781271143830",
+      "prize": "3",
+      "details": "ULTOMO SORTEO DE CHETEOS DE CUENTAS ASTAS EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2025-06-12T13:32:00.000Z",
+      "endTime": "2026-06-22T12:00:00.000Z",
+      "createdAt": "2026-06-12T13:32:23.830Z",
+      "status": "ended",
+      "winnerId": "1262395234596290603",
+      "winnerTag": "aitor2010._47185",
+      "winnerStatus": "Pendiente",
+      "participants": [
+        "1262395234596290603",
+        "668162814078222366"
+      ],
+      "history": [
+        {
+          "type": "winner",
+          "date": "2026-06-22T15:24:40.992Z",
+          "actorId": null,
+          "actorTag": null,
+          "winnerId": "1262395234596290603",
+          "winnerTag": "aitor2010._47185",
+          "previousWinnerId": null,
+          "previousWinnerTag": null
+        }
+      ],
+      "rerollCount": 0,
+      "mentionEveryone": false,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514985724850471117",
+      "endedAt": "2026-06-22T15:24:40.790Z",
+      "announcementSent": true
+    },
+    {
+      "id": "gw_1781271076432",
+      "prize": "1",
+      "details": "",
+      "channelId": "1504873155129512066",
+      "image": null,
+      "startTime": "2026-06-12T13:31:00.000Z",
+      "endTime": "2027-12-12T10:11:00.000Z",
+      "createdAt": "2026-06-12T13:31:16.432Z",
+      "status": "active",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Pendiente",
+      "participants": [],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": false,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514985442603438261"
+    },
+    {
+      "id": "gw_1781271033037",
+      "prize": "1",
+      "details": "wweewwe",
+      "channelId": "1504873155129512066",
+      "image": null,
+      "startTime": "2026-06-12T09:11:00.000Z",
+      "endTime": "2026-03-02T21:22:00.000Z",
+      "createdAt": "2026-06-12T13:30:33.037Z",
+      "status": "ended",
+      "winnerId": null,
+      "winnerTag": "Sin participantes",
+      "winnerStatus": "Pendiente",
+      "participants": [],
+      "history": [
+        {
+          "type": "winner",
+          "date": "2026-06-12T13:30:33.584Z",
+          "actorId": null,
+          "actorTag": null,
+          "winnerId": null,
+          "winnerTag": "Sin participantes",
+          "previousWinnerId": null,
+          "previousWinnerTag": null
+        }
+      ],
+      "rerollCount": 0,
+      "mentionEveryone": false,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [
+          "1490748504682004601"
+        ],
+        "canEdit": []
+      },
+      "messageId": "1514985260486492283",
+      "endedAt": "2026-06-12T13:30:33.584Z"
+    },
+    {
+      "id": "gw_1781270701141",
+      "prize": "3",
+      "details": "ULTIMO SORTEO DE CHETEO DE CUETAS ASTA QUE EL SERVER ESTAS ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-12T13:24:00.000Z",
+      "endTime": null,
+      "createdAt": "2026-06-12T13:25:01.141Z",
+      "status": "active",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Pendiente",
+      "participants": [
+        "1262395234596290603"
+      ],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": true,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514985724850471117"
+    },
+    {
+      "id": "gw_1781170733577",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T09:39:00.000Z",
+      "endTime": "2026-06-15T12:00:00.000Z",
+      "createdAt": "2026-06-11T09:38:53.577Z",
+      "status": "ended",
+      "winnerId": "1262395234596290603",
+      "winnerTag": "aitor2010._47185",
+      "winnerStatus": "Pendiente",
+      "participants": [
+        "1262395234596290603"
+      ],
+      "history": [
+        {
+          "type": "winner",
+          "date": "2026-06-11T09:39:27.284Z",
+          "actorId": null,
+          "actorTag": null,
+          "winnerId": "1262395234596290603",
+          "winnerTag": "aitor2010._47185",
+          "previousWinnerId": null,
+          "previousWinnerTag": null
+        }
+      ],
+      "rerollCount": 0,
+      "mentionEveryone": false,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514564574366662728",
+      "endedAt": "2026-06-11T09:39:27.283Z"
+    },
+    {
+      "id": "gw_1781170120968",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T11:29",
+      "endTime": "2026-06-15T14:00",
+      "createdAt": "2026-06-11T09:28:40.968Z",
+      "status": "cancelled",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Cancelado",
+      "participants": [],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": true,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514562004650819655",
+      "endedAt": "2026-06-11T09:37:54.660Z"
+    },
+    {
+      "id": "gw_1781169474174",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T11:18",
+      "endTime": "2026-06-15T14:00",
+      "createdAt": "2026-06-11T09:17:54.174Z",
+      "status": "cancelled",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Cancelado",
+      "participants": [],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": true,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514559291959414884",
+      "endedAt": "2026-06-11T09:18:13.502Z"
+    },
+    {
+      "id": "gw_1781168911593",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T11:09",
+      "endTime": "2026-06-15T14:00",
+      "createdAt": "2026-06-11T09:08:31.593Z",
+      "status": "cancelled",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Cancelado",
+      "participants": [],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": false,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514556932151840829",
+      "endedAt": "2026-06-11T09:18:14.760Z"
+    },
+    {
+      "id": "gw_1781168616446",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T11:04",
+      "endTime": "2026-06-15T14:00",
+      "createdAt": "2026-06-11T09:03:36.446Z",
+      "status": "cancelled",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Cancelado",
+      "participants": [],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": true,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514555694743818291",
+      "endedAt": "2026-06-11T09:18:12.354Z"
+    },
+    {
+      "id": "gw_1781168085997",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T10:55",
+      "endTime": "2025-06-15T14:00",
+      "createdAt": "2026-06-11T08:54:45.997Z",
+      "status": "ended",
+      "winnerId": null,
+      "winnerTag": "Sin participantes",
+      "winnerStatus": "Pendiente",
+      "participants": [],
+      "history": [
+        {
+          "type": "winner",
+          "date": "2026-06-11T08:54:54.366Z",
+          "actorId": null,
+          "actorTag": null,
+          "winnerId": null,
+          "winnerTag": "Sin participantes",
+          "previousWinnerId": null,
+          "previousWinnerTag": null
+        }
+      ],
+      "rerollCount": 0,
+      "mentionEveryone": false,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514553469900427325",
+      "endedAt": "2026-06-11T08:54:54.366Z"
+    },
+    {
+      "id": "gw_1781165740383",
+      "prize": "1",
+      "details": "ULTIMO SORTEO ASTA QUE EL SERVER ESTE ACTIVO",
+      "channelId": "1509638370056339556",
+      "image": null,
+      "startTime": "2026-06-11T10:15",
+      "endTime": "2026-06-15T14:00",
+      "createdAt": "2026-06-11T08:15:40.383Z",
+      "status": "cancelled",
+      "winnerId": null,
+      "winnerTag": null,
+      "winnerStatus": "Cancelado",
+      "participants": [],
+      "history": [],
+      "rerollCount": 0,
+      "mentionEveryone": true,
+      "permissions": {
+        "canReroll": [],
+        "canFinish": [],
+        "canEdit": []
+      },
+      "messageId": "1514543630822412439",
+      "endedAt": "2026-06-11T09:18:07.255Z"
+    }
+  ],
+  "permissions": {
+    "canReroll": [],
+    "canFinish": [],
+    "canEdit": []
+  }
+}

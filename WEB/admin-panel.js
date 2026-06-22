@@ -412,29 +412,33 @@ app.get('/api/guilds/:guildId/active-tickets', async (req, res) => {
             c.name.startsWith('ticket-')
         );
 
-        const allTickets = ticketChannels.map(ch => {
+        const allTickets = await Promise.all(ticketChannels.map(async ch => {
             // Extraer userId del nombre del canal (ticket-{userId} o ticket-{userId}-{texto})
             const parts = ch.name.replace('ticket-', '').split('-');
             const userId = parts[0];
-            const member = guild.members.cache.get(userId);
-            
-            let userAvatar = null;
+            let member = guild.members.cache.get(userId);
+            if (!member) {
+                member = await guild.members.fetch(userId).catch(() => null);
+            }
+
+            let userAvatar = `https://cdn.discordapp.com/embed/avatars/0.png`;
+            let userName = `Usuario#${userId}`;
             if (member) {
                 userAvatar = member.user.displayAvatarURL({ size: 128 }) || member.user.defaultAvatarURL;
-            } else {
-                userAvatar = `https://cdn.discordapp.com/embed/avatars/0.png`;
+                userName = member.user.tag;
             }
-            
+
             return {
                 channelId: ch.id,
                 channelName: ch.name,
                 userId: userId,
-                userName: member ? member.user.tag : `Usuario#${userId}`,
+                userName: userName,
                 userAvatar: userAvatar,
                 categoryName: ch.parent ? ch.parent.name : 'Sin categoría',
                 createdAt: ch.createdAt ? ch.createdAt.toISOString() : null
             };
-        }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }));
+        allTickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         const total = allTickets.length;
         const tickets = allTickets.slice(offset, offset + limit);
@@ -630,6 +634,36 @@ app.post('/api/guilds/:guildId/logs-config', (req, res) => {
     res.json({ success: true });
 });
 
+// Endpoints para configuración de moderación y AutoMod
+app.get('/api/guilds/:guildId/moderation-config', (req, res) => {
+    const defaultConfig = {
+        censorship: {
+            capsEnabled: false,
+            capsPercentage: 70,
+            capsMinLength: 3,
+            wordsEnabled: false,
+            blockedWords: [],
+            imagesEnabled: false,
+            channels: [],
+            alertChannel: true,
+            alertDM: false
+        },
+        actions: {
+            deleteOnBan: false,
+            deleteOnKick: false
+        }
+    };
+    const config = configManager.loadGuildConfig(req.params.guildId, 'moderation', defaultConfig);
+    res.json(config);
+});
+
+app.post('/api/guilds/:guildId/moderation-config', (req, res) => {
+    configManager.saveGuildConfig(req.params.guildId, 'moderation', req.body);
+    logPanelActivity(req.params.guildId, 'MODERATION', 'Configuración de moderación y AutoMod actualizada');
+    res.json({ success: true });
+});
+
+
 // Endpoints para configuración de bienvenidas
 const welcomeConfigPath = path.join(__dirname, '..', 'config', 'welcome-config.json');
 
@@ -717,11 +751,24 @@ function getGuildGiveawayData(guildId) {
     return data;
 }
 
+let isProcessingGiveaways = false;
+
 function saveGuildGiveawayData(guildId, guildData) {
-    const config = loadGiveawaysConfig();
-    if (!config.guilds) config.guilds = {};
-    config.guilds[guildId] = guildData;
-    saveGiveawaysConfig(config);
+    configManager.saveGuildConfig(guildId, 'giveaways', guildData);
+}
+
+function normalizeGiveawayDateString(value) {
+    if (!value) return null;
+    const normalized = String(value).trim().replace(' ', 'T');
+    const date = new Date(normalized);
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function parseGiveawayDateMs(value) {
+    if (!value) return NaN;
+    const normalized = String(value).trim().replace(' ', 'T');
+    const date = new Date(normalized);
+    return date.getTime();
 }
 
 function formatGiveawayEmbed(guild, giveaway) {
@@ -758,36 +805,191 @@ function formatGiveawayEmbed(guild, giveaway) {
 
     if (giveaway.status === 'active') {
         embed.setFooter({ text: 'Presiona el botón para participar en el sorteo.' });
+    } else if (giveaway.status === 'scheduled') {
+        embed.setFooter({ text: 'Sorteo programado' });
+    } else if (giveaway.status === 'ended') {
+        embed.setFooter({ text: 'Sorteo finalizado' });
     } else {
-        embed.setFooter({ text: `Sorteo ${giveaway.status === 'ended' ? 'finalizado' : 'cancelado'}` });
+        embed.setFooter({ text: 'Sorteo cancelado' });
     }
 
     return embed;
 }
 
+async function processGuildScheduledGiveaways(guild, guildData) {
+    if (!guild || !guildData?.giveaways) return false;
+    let changed = false;
+    const now = Date.now();
+
+    for (const giveaway of guildData.giveaways) {
+        if (giveaway.status === 'cancelled' || giveaway.status === 'ended') {
+            continue;
+        }
+
+        const startMs = giveaway.startTime ? parseGiveawayDateMs(giveaway.startTime) : NaN;
+        const endMs = giveaway.endTime ? parseGiveawayDateMs(giveaway.endTime) : NaN;
+
+        if (giveaway.startTime && Number.isNaN(startMs)) {
+            console.warn(`⚠️ Fecha de inicio inválida para sorteo ${giveaway.id}: ${giveaway.startTime}`);
+            continue;
+        }
+        if (giveaway.endTime && Number.isNaN(endMs)) {
+            console.warn(`⚠️ Fecha de fin inválida para sorteo ${giveaway.id}: ${giveaway.endTime}`);
+        }
+
+        if (giveaway.status === 'scheduled') {
+            console.log(`🔎 Sorteo programado ${giveaway.id}: inicia ${new Date(startMs).toLocaleString('es-ES')} (ahora ${new Date(now).toLocaleString('es-ES')})`);
+        }
+
+        if (giveaway.status === 'scheduled' && now >= startMs) {
+            giveaway.status = 'active';
+            changed = true;
+            try {
+                const updated = await updateGiveawayMessage(guild, giveaway);
+                if (!updated) {
+                    console.warn(`⚠️ No se pudo actualizar el mensaje al activar sorteo ${giveaway.id}`);
+                }
+            } catch (err) {
+                console.error(`⚠️ No se pudo actualizar el mensaje al activar sorteo ${giveaway.id}:`, err);
+            }
+            console.log(`✅ Sorteo activado: ${giveaway.prize} en servidor ${guild.name}`);
+        }
+
+        if ((giveaway.status === 'active' || giveaway.status === 'scheduled') && !Number.isNaN(endMs) && now >= endMs) {
+            try {
+                await finalizeGiveaway(guild, giveaway);
+            } catch (err) {
+                console.error(`❌ Error finalizando sorteo ${giveaway.id}:`, err);
+            }
+            changed = true;
+            console.log(`🏆 Sorteo finalizado: ${giveaway.prize} en servidor ${guild.name}`);
+        }
+    }
+
+    return changed;
+}
+
+async function findExistingGiveawayMessage(channel, giveaway) {
+    if (!channel || !channel.isTextBased()) return null;
+    const targetCustomId = `giveaway_join_${giveaway.id}`;
+    let beforeId = null;
+    let attempts = 0;
+
+    try {
+        while (attempts < 5) {
+            const messages = await channel.messages.fetch({ limit: 100, before: beforeId || undefined });
+            if (!messages.size) break;
+
+            for (const message of messages.values()) {
+                if (message.components?.length) {
+                    for (const row of message.components) {
+                        const componentArray = row.components || [];
+                        for (const component of componentArray) {
+                            if (component.customId === targetCustomId) {
+                                return message;
+                            }
+                        }
+                    }
+                }
+
+                const title = message.embeds?.[0]?.title;
+                if (title && title.includes(`Sorteo: ${giveaway.prize}`)) {
+                    return message;
+                }
+            }
+
+            beforeId = messages.last().id;
+            attempts += 1;
+        }
+    } catch (err) {
+        console.warn(`⚠️ No se pudo buscar mensaje existente del sorteo ${giveaway.id}:`, err);
+    }
+    return null;
+}
+
 async function updateGiveawayMessage(guild, giveaway) {
-    if (!giveaway.channelId || !giveaway.messageId) return;
+    if (!giveaway.channelId) {
+        console.warn(`⚠️ Sorteo ${giveaway.id} sin channelId`);
+        return false;
+    }
     try {
         const channel = guild.channels.cache.get(giveaway.channelId);
-        if (!channel || !channel.isTextBased()) return;
-        const message = await channel.messages.fetch(giveaway.messageId).catch(() => null);
-        if (!message) return;
+        if (!channel) {
+            console.warn(`⚠️ Canal ${giveaway.channelId} no encontrado para sorteo ${giveaway.id}`);
+            return false;
+        }
+        if (!channel.isTextBased()) {
+            console.warn(`⚠️ Canal ${giveaway.channelId} no es de texto para sorteo ${giveaway.id}`);
+            return false;
+        }
 
         const embed = formatGiveawayEmbed(guild, giveaway);
         const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
         const joinButton = new ButtonBuilder()
             .setCustomId(`giveaway_join_${giveaway.id}`)
-            .setLabel(giveaway.status === 'active' ? 'Participar' : 'Sorteo cerrado')
+            .setLabel(giveaway.status === 'active' ? 'Participar' : giveaway.status === 'scheduled' ? 'Sorteo programado' : 'Sorteo cerrado')
             .setStyle(ButtonStyle.Success)
             .setEmoji('🎉')
             .setDisabled(giveaway.status !== 'active');
 
         const actionRow = new ActionRowBuilder().addComponents(joinButton);
 
-        await message.edit({ embeds: [embed], components: [actionRow] });
+        let message = null;
+        if (giveaway.messageId) {
+            message = await channel.messages.fetch(giveaway.messageId).catch(() => null);
+            if (message) {
+                await message.edit({ embeds: [embed], components: [actionRow] });
+                console.log(`✏️ Mensaje de sorteo ${giveaway.id} actualizado (${giveaway.status})`);
+                return true;
+            }
+            console.warn(`⚠️ Mensaje ${giveaway.messageId} del sorteo ${giveaway.id} no encontrado, buscando mensaje existente...`);
+        }
+
+        const existingMessage = await findExistingGiveawayMessage(channel, giveaway);
+        if (existingMessage) {
+            giveaway.messageId = existingMessage.id;
+            await existingMessage.edit({ embeds: [embed], components: [actionRow] });
+            console.log(`🔍 Mensaje existente usado para el sorteo ${giveaway.id}: ${existingMessage.id}`);
+            return true;
+        }
+
+        const newMessage = await channel.send({ embeds: [embed], components: [actionRow] });
+        giveaway.messageId = newMessage.id;
+        console.log(`🆕 Nuevo mensaje de sorteo ${giveaway.id} enviado y almacenado como ${newMessage.id}`);
+        return true;
     } catch (error) {
-        console.error('Error actualizando mensaje de sorteo:', error);
+        console.error(`Error actualizando mensaje de sorteo ${giveaway.id}:`, error);
+        return false;
     }
+}
+
+async function ensureGiveawayMessages(guild, guildData) {
+    if (!guild || !guildData?.giveaways) return false;
+    let changed = false;
+
+    for (const giveaway of guildData.giveaways) {
+        if (giveaway.status === 'ended' || giveaway.status === 'cancelled') continue;
+        if (!giveaway.channelId) continue;
+
+        const channel = guild.channels.cache.get(giveaway.channelId);
+        if (!channel || !channel.isTextBased()) continue;
+
+        let createdOrUpdated = false;
+        if (!giveaway.messageId) {
+            createdOrUpdated = await updateGiveawayMessage(guild, giveaway);
+        } else {
+            const message = await channel.messages.fetch(giveaway.messageId).catch(() => null);
+            if (!message) {
+                createdOrUpdated = await updateGiveawayMessage(guild, giveaway);
+            } else {
+                createdOrUpdated = false;
+            }
+        }
+
+        if (createdOrUpdated) changed = true;
+    }
+
+    return changed;
 }
 
 function pickRandomParticipant(giveaway, exclude = []) {
@@ -805,6 +1007,7 @@ async function finalizeGiveaway(guild, giveaway, actor = null, forceNew = false)
 
     giveaway.status = 'ended';
     giveaway.endedAt = new Date().toISOString();
+    giveaway.announcementSent = true;
 
     if (!newWinnerId) {
         giveaway.winnerId = null;
@@ -841,6 +1044,10 @@ async function finalizeGiveaway(guild, giveaway, actor = null, forceNew = false)
     await updateGiveawayMessage(guild, giveaway);
 
     try {
+        if (giveaway.announcementSent) {
+            return giveaway;
+        }
+
         const channel = guild.channels.cache.get(giveaway.channelId);
         if (channel && channel.isTextBased()) {
             const mention = giveaway.winnerId ? `<@${giveaway.winnerId}>` : 'Nadie';
@@ -862,36 +1069,32 @@ async function finalizeGiveaway(guild, giveaway, actor = null, forceNew = false)
 
 async function processScheduledGiveaways() {
     if (!botClient) return;
+    if (isProcessingGiveaways) return;
+    isProcessingGiveaways = true;
     try {
-        const config = loadGiveawaysConfig();
-        if (!config.guilds) return;
-        for (const [guildId, guildData] of Object.entries(config.guilds)) {
-            const guild = botClient.guilds.cache.get(guildId);
-            if (!guild || !guildData.giveaways) continue;
-            let changed = false;
-            for (const giveaway of guildData.giveaways) {
-                const now = Date.now();
-                const startMs = giveaway.startTime ? new Date(giveaway.startTime).getTime() : null;
-                const endMs = giveaway.endTime ? new Date(giveaway.endTime).getTime() : null;
+        // Procesar sorteos programados para cada servidor
+        for (const guild of botClient.guilds.cache.values()) {
+            try {
+                const guildData = getGuildGiveawayData(guild.id);
+                if (!guildData.giveaways || guildData.giveaways.length === 0) continue;
 
-                if (giveaway.status === 'scheduled' && startMs && now >= startMs) {
-                    giveaway.status = 'active';
-                    changed = true;
-                    await updateGiveawayMessage(guild, giveaway);
-                }
-                if ((giveaway.status === 'active' || giveaway.status === 'scheduled') && endMs && now >= endMs) {
-                    await finalizeGiveaway(guild, giveaway);
-                    changed = true;
-                }
+                const changedSchedule = await processGuildScheduledGiveaways(guild, guildData);
+                const changedMessages = await ensureGiveawayMessages(guild, guildData);
+                if (changedSchedule || changedMessages) saveGuildGiveawayData(guild.id, guildData);
+            } catch (guildError) {
+                console.error(`Error procesando sorteos en servidor ${guild.name} (${guild.id}):`, guildError);
             }
-            if (changed) saveGuildGiveawayData(guildId, guildData);
         }
     } catch (error) {
         console.error('Error procesando sorteos programados:', error);
+    } finally {
+        isProcessingGiveaways = false;
     }
 }
 
-setInterval(processScheduledGiveaways, 30000);
+setInterval(() => {
+    processScheduledGiveaways().catch(err => console.error('Error en intervalo de sorteos:', err));
+}, 30000);
 
 async function handleGiveawayInteraction(interaction) {
     try {
@@ -933,9 +1136,33 @@ async function handleGiveawayInteraction(interaction) {
     }
 }
 
-app.get('/api/guilds/:guildId/giveaways', (req, res) => {
+app.get('/api/guilds/:guildId/giveaways', async (req, res) => {
+    if (botClient && !isProcessingGiveaways) {
+        const guild = botClient.guilds.cache.get(req.params.guildId);
+        if (guild) {
+            const guildData = getGuildGiveawayData(req.params.guildId);
+            const changed = await processGuildScheduledGiveaways(guild, guildData);
+            if (changed) saveGuildGiveawayData(req.params.guildId, guildData);
+        }
+    }
     const guildData = getGuildGiveawayData(req.params.guildId);
     res.json(guildData);
+});
+
+app.post('/api/guilds/:guildId/giveaways/recheck', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const guildData = getGuildGiveawayData(req.params.guildId);
+    if (!guildData) return res.status(404).json({ error: 'No se encontró información del sorteo' });
+
+    if (!isProcessingGiveaways) {
+        const changed = await processGuildScheduledGiveaways(guild, guildData);
+        if (changed) saveGuildGiveawayData(req.params.guildId, guildData);
+    }
+
+    res.json({ success: true, changed: false, giveaways: guildData.giveaways || [] });
 });
 
 app.post('/api/guilds/:guildId/giveaways', async (req, res) => {
@@ -951,9 +1178,9 @@ app.post('/api/guilds/:guildId/giveaways', async (req, res) => {
     const channel = guild.channels.cache.get(channelId);
     if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
-    const normalizedStart = startTime || new Date().toISOString();
-    const normalizedEnd = endTime || null;
-    const isScheduled = startTime && new Date(startTime).getTime() > Date.now();
+    const normalizedStart = normalizeGiveawayDateString(startTime) || new Date().toISOString();
+    const normalizedEnd = normalizeGiveawayDateString(endTime);
+    const isScheduled = Boolean(startTime) && normalizeGiveawayDateString(startTime) && new Date(normalizeGiveawayDateString(startTime)).getTime() > Date.now();
 
     const giveaway = {
         id: `gw_${Date.now()}`,
@@ -1018,8 +1245,13 @@ app.put('/api/guilds/:guildId/giveaways/:giveawayId', async (req, res) => {
     if (details !== undefined) giveaway.details = details;
     if (channelId !== undefined) giveaway.channelId = channelId;
     if (image !== undefined) giveaway.image = image;
-    if (startTime !== undefined) giveaway.startTime = startTime;
-    if (endTime !== undefined) giveaway.endTime = endTime;
+    if (startTime !== undefined) {
+        const normalized = normalizeGiveawayDateString(startTime);
+        if (normalized) giveaway.startTime = normalized;
+    }
+    if (endTime !== undefined) {
+        giveaway.endTime = normalizeGiveawayDateString(endTime);
+    }
     if (status !== undefined) giveaway.status = status;
     if (winnerStatus !== undefined) giveaway.winnerStatus = winnerStatus;
     if (permissions !== undefined) {
@@ -1346,17 +1578,16 @@ app.get('/api/guilds/:guildId/suggestions', async (req, res) => {
     if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
 
     try {
-        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
-        let config = { guilds: {} };
-        if (fs.existsSync(suggestionsConfigPath)) {
-            try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
-        }
-        if (!config.guilds[guild.id]) config.guilds[guild.id] = { suggestionsChannelId: '', suggestions: [] };
+        // Usar configManager para cargar sugerencias desde la carpeta del servidor
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', { 
+            suggestionsChannelId: '', 
+            suggestions: [] 
+        });
 
         res.json({
             success: true,
-            suggestions: config.guilds[guild.id].suggestions || [],
-            suggestionsChannelId: config.guilds[guild.id].suggestionsChannelId || ''
+            suggestions: suggestionsConfig.suggestions || [],
+            suggestionsChannelId: suggestionsConfig.suggestionsChannelId || ''
         });
     } catch (e) {
         console.error('Error obteniendo sugerencias:', e);
@@ -1371,47 +1602,100 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
     if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
 
     try {
-        const { status } = req.body;
         const suggestionId = parseInt(req.params.suggestionId);
+        const { status, approvedBy, comments } = req.body;
 
-        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
-        let config = { guilds: {} };
-        if (fs.existsSync(suggestionsConfigPath)) {
-            try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
+        // Usar configManager para cargar y guardar sugerencias
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', { 
+            suggestionsChannelId: '', 
+            suggestions: [] 
+        });
+
+        const suggestion = suggestionsConfig.suggestions.find(s => s.id === suggestionId);
+        if (!suggestion) {
+            return res.status(404).json({ error: 'Sugerencia no encontrada' });
         }
-        if (!config.guilds[guild.id]) config.guilds[guild.id] = { suggestionsChannelId: '', suggestions: [] };
 
-        const suggestion = config.guilds[guild.id].suggestions.find(s => s.id === suggestionId);
-        if (!suggestion) return res.status(404).json({ error: 'Sugerencia no encontrada' });
+        // Actualizar estado
+        if (status) suggestion.status = status;
+        if (approvedBy && status === 'approved') {
+            suggestion.approvedAt = new Date().toISOString();
+            suggestion.approvedBy = approvedBy;
+        }
+        if (comments) suggestion.comments.push(comments);
 
-        suggestion.status = status;
-        suggestion.approvedAt = new Date().toISOString();
-        suggestion.approvedBy = 'Admin Panel';
+        // Guardar cambios
+        configManager.saveGuildConfig(guild.id, 'suggestions', suggestionsConfig);
 
-        // Si se aprueba, enviar al canal configurado
-        if (status === 'approved' && config.guilds[guild.id].suggestionsChannelId) {
-            try {
-                const channel = guild.channels.cache.get(config.guilds[guild.id].suggestionsChannelId);
-                if (channel) {
-                    const { EmbedBuilder } = require('discord.js');
-                    const embed = new EmbedBuilder()
-                        .setTitle('✅ Sugerencia Aprobada')
-                        .setDescription(suggestion.text)
-                        .setAuthor({ name: suggestion.userTag, iconURL: suggestion.userAvatar })
-                        .setColor(0x00FF00)
-                        .setTimestamp();
+        // 📨 ENVIAR EMBED AL USUARIO SI SE RECHAZA O APRUEBA
+        try {
+            const user = await botClient.users.fetch(suggestion.userId);
+            const { EmbedBuilder } = require('discord.js');
 
-                    await channel.send({ embeds: [embed] });
+            if (status === 'rejected') {
+                // Embed de RECHAZO
+                const rejectedEmbed = new EmbedBuilder()
+                    .setTitle('❌ Sugerencia Rechazada')
+                    .setDescription(`Tu sugerencia ha sido rechazada por el staff.`)
+                    .addFields(
+                        { name: '📝 Tu sugerencia:', value: suggestion.text || 'Sin contenido', inline: false },
+                        { name: '⏰ Enviada:', value: new Date(suggestion.createdAt).toLocaleString('es-ES'), inline: false }
+                    )
+                    .setColor(0xFF0000)
+                    .setFooter({ text: `Servidor: ${guild.name}` })
+                    .setTimestamp();
+
+                // Agregar comentarios si existen
+                if (suggestion.comments && suggestion.comments.length > 0) {
+                    const commentText = suggestion.comments
+                        .map(c => `• ${c.text || c}`)
+                        .join('\n');
+                    rejectedEmbed.addFields({
+                        name: '💬 Comentarios del Staff:',
+                        value: commentText,
+                        inline: false
+                    });
                 }
-            } catch (e) {
-                console.error('Error enviando sugerencia aprobada:', e);
+
+                await user.send({ embeds: [rejectedEmbed] });
+                console.log(`✅ Embed de rechazo enviado a ${suggestion.userTag}`);
+            } else if (status === 'approved') {
+                // Embed de APROBACIÓN
+                const approvedEmbed = new EmbedBuilder()
+                    .setTitle('✅ Sugerencia Aprobada')
+                    .setDescription(`¡Tu sugerencia ha sido aprobada! Será considerada para futuras actualizaciones del servidor.`)
+                    .addFields(
+                        { name: '📝 Tu sugerencia:', value: suggestion.text || 'Sin contenido', inline: false },
+                        { name: '⏰ Enviada:', value: new Date(suggestion.createdAt).toLocaleString('es-ES'), inline: false }
+                    )
+                    .setColor(0x00FF00)
+                    .setFooter({ text: `Servidor: ${guild.name}` })
+                    .setTimestamp();
+
+                // Agregar comentarios si existen
+                if (suggestion.comments && suggestion.comments.length > 0) {
+                    const commentText = suggestion.comments
+                        .map(c => `• ${c.text || c}`)
+                        .join('\n');
+                    approvedEmbed.addFields({
+                        name: '💬 Comentarios del Staff:',
+                        value: commentText,
+                        inline: false
+                    });
+                }
+
+                await user.send({ embeds: [approvedEmbed] });
+                console.log(`✅ Embed de aprobación enviado a ${suggestion.userTag}`);
             }
+        } catch (e) {
+            console.log(`⚠️ No se pudo enviar embed a ${suggestion.userTag}: ${e.message}`);
         }
 
-        fs.writeFileSync(suggestionsConfigPath, JSON.stringify(config, null, 2));
-
-        logPanelActivity(guild.id, 'SUGGESTIONS', `Sugerencia ${suggestion.id} cambió a estado: ${status}`);
-        res.json({ success: true });
+        res.json({ 
+            success: true, 
+            message: 'Sugerencia actualizada',
+            suggestion 
+        });
     } catch (e) {
         console.error('Error actualizando sugerencia:', e);
         res.status(500).json({ error: 'Error actualizando sugerencia' });
@@ -1429,21 +1713,61 @@ app.post('/api/guilds/:guildId/suggestions-channel', async (req, res) => {
         const channel = guild.channels.cache.get(channelId);
         if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
-        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
-        let config = { guilds: {} };
-        if (fs.existsSync(suggestionsConfigPath)) {
-            try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
-        }
-        if (!config.guilds[guild.id]) config.guilds[guild.id] = { suggestionsChannelId: '', suggestions: [] };
+        // Usar configManager para guardar el canal de sugerencias
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', { 
+            suggestionsChannelId: '', 
+            suggestions: [] 
+        });
 
-        config.guilds[guild.id].suggestionsChannelId = channelId;
-        fs.writeFileSync(suggestionsConfigPath, JSON.stringify(config, null, 2));
+        suggestionsConfig.suggestionsChannelId = channelId;
+        configManager.saveGuildConfig(guild.id, 'suggestions', suggestionsConfig);
 
         logPanelActivity(guild.id, 'SUGGESTIONS', `Canal de sugerencias configurado: ${channel.name}`);
         res.json({ success: true });
     } catch (e) {
         console.error('Error guardando canal de sugerencias:', e);
         res.status(500).json({ error: 'Error guardando canal de sugerencias' });
+    }
+});
+
+// Endpoint: Eliminar sugerencia
+app.delete('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    try {
+        const suggestionId = parseInt(req.params.suggestionId);
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', {
+            suggestionsChannelId: '',
+            suggestions: []
+        });
+
+        const index = suggestionsConfig.suggestions.findIndex(s => s.id === suggestionId);
+        if (index === -1) {
+            return res.status(404).json({ error: 'Sugerencia no encontrada' });
+        }
+
+        const removedSuggestion = suggestionsConfig.suggestions.splice(index, 1)[0];
+        configManager.saveGuildConfig(guild.id, 'suggestions', suggestionsConfig);
+
+        if (removedSuggestion.messageId && suggestionsConfig.suggestionsChannelId) {
+            try {
+                const channel = guild.channels.cache.get(suggestionsConfig.suggestionsChannelId) || await guild.channels.fetch(suggestionsConfig.suggestionsChannelId).catch(() => null);
+                if (channel && channel.isTextBased() && channel.messages) {
+                    const message = await channel.messages.fetch(removedSuggestion.messageId).catch(() => null);
+                    if (message) await message.delete();
+                }
+            } catch (e) {
+                console.error('Error eliminando mensaje de sugerencia en Discord:', e);
+            }
+        }
+
+        logPanelActivity(guild.id, 'SUGGESTIONS', `Sugerencia eliminada ID: ${suggestionId}`);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error eliminando sugerencia:', e);
+        res.status(500).json({ error: 'Error eliminando sugerencia' });
     }
 });
 
@@ -1461,19 +1785,15 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
     }
 
     try {
-        const suggestionsConfigPath = path.join(__dirname, '..', 'config', 'suggestions-config.json');
-        let config = { guilds: {} };
-        if (fs.existsSync(suggestionsConfigPath)) {
-            try { config = JSON.parse(fs.readFileSync(suggestionsConfigPath, 'utf8')); } catch (e) { }
-        }
-        if (!config.guilds[guild.id]) config.guilds[guild.id] = { suggestionsChannelId: '', suggestions: [] };
-
-        const suggestion = config.guilds[guild.id].suggestions.find(s => s.id === suggestionId);
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', {
+            suggestionsChannelId: '',
+            suggestions: []
+        });
+        const suggestion = suggestionsConfig.suggestions.find(s => s.id === suggestionId);
         if (!suggestion) {
             return res.status(404).json({ error: 'Sugerencia no encontrada' });
         }
 
-        // Guardar comentario
         if (!suggestion.comments) suggestion.comments = [];
         suggestion.comments.push({
             text: comment,
@@ -1481,9 +1801,8 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
             postedInChannel: postInChannel === true
         });
 
-        fs.writeFileSync(suggestionsConfigPath, JSON.stringify(config, null, 2));
+        configManager.saveGuildConfig(guild.id, 'suggestions', suggestionsConfig);
 
-        // OBLIGATORIO: Enviar comentario al usuario por MD
         let mdSent = false;
         try {
             const user = await botClient.users.fetch(suggestion.userId);
@@ -1498,14 +1817,12 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
             console.log(`✅ Comentario enviado a ${suggestion.userTag} por MD`);
             mdSent = true;
         } catch (e) {
-            console.log(`⚠️ No se pudo enviar MD a ${suggestion.userTag}: ${e.message}`)
-            mdSent = false;
+            console.log(`⚠️ No se pudo enviar MD a ${suggestion.userTag}: ${e.message}`);
         }
 
-        // OPCIONAL: Enviar comentario al canal de sugerencias si se solicita
         if (postInChannel === true) {
             try {
-                const channelId = config.guilds[guild.id].suggestionsChannelId;
+                const channelId = suggestionsConfig.suggestionsChannelId;
                 if (!channelId) {
                     return res.status(400).json({ error: 'Canal de sugerencias no configurado' });
                 }
@@ -1515,13 +1832,11 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
                     return res.status(400).json({ error: 'Canal de sugerencias no encontrado' });
                 }
 
-                // Verificar permisos del bot
                 const botMember = guild.members.me || await guild.members.fetch(botClient.user.id).catch(() => null);
                 if (!botMember || !botMember.permissionsIn(channel).has('SendMessages')) {
                     return res.status(403).json({ error: 'Bot sin permisos para enviar en el canal de sugerencias' });
                 }
 
-                // Enviar comentario al canal
                 const { EmbedBuilder } = require('discord.js');
                 const channelEmbed = new EmbedBuilder()
                     .setTitle('💬 Comentario del Staff')
@@ -1585,7 +1900,7 @@ app.get('/api/guilds/:guildId/auto-responses', (req, res) => {
 
 // POST: Crear nueva auto-respuesta
 app.post('/api/guilds/:guildId/auto-responses', (req, res) => {
-    const config = loadAutoResponses();
+    const config = loadAutoResponses(req.params.guildId);
     if (!config.guilds[req.params.guildId]) config.guilds[req.params.guildId] = [];
 
     const newResponse = {
@@ -1612,14 +1927,14 @@ app.post('/api/guilds/:guildId/auto-responses', (req, res) => {
     };
 
     config.guilds[req.params.guildId].push(newResponse);
-    saveAutoResponses(config);
+    saveAutoResponses(req.params.guildId, config);
     logPanelActivity(req.params.guildId, 'AUTO_RESPONSE', `Auto-respuesta creada: "${newResponse.trigger}"`);
     res.json({ success: true, response: newResponse });
 });
 
 // PUT: Actualizar auto-respuesta existente
 app.put('/api/guilds/:guildId/auto-responses/:responseId', (req, res) => {
-    const config = loadAutoResponses();
+    const config = loadAutoResponses(req.params.guildId);
     if (!config.guilds[req.params.guildId]) return res.status(404).json({ error: 'No hay auto-respuestas' });
 
     const index = config.guilds[req.params.guildId].findIndex(r => r.id === req.params.responseId);
@@ -1627,21 +1942,21 @@ app.put('/api/guilds/:guildId/auto-responses/:responseId', (req, res) => {
 
     const existing = config.guilds[req.params.guildId][index];
     config.guilds[req.params.guildId][index] = { ...existing, ...req.body, id: existing.id };
-    saveAutoResponses(config);
+    saveAutoResponses(req.params.guildId, config);
     logPanelActivity(req.params.guildId, 'AUTO_RESPONSE', `Auto-respuesta actualizada: "${existing.trigger}"`);
     res.json({ success: true });
 });
 
 // DELETE: Eliminar auto-respuesta
 app.delete('/api/guilds/:guildId/auto-responses/:responseId', (req, res) => {
-    const config = loadAutoResponses();
+    const config = loadAutoResponses(req.params.guildId);
     if (!config.guilds[req.params.guildId]) return res.status(404).json({ error: 'No hay auto-respuestas' });
 
     const index = config.guilds[req.params.guildId].findIndex(r => r.id === req.params.responseId);
     if (index === -1) return res.status(404).json({ error: 'Auto-respuesta no encontrada' });
 
     const removed = config.guilds[req.params.guildId].splice(index, 1);
-    saveAutoResponses(config);
+    saveAutoResponses(req.params.guildId, config);
     logPanelActivity(req.params.guildId, 'AUTO_RESPONSE', `Auto-respuesta eliminada: "${removed[0].trigger}"`);
     res.json({ success: true });
 });
@@ -1843,6 +2158,12 @@ app.get('/', (req, res) => {
 function startAdminPanel(client) {
     setBotClient(client);
     updateBotStats();
+    
+    // Ejecutar procesamiento de sorteos inmediatamente al iniciar
+    console.log('🎯 Iniciando verificación de sorteos programados...');
+    processScheduledGiveaways().catch(err => console.error('Error en verificación inicial de sorteos:', err));
+    
+    
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`\n---------------------------------------------------`);
         console.log(`✅ Panel de CodeCord-Style iniciado con éxito`);
