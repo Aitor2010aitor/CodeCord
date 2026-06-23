@@ -306,7 +306,7 @@ async function generateTicketPDF(ticketChannel, ticketName, closedBy) {
     }
 }
 
-// Función para generar HTML del ticket
+// Función para generar HTML del ticket (estilo Discord moderno)
 async function generateTicketHTML(ticketChannel, ticketName, closedBy) {
     try {
         // Crear directorio de tickets si no existe
@@ -335,181 +335,260 @@ async function generateTicketHTML(ticketChannel, ticketName, closedBy) {
         // Ordenar mensajes por fecha (más antiguos primero)
         messages.reverse();
 
-        // Crear HTML para el archivo con estilo de código de programación
-        const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Ticket: ${ticketName}</title>
-        <style>
-            body {
-                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-                margin: 0;
-                padding: 20px;
-                background-color: #1e1e1e;
-                color: #d4d4d4;
-                line-height: 1.4;
-            }
-            .header {
-                background: linear-gradient(135deg, #0078d4, #106ebe);
-                color: #ffffff;
-                padding: 20px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                text-align: center;
-                border: 1px solid #0078d4;
-                box-shadow: 0 0 20px rgba(0, 120, 212, 0.3);
-            }
-            .ticket-info {
-                background: #2d2d30;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                border: 1px solid #3e3e42;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            }
-            .message {
-                background: #252526;
-                margin: 10px 0;
-                padding: 15px;
-                border-radius: 8px;
-                border-left: 4px solid #0078d4;
-                border: 1px solid #3e3e42;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            }
-            .message-header {
-                font-weight: bold;
-                color: #4ec9b0;
-                margin-bottom: 8px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .message-content {
-                line-height: 1.6;
-                word-wrap: break-word;
-                color: #d4d4d4;
-            }
-            .timestamp {
-                color: #808080;
-                font-size: 0.9em;
-            }
-            .bot-message {
-                border-left-color: #00d166;
-                background: #1a3a1a;
-            }
-            .user-message {
-                border-left-color: #0078d4;
-                background: #1a1a2e;
-            }
-            .embed {
-                background: #2d2d30;
-                border: 1px solid #3e3e42;
-                border-radius: 6px;
-                padding: 12px;
-                margin: 8px 0;
-            }
-            .embed-title {
-                font-weight: bold;
-                color: #4ec9b0;
-                margin-bottom: 8px;
-                font-size: 1.1em;
-            }
-            .embed-description {
-                color: #d4d4d4;
-                line-height: 1.5;
-            }
-            .footer {
-                text-align: center;
-                margin-top: 30px;
-                padding: 20px;
-                color: #808080;
-                border-top: 1px solid #3e3e42;
-                background: #2d2d30;
-                border-radius: 8px;
-                border: 1px solid #3e3e42;
-            }
-            .code-style {
-                background: #1e1e1e;
-                border: 1px solid #3e3e42;
-                border-radius: 4px;
-                padding: 2px 6px;
-                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-                color: #4ec9b0;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>🎫 Ticket: ${ticketName}</h1>
-            <p>Generado automáticamente al cerrar el ticket</p>
-        </div>
-        
-        <div class="ticket-info">
-            <h3>📋 Información del Ticket</h3>
-            <p><span class="code-style">Nombre del Canal:</span> ${ticketName}</p>
-            <p><span class="code-style">ID del Canal:</span> ${ticketChannel.id}</p>
-            <p><span class="code-style">Cerrado por:</span> ${closedBy}</p>
-            <p><span class="code-style">Fecha de Cierre:</span> ${new Date().toLocaleString('es-ES')}</p>
-            <p><span class="code-style">Total de Mensajes:</span> ${messages.length}</p>
-        </div>
-        
-        <h2>💬 Historial de Mensajes</h2>
-        
-        ${messages.map(msg => {
+        // ── Helper: Sanitiza y convierte Markdown básico de Discord a HTML ──
+        function parseMarkdown(text, guild) {
+            if (!text) return '';
+            let s = text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            // Bloques de código
+            s = s.replace(/```([^`]+)```/gs, (_, c) => `<pre class="code-block"><code>${c.trim()}</code></pre>`);
+            // Código en línea
+            s = s.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+            // Negrita **
+            s = s.replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>');
+            // Cursiva *
+            s = s.replace(/\*(.+?)\*/gs, '<em>$1</em>');
+            // Subrayado __
+            s = s.replace(/__(.+?)__/gs, '<u>$1</u>');
+            // Tachado ~~
+            s = s.replace(/~~(.+?)~~/gs, '<del>$1</del>');
+            // Menciones de usuarios <@ID>
+            s = s.replace(/&lt;@!?(\d+)&gt;/g, (_, id) => {
+                let name = id;
+                if (guild && guild.members && guild.members.cache) {
+                    const m = guild.members.cache.get(id);
+                    if (m) name = m.user.username;
+                }
+                return `<span class="mention">@${name}</span>`;
+            });
+            // Menciones de roles <@&ID>
+            s = s.replace(/&lt;@&amp;(\d+)&gt;/g, (_, id) => {
+                if (guild && guild.roles && guild.roles.cache) {
+                    const r = guild.roles.cache.get(id);
+                    if (r) return `<span class="mention">@${r.name}</span>`;
+                }
+                return `<span class="mention">@rol</span>`;
+            });
+            // Menciones de canales <#ID>
+            s = s.replace(/&lt;#(\d+)&gt;/g, (_, id) => {
+                if (guild && guild.channels && guild.channels.cache) {
+                    const c2 = guild.channels.cache.get(id);
+                    if (c2) return `<span class="mention">#${c2.name}</span>`;
+                }
+                return `<span class="mention">#canal</span>`;
+            });
+            // Saltos de línea
+            s = s.replace(/\n/g, '<br>');
+            return s;
+        }
+
+        // ── Iconos SVG de los botones ──
+        const SVG_LOCK  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 9V7C17 4.243 14.757 2 12 2S7 4.243 7 7v2H5v13h14V9h-2ZM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v2H9V7Zm3 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>`;
+        const SVG_UNLOCK = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 9H9V7a3 3 0 0 1 6 0V5h2V7c0-2.757-2.243-5-5-5S7 4.243 7 7v2H5v13h14V9h-2Zm-5 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" opacity=".7"/></svg>`;
+        const SVG_CHECK  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17Z"/></svg>`;
+
+        function buildButtonIcon(btn) {
+            if (!btn.emoji) return '';
+            const n = btn.emoji.name || '';
+            if (n === '🔒' || n === 'lock') return SVG_LOCK;
+            if (n === '🔓' || n === 'unlock') return SVG_UNLOCK;
+            if (n === '✅' || n === 'check') return SVG_CHECK;
+            return `<span class="btn-emoji">${n}</span>`;
+        }
+
+        function buildButtons(components) {
+            if (!components || !components.length) return '';
+            let html2 = '<div class="buttons-row">';
+            components.forEach(row => {
+                if (!row.components) return;
+                row.components.forEach(btn => {
+                    const styleMap = { 1: 'btn-primary', 2: 'btn-secondary', 3: 'btn-success', 4: 'btn-danger', 5: 'btn-link' };
+                    const cls = styleMap[btn.style] || 'btn-secondary';
+                    html2 += `<button class="btn ${cls}">${buildButtonIcon(btn)}<span>${btn.label || ''}</span></button>`;
+                });
+            });
+            html2 += '</div>';
+            return html2;
+        }
+
+        function buildEmbeds(embeds, guild) {
+            if (!embeds || !embeds.length) return '';
+            return embeds.map(embed => {
+                const color = embed.color ? '#' + embed.color.toString(16).padStart(6, '0') : '#5865f2';
+                let fields = '';
+                if (embed.fields && embed.fields.length) {
+                    fields = `<div class="embed-fields">${embed.fields.map(f =>
+                        `<div class="embed-field${f.inline ? ' inline' : ''}">
+                            <div class="embed-field-name">${f.name}</div>
+                            <div class="embed-field-value">${parseMarkdown(f.value, guild)}</div>
+                        </div>`
+                    ).join('')}</div>`;
+                }
+                return `
+                <div class="embed" style="border-left-color:${color}">
+                    ${embed.author ? `<div class="embed-author">${embed.author.name || ''}</div>` : ''}
+                    ${embed.title ? `<div class="embed-title">${embed.title}</div>` : ''}
+                    ${embed.description ? `<div class="embed-description">${parseMarkdown(embed.description, guild)}</div>` : ''}
+                    ${fields}
+                    ${embed.image ? `<img src="${embed.image.url}" class="embed-img" alt="embed image">` : ''}
+                    ${embed.footer ? `<div class="embed-footer">${embed.footer.iconURL ? `<img src="${embed.footer.iconURL}" class="embed-footer-icon" alt="">` : ''}${embed.footer.text || ''}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // ── Construir filas de mensajes ──
+        const guild = ticketChannel.guild || null;
+        const messagesHtml = messages.map(msg => {
             const isBot = msg.author.bot;
-            const timestamp = new Date(msg.createdTimestamp).toLocaleString('es-ES');
+            const avatarUrl = (typeof msg.author.displayAvatarURL === 'function')
+                ? msg.author.displayAvatarURL({ size: 64, format: 'png' })
+                : `https://cdn.discordapp.com/embed/avatars/${parseInt(msg.author.discriminator || '0') % 5}.png`;
 
-            let content = msg.content || '';
-
-            // Procesar embeds
-            let embedsHtml = '';
-            if (msg.embeds && msg.embeds.length > 0) {
-                embedsHtml = msg.embeds.map(embed => `
-              <div class="embed">
-                ${embed.title ? `<div class="embed-title">${embed.title}</div>` : ''}
-                ${embed.description ? `<div class="embed-description">${embed.description}</div>` : ''}
-              </div>
-            `).join('');
+            let nameColor = '#ffffff';
+            if (guild && guild.members && guild.members.cache && msg.author.id) {
+                const member = guild.members.cache.get(msg.author.id);
+                if (member && member.displayHexColor && member.displayHexColor !== '#000000') {
+                    nameColor = member.displayHexColor;
+                }
             }
 
-            // Procesar attachments
-            let attachmentsHtml = '';
+            const ts = new Date(msg.createdTimestamp);
+            const tsStr = ts.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                + ' ' + ts.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+            let body = '';
+            if (msg.content && msg.content.trim()) {
+                body += `<div class="msg-text">${parseMarkdown(msg.content, guild)}</div>`;
+            }
+            body += buildEmbeds(msg.embeds, guild);
+            body += buildButtons(msg.components);
+
+            // Attachments
             if (msg.attachments && msg.attachments.size > 0) {
-                attachmentsHtml = msg.attachments.map(att =>
-                    `<p><em>📎 Archivo adjunto: ${att.name} (${(att.size / 1024).toFixed(1)} KB)</em></p>`
-                ).join('');
+                msg.attachments.forEach(att => {
+                    const isImg = /\.(png|jpg|jpeg|gif|webp)$/i.test(att.name || '');
+                    body += isImg
+                        ? `<img src="${att.url}" class="attachment-img" alt="${att.name}">`
+                        : `<div class="attachment-file">📎 ${att.name} (${(att.size / 1024).toFixed(1)} KB)</div>`;
+                });
             }
 
             return `
-            <div class="message ${isBot ? 'bot-message' : 'user-message'}">
-              <div class="message-header">
-                <span>${isBot ? '🤖' : '👤'} ${msg.author.tag}</span>
-                <span class="timestamp">${timestamp}</span>
-              </div>
-              <div class="message-content">
-                ${content ? content.replace(/\n/g, '<br>') : '<em>Sin contenido de texto</em>'}
-                ${embedsHtml}
-                ${attachmentsHtml}
-              </div>
-            </div>
-          `;
-        }).join('')}
-        
-        <div class="footer">
-            <p>Este archivo HTML fue generado automáticamente por el bot de Discord</p>
-            <p>Fecha de generación: ${new Date().toLocaleString('es-ES')}</p>
-        </div>
-    </body>
-    </html>
-    `;
+            <div class="message-group">
+                <img class="avatar" src="${avatarUrl}" alt="">
+                <div class="message-right">
+                    <div class="message-meta">
+                        <span class="author-name" style="color:${nameColor}">${msg.author.username}</span>
+                        ${isBot ? `<span class="bot-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17Z"/></svg> APP</span>` : ''}
+                        <span class="ts">${tsStr}</span>
+                    </div>
+                    ${body}
+                </div>
+            </div>`;
+        }).join('');
 
-        // Generar archivo HTML
+        // ── Plantilla HTML completa ──
+        const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#${ticketName} - View Transcript</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#1a1c28}::-webkit-scrollbar-thumb{background:#3b3d52;border-radius:4px}
+body{font-family:'Inter','Segoe UI',sans-serif;background:#0c0d12;color:#dbdee1;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding-bottom:60px}
+
+/* ── TOPBAR ── */
+.topbar{width:100%;background:#151722;border-bottom:1px solid #1e1f2e;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:12px}
+.topbar-left{display:flex;align-items:center;gap:8px}
+.ch-hash{color:#4f5160;font-size:22px;font-weight:700;line-height:1}
+.ch-name{color:#fff;font-size:17px;font-weight:700}
+.view-label{color:#72767d;font-size:15px;font-weight:400}
+.topbar-meta{display:flex;gap:10px;flex-wrap:wrap}
+.meta-pill{background:#1e1f2e;border:1px solid #2a2b3d;border-radius:6px;padding:3px 10px;font-size:12.5px;color:#a3a6aa}
+.meta-pill strong{color:#fff}
+
+/* ── CONTENEDOR DE MENSAJES ── */
+.messages-container{width:100%;max-width:1100px;padding:24px 28px;display:flex;flex-direction:column;gap:2px}
+
+/* ── SEPARADOR DE FECHA ── */
+.date-sep{display:flex;align-items:center;gap:12px;margin:20px 0 8px;color:#4f5160;font-size:12px;font-weight:600}
+.date-sep::before,.date-sep::after{content:'';flex:1;height:1px;background:#1e1f2e}
+
+/* ── MENSAJE ── */
+.message-group{display:flex;align-items:flex-start;padding:4px 12px;border-radius:8px;gap:0;transition:background .08s}
+.message-group:hover{background:#151722}
+.avatar{width:40px;height:40px;border-radius:50%;margin-right:16px;flex-shrink:0;background:#2b2d3a;object-fit:cover}
+.message-right{flex:1;min-width:0}
+.message-meta{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.author-name{font-weight:600;font-size:15px;cursor:pointer}
+.author-name:hover{text-decoration:underline}
+.bot-badge{display:inline-flex;align-items:center;gap:3px;background:#5865f2;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.3px;vertical-align:middle}
+.ts{color:#72767d;font-size:11.5px}
+
+/* ── TEXTO ── */
+.msg-text{font-size:15px;line-height:1.45;color:#dbdee1;word-break:break-word;white-space:pre-wrap}
+.inline-code{background:#111218;padding:1px 6px;border-radius:4px;font-family:Consolas,Monaco,monospace;font-size:13px;color:#4ec9b0;border:1px solid #2a2b3d}
+.code-block{background:#111218;border:1px solid #2a2b3d;border-radius:6px;padding:12px 16px;margin:8px 0;font-family:Consolas,Monaco,monospace;font-size:13px;color:#c0c7d4;overflow-x:auto;white-space:pre}
+.mention{background:rgba(88,101,242,.15);color:#c9cdfb;font-weight:500;padding:0 4px;border-radius:3px}
+
+/* ── EMBED ── */
+.embed{background:#1e2030;border:1px solid #2a2b3d;border-left:4px solid #5865f2;border-radius:4px;padding:12px 16px;margin:8px 0;max-width:500px;display:flex;flex-direction:column;gap:6px}
+.embed-author{color:#dbdee1;font-size:13px;font-weight:600}
+.embed-title{color:#fff;font-size:15px;font-weight:700}
+.embed-description{color:#dbdee1;font-size:14px;line-height:1.4;white-space:pre-wrap}
+.embed-fields{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.embed-field{flex:1;min-width:120px}
+.embed-field.inline{flex:0 0 calc(33% - 6px)}
+.embed-field-name{color:#fff;font-size:13px;font-weight:600;margin-bottom:2px}
+.embed-field-value{color:#dbdee1;font-size:13px}
+.embed-img{max-width:100%;border-radius:4px;margin-top:8px}
+.embed-footer{color:#72767d;font-size:12px;display:flex;align-items:center;gap:6px;margin-top:4px}
+.embed-footer-icon{width:16px;height:16px;border-radius:50%}
+
+/* ── BOTONES ── */
+.buttons-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;font-size:14px;font-weight:500;color:#fff;border:none;cursor:default;font-family:inherit;line-height:1}
+.btn-icon{flex-shrink:0}
+.btn-primary{background:#5865f2}
+.btn-secondary{background:#4f545c}
+.btn-success{background:#248046}
+.btn-danger{background:#da373c}
+.btn-link{background:transparent;color:#00a8fc;text-decoration:underline;padding:8px 2px}
+
+/* ── ADJUNTOS ── */
+.attachment-img{max-width:400px;max-height:300px;border-radius:4px;margin-top:8px;display:block}
+.attachment-file{background:#1e2030;border:1px solid #2a2b3d;border-radius:6px;padding:8px 12px;font-size:13px;color:#a3a6aa;margin-top:6px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="ch-hash">#</span>
+    <span class="ch-name">${ticketName}</span>
+    <span class="view-label">- View Transcript</span>
+  </div>
+  <div class="topbar-meta">
+    <div class="meta-pill">Cerrado por: <strong>${closedBy}</strong></div>
+    <div class="meta-pill">Mensajes: <strong>${messages.length}</strong></div>
+    <div class="meta-pill">Fecha: <strong>${new Date().toLocaleDateString('es-ES')}</strong></div>
+  </div>
+</div>
+
+<div class="messages-container">
+  ${messagesHtml}
+</div>
+</body>
+</html>`;
+
+        // Guardar archivo HTML
         const fileName = `ticket_${ticketName}_${Date.now()}.html`;
         const filePath = path.join(ticketsDir, fileName);
-
-        // Escribir el HTML al archivo
         fs.writeFileSync(filePath, html, 'utf8');
 
         console.log(`✅ HTML generado: ${filePath}`);

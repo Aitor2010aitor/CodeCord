@@ -3,48 +3,34 @@
 ---
 
 > [!IMPORTANT]
+>> [!IMPORTANT]
 >
-> ## 🔧 Versión 4.0
+> ## 🔧 Versión 4.5
 >
-> ### ✨ Novedades
+> ### 🎫 Mejoras en las Transcripciones de Tickets Cerrados
 >
-> **🎉 Sistema de Sorteos Mejorado**
+> * 📄 Nuevo diseño HTML para las transcripciones de tickets.
 >
-> * Corregidos errores que podían provocar fallos en algunos sorteos.
-> * Solucionados problemas detectados en la participación y selección de ganadores.
+> * 🎨 Interfaz más moderna inspirada en Discord.
 >
-> **🛡️ Nuevo Sistema de Censura**
+> * 👤 Mejor visualización de usuarios, mensajes y fechas.
 >
-> * Añadido sistema de censura de palabras configurable.
-> * Eliminación automática de mensajes que contengan palabras bloqueadas.
-> * Gestión completa desde el panel web.
->
-> **🌐 Nueva Zona en el Panel de Administración**
->
-> * Nueva sección para administrar las palabras censuradas.
-> * Configuración sencilla e intuitiva desde la web.
->
-> **🧹 Eliminación Automática de Mensajes**
->
-> * Nueva opción para eliminar automáticamente los mensajes de usuarios expulsados.
-> * Nueva opción para eliminar automáticamente los mensajes de usuarios baneados.
->
-> **🔨 Corrección de Bugs**
->
-> * Solucionados diversos errores encontrados en versiones anteriores.
-> * Corregidos pequeños fallos visuales y de funcionamiento.
+> * 🔍 Mejor organización y lectura de conversaciones largas.
 
-> Y seguramente algún bug más que se nos ha olvidado apuntar 😆
+> * 💾 Exportación más estable y fiable de tickets cerrados.
+>
+
+
 
 ---
 
-Este repositorio contiene un bot de Discord multifuncional integrado con un **Panel Web de Administración** que permite gestionar el bot y el servidor mediante una interfaz moderna, rápida y fácil de usar.
+Este repositorio contiene un bot de Discord multifuncional de alto rendimiento integrado con un **Panel Web de Administración** interactivo que permite gestionar el bot y el servidor cómodamente a través de una interfaz gráfica moderna, rápida y segura.
 
 ---
 
 ## 🖥️ ¿Qué es y qué hace el Panel Web de Administración?
 
-El panel web permite controlar la configuración del bot en tiempo real desde el navegador, evitando tener que editar archivos manualmente o utilizar comandos complejos dentro de Discord.
+El panel web te permite controlar la configuración del bot en tiempo real desde tu navegador web, evitando tener que configurar archivos JSON manualmente o utilizar largos comandos dentro de Discord.
 
 ### 📊 Panel de Control (Dashboard)
 
@@ -55,29 +41,30 @@ El panel web permite controlar la configuración del bot en tiempo real desde el
 
 ### 🎫 Gestión de Tickets
 
-* Historial completo de tickets.
-* Descarga de transcripciones en HTML.
-* Creación de paneles personalizados.
+* Historial y transcripciones HTML.
+* Creación avanzada de paneles.
 * Hasta 5 botones configurables.
 * Formularios personalizados.
-* Vista previa antes de publicar.
-* Configuración de roles de soporte.
+* Vista previa del panel.
+* Gestión de roles de soporte.
 
 ### 🎉 Sistema de Sorteos
 
-* Crear sorteos desde el panel web.
+* Crear sorteos desde la web.
 * Configurar premios y duración.
-* Participación mediante botones.
 * Selección automática de ganadores.
 * Re-roll de ganadores.
-* Registro de participantes y resultados.
+* Registro completo de participantes.
+* Sistema optimizado y corregido en la versión 4.0.
 
 ### 🛡️ Sistema de Censura
 
-* Gestión de palabras prohibidas.
-* Eliminación automática de mensajes.
-* Configuración desde la web.
-* Registro de acciones realizadas.
+Nueva sección incorporada en la versión 4.0.
+
+* Crear listas de palabras bloqueadas.
+* Eliminar mensajes automáticamente.
+* Configuración desde el panel web.
+* Registro de acciones realizadas por el sistema.
 
 ### 🤖 Sistema de Auto-Respuestas
 
@@ -85,26 +72,27 @@ El panel web permite controlar la configuración del bot en tiempo real desde el
 * Mensajes de texto o embeds.
 * Vista previa en tiempo real.
 * Filtros por canales y roles.
-* Configuración avanzada.
+* Correcciones de errores y mejoras de estabilidad.
 
 ### 📢 Constructor de Embeds
 
 * Creación visual de anuncios.
-* Configuración de títulos, descripciones, imágenes y colores.
+* Configuración de títulos, colores, imágenes y descripción.
 * Envío directo al canal seleccionado.
 
 ### ⚙️ Sistema de Logs
 
-* Registro de mensajes eliminados.
-* Registro de mensajes editados.
-* Registro de cambios de roles.
-* Registro de entradas y salidas de usuarios.
+* Mensajes eliminados.
+* Mensajes editados.
+* Cambios de roles.
+* Entradas y salidas de usuarios.
+* Configuración individual por evento.
 
 ### 👋 Sistema de Bienvenidas
 
 * Mensajes personalizados.
 * Tarjetas de bienvenida automáticas.
-* Fondos configurables.
+* Fondos e imágenes configurables.
 
 ### 👥 Gestión de Miembros y Auditoría
 
@@ -115,8 +103,10 @@ El panel web permite controlar la configuración del bot en tiempo real desde el
 
 ### 🧹 Limpieza Automática de Mensajes
 
+Nueva función añadida en la versión 4.0.
+
 * Eliminación automática de mensajes de usuarios expulsados.
 * Eliminación automática de mensajes de usuarios baneados.
-* Configuración desde el panel web.
+* Configuración desde el panel administrativo.
 
 ---
