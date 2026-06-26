@@ -3347,7 +3347,9 @@ client.on('messageCreate', async (message) => {
                         const triggeredWord = censorship.blockedWords.find(word => {
                             const cleanWord = word.trim().toLowerCase();
                             if (!cleanWord) return false;
-                            return contentLower.includes(cleanWord);
+                            const escapedWord = cleanWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const regex = new RegExp(`(^|[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑüÜ])${escapedWord}([^a-zA-Z0-9áéíóúñÁÉÍÓÚÑüÜ]|$)`, 'i');
+                            return regex.test(contentLower);
                         });
 
                         if (triggeredWord) {

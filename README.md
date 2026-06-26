@@ -3,24 +3,25 @@
 ---
 
 > [!IMPORTANT]
->> [!IMPORTANT]
 >
-> ## 🔧 Versión 4.5
+> ## 🔧 Versión 5.0 - Novedades
 >
-> ### 🎫 Mejoras en las Transcripciones de Tickets Cerrados
+> ### 🛡️ Mejora del Sistema de Censura
 >
-> * 📄 Nuevo diseño HTML para las transcripciones de tickets.
+> Se ha rediseñado completamente el sistema de censura de palabras para hacerlo mucho más preciso.
 >
-> * 🎨 Interfaz más moderna inspirada en Discord.
+> **Antes:**
 >
-> * 👤 Mejor visualización de usuarios, mensajes y fechas.
+> * El sistema detectaba coincidencias por letras o fragmentos de palabras.
+> * Esto provocaba falsos positivos y, en muchos casos, impedía enviar mensajes que realmente no contenían palabras prohibidas.
 >
-> * 🔍 Mejor organización y lectura de conversaciones largas.
-
-> * 💾 Exportación más estable y fiable de tickets cerrados.
+> **Ahora:**
 >
-
-
+> * La censura funciona mediante **frases o palabras completas**.
+> * Se eliminan los falsos positivos.
+> * Mayor precisión en la detección.
+> * Mejor experiencia para los usuarios.
+> * Configuración más fiable y eficiente.
 
 ---
 
@@ -30,7 +31,7 @@ Este repositorio contiene un bot de Discord multifuncional de alto rendimiento i
 
 ## 🖥️ ¿Qué es y qué hace el Panel Web de Administración?
 
-El panel web te permite controlar la configuración del bot en tiempo real desde tu navegador web, evitando tener que configurar archivos JSON manualmente o utilizar largos comandos dentro de Discord.
+El panel web te permite controlar la configuración del bot en tiempo real desde tu navegador, evitando tener que modificar archivos JSON manualmente o utilizar largos comandos dentro de Discord.
 
 ### 📊 Panel de Control (Dashboard)
 
@@ -55,16 +56,18 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Selección automática de ganadores.
 * Re-roll de ganadores.
 * Registro completo de participantes.
-* Sistema optimizado y corregido en la versión 4.0.
+* Sistema optimizado y corregido.
 
 ### 🛡️ Sistema de Censura
 
-Nueva sección incorporada en la versión 4.0.
+**Mejorado en la versión 5.0.**
 
-* Crear listas de palabras bloqueadas.
-* Eliminar mensajes automáticamente.
+* Crear listas de palabras o frases bloqueadas.
+* Detección mediante palabras y frases completas.
+* Eliminación automática de mensajes.
 * Configuración desde el panel web.
 * Registro de acciones realizadas por el sistema.
+* Mayor precisión y menos falsos positivos.
 
 ### 🤖 Sistema de Auto-Respuestas
 
@@ -102,8 +105,6 @@ Nueva sección incorporada en la versión 4.0.
 * Registro de acciones administrativas.
 
 ### 🧹 Limpieza Automática de Mensajes
-
-Nueva función añadida en la versión 4.0.
 
 * Eliminación automática de mensajes de usuarios expulsados.
 * Eliminación automática de mensajes de usuarios baneados.
