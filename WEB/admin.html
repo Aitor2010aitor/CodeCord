@@ -688,6 +688,9 @@
             <a href="#servers" class="nav-link" onclick="showSection('servers')">
                 <i class="fas fa-server"></i> <span>Servidores</span>
             </a>
+            <a href="#autorol" class="nav-link" onclick="showSection('autorol')">
+                <i class="fas fa-tags"></i> <span>Auto-Rol</span>
+            </a>
             <a href="/logout" class="nav-link"
                 style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); color: #ff4d4d;">
                 <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
@@ -1160,8 +1163,8 @@
                     <div>
                         <label
                             style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">CUERPO</label>
-                        <textarea id="eb-desc" placeholder="Descripción del embed..." oninput="updateEBPreview()"
-                            style="width: 100%; height: 120px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"></textarea>
+                        <textarea id="eb-desc" placeholder="Descripción del embed..." oninput="updateEBPreview(); this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                            style="width: 100%; min-height: 120px; overflow: hidden; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"></textarea>
                     </div>
 
                     <div>
@@ -1347,8 +1350,8 @@
                         <label
                             style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">RESPUESTA</label>
                         <textarea id="ar-response" placeholder="Texto de la respuesta..."
-                            style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"
-                            oninput="updateArPreview()"></textarea>
+                            style="width: 100%; min-height: 80px; overflow: hidden; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"
+                            oninput="updateArPreview(); this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
                     </div>
 
                     <div style="margin-bottom: 16px;">
@@ -1380,8 +1383,8 @@
                             style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">DESCRIPCIÓN
                             DEL EMBED</label>
                         <textarea id="ar-embed-desc" placeholder="Descripción o contenido del Embed..."
-                            style="width: 100%; height: 80px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"
-                            oninput="updateArPreview()"></textarea>
+                            style="width: 100%; min-height: 80px; overflow: hidden; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; resize: none; font-family: inherit;"
+                            oninput="updateArPreview(); this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
@@ -2094,6 +2097,58 @@
                 </table>
             </div>
         </div>
+
+        <!-- Autorol Section -->
+        <div id="autorol" class="section">
+            <div class="section-header">
+                <span class="section-title">🏷️ Auto-Rol (Reaction Roles)</span>
+                <button onclick="saveAutorolConfig()" class="view-btn"
+                    style="background: var(--success); color: #181825; font-weight: 700;">
+                    <i class="fas fa-save"></i> Enviar y Guardar
+                </button>
+            </div>
+
+            <p style="color: var(--text-muted); margin-bottom: 24px;">Configura un mensaje Embed donde los usuarios
+                pueden reaccionar para obtener roles.</p>
+
+            <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 15px; color: var(--accent);">1. Configuración del Mensaje</h4>
+
+                <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Canal
+                    Destino</label>
+                <select id="autorol-channel" class="log-select" style="margin-bottom: 15px;"></select>
+
+                <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Título del
+                    Embed</label>
+                <input type="text" id="autorol-title" class="log-select" placeholder="Ej: Selecciona tus roles"
+                    style="margin-bottom: 15px;">
+
+                <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Descripción
+                    del Embed</label>
+                <textarea id="autorol-desc" class="log-select" placeholder="Ej: Reacciona para obtener roles..."
+                    style="margin-bottom: 15px; min-height: 80px; overflow: hidden; resize: none;"
+                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+
+                <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Color
+                    (Hex)</label>
+                <input type="text" id="autorol-color" class="log-select" placeholder="#5865f2" value="#5865f2">
+            </div>
+
+            <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="color: var(--success); margin: 0;">2. Configuración de Roles y Emojis</h4>
+                    <button onclick="addAutorolRow()" class="view-btn" style="background: rgba(255,255,255,0.1);">+
+                        Añadir Rol</button>
+                </div>
+
+                <div id="autorol-rows-container">
+                    <!-- Filas dinámicas -->
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
@@ -2151,7 +2206,10 @@
         }
 
         function refreshSection(sectionId) {
-            if (!currentGuildId) return;
+            if (!currentGuildId) {
+                if (sectionId === 'autorol') loadAutorolData();
+                return;
+            }
             if (sectionId === 'logs-config') loadLogsConfig();
             if (sectionId === 'welcome') loadWelcomeConfig();
             if (sectionId === 'moderation') loadModerationConfig();
@@ -2163,6 +2221,7 @@
             if (sectionId === 'suggestions') loadSuggestions();
             if (sectionId === 'giveaways') loadGiveaways();
             if (sectionId === 'servers') loadServers();
+            if (sectionId === 'autorol') loadAutorolData();
         }
 
         function showSection(sectionId) {
@@ -4081,6 +4140,202 @@
         loadGuildsForSelector();
         setInterval(loadStatus, 30000);
         setInterval(loadActivity, 60000);
+
+        // ==========================================
+        // SISTEMA DE AUTOROL
+        // ==========================================
+        let serverEmojis = [];
+        let autorolRowCounter = 0;
+
+        async function loadAutorolData() {
+            const channelSelect = document.getElementById('autorol-channel');
+            const container = document.getElementById('autorol-rows-container');
+
+            if (!currentGuildId) {
+                channelSelect.innerHTML = '<option value="">Selecciona un servidor primero...</option>';
+                container.innerHTML = '<div style="color: var(--text-muted); padding: 10px;">Selecciona un servidor arriba 👆 para configurar autoroles.</div>';
+                return;
+            }
+
+            if (container.innerHTML.includes('Selecciona un servidor')) {
+                container.innerHTML = '';
+            }
+
+            // Cargar Canales
+            if (guildChannels.length === 0) await loadChannels();
+            channelSelect.innerHTML = '<option value="">Seleccionar canal...</option>' +
+                guildChannels.map(c => `<option value="${c.id}"># ${c.name}</option>`).join('');
+
+            // Cargar Emojis
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/emojis`);
+                serverEmojis = await res.json();
+            } catch (e) { console.error("Error loading emojis", e); }
+
+            // Cargar Roles
+            if (guildRoles.length === 0) await loadRoles();
+
+            // Iniciar con una fila vacía si no hay ninguna
+            if (container.children.length === 0) {
+                addAutorolRow();
+            }
+        }
+
+        function getEmojiOptions() {
+            let options = '<option value="">Selecciona un emoji...</option>';
+
+            const basicEmojis = ['✅', '❌', '👍', '👎', '⭐', '❤️', '🔥', '🎮', '🎵', '🎉', '✨', '👑', '🚀', '🎨', '📚', '🏆'];
+            options += '<optgroup label="Emojis Básicos">';
+            basicEmojis.forEach(e => {
+                options += `<option value="${e}">${e}</option>`;
+            });
+            options += '</optgroup>';
+
+            if (serverEmojis && serverEmojis.length > 0) {
+                options += '<optgroup label="Emojis del Servidor">';
+                serverEmojis.forEach(e => {
+                    options += `<option value="${e.id}">${e.name} (Custom)</option>`;
+                });
+                options += '</optgroup>';
+            }
+
+            return options;
+        }
+
+        function getRoleOptions() {
+            let options = '<option value="">Selecciona un rol...</option>';
+            guildRoles.forEach(r => {
+                options += `<option value="${r.id}">@${r.name}</option>`;
+            });
+            return options;
+        }
+
+        function addAutorolRow() {
+            if (!currentGuildId) {
+                showToast('error', 'Selecciona un servidor primero');
+                return;
+            }
+            const container = document.getElementById('autorol-rows-container');
+            if (container.innerHTML.includes('Selecciona un servidor')) {
+                container.innerHTML = '';
+            }
+
+            const rowId = `autorol-row-${autorolRowCounter++}`;
+
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = 'autorol-row-item';
+            div.style = 'display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;';
+
+            div.innerHTML = `
+                <div style="flex: 1;">
+                    <label style="display:block; margin-bottom:6px; font-size:0.8rem; color:var(--text-muted);">Emoji</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <img class="emoji-preview" src="" style="width: 24px; height: 24px; display: none; border-radius: 4px;" />
+                        <input type="text" list="autorol-emojis-${rowId}" class="log-select autorol-emoji-select" style="margin:0; flex: 1;" placeholder="Emoji o ID (ej: 🎉 o 123456)" onchange="updateEmojiPreview(this)" oninput="updateEmojiPreview(this)">
+                        <datalist id="autorol-emojis-${rowId}">
+                            ${getEmojiOptions()}
+                        </datalist>
+                    </div>
+                </div>
+                <div style="flex: 2;">
+                    <label style="display:block; margin-bottom:6px; font-size:0.8rem; color:var(--text-muted);">Rol a asignar</label>
+                    <select class="log-select autorol-role-select" style="margin:0;">
+                        ${getRoleOptions()}
+                    </select>
+                </div>
+                <div>
+                    <button onclick="document.getElementById('${rowId}').remove()" class="view-btn" style="background: var(--danger); color: white; height: 40px; padding: 0 15px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(div);
+        }
+
+        function updateEmojiPreview(selectEl) {
+            const val = selectEl.value;
+            const img = selectEl.parentElement.querySelector('.emoji-preview');
+            if (!val) {
+                img.style.display = 'none';
+                return;
+            }
+            const customEmoji = serverEmojis.find(e => e.id === val);
+            if (customEmoji) {
+                // Discord emoji URL structure
+                img.src = `https://cdn.discordapp.com/emojis/${customEmoji.id}.${customEmoji.animated ? 'gif' : 'png'}`;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+        }
+
+        async function saveAutorolConfig() {
+            if (!currentGuildId) return showToast('error', 'Selecciona un servidor');
+
+            const channelId = document.getElementById('autorol-channel').value;
+            const title = document.getElementById('autorol-title').value;
+            const desc = document.getElementById('autorol-desc').value;
+            const color = document.getElementById('autorol-color').value;
+
+            if (!channelId) return showToast('error', 'Selecciona un canal');
+            if (!title && !desc) return showToast('error', 'Agrega un título o descripción');
+
+            const rows = document.querySelectorAll('.autorol-row-item');
+            const reactions = [];
+
+            let hasError = false;
+            rows.forEach(row => {
+                const emoji = row.querySelector('.autorol-emoji-select').value;
+                const roleId = row.querySelector('.autorol-role-select').value;
+
+                if (emoji && roleId) {
+                    reactions.push({ emoji, roleId });
+                } else if (emoji || roleId) {
+                    hasError = true;
+                }
+            });
+
+            if (hasError) return showToast('error', 'Completa todos los pares de Emoji-Rol');
+            if (reactions.length === 0) return showToast('error', 'Añade al menos un rol');
+            if (reactions.length > 20) return showToast('error', 'El límite es de 20 reacciones por mensaje');
+
+            const data = {
+                channelId,
+                embed: {
+                    title,
+                    description: desc,
+                    color: color || '#5865f2'
+                },
+                reactions
+            };
+
+            try {
+                showToast('info', 'Guardando y enviando...');
+                const res = await fetch(`/api/guilds/${currentGuildId}/autorol`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    showToast('success', 'Auto-Rol configurado correctamente');
+
+                    document.getElementById('autorol-title').value = '';
+                    document.getElementById('autorol-desc').value = '';
+                    document.getElementById('autorol-rows-container').innerHTML = '';
+                    addAutorolRow();
+
+                } else {
+                    const err = await res.json();
+                    showToast('error', 'Error: ' + (err.error || 'Desconocido'));
+                }
+            } catch (e) {
+                showToast('error', 'Error de conexión');
+            }
+        }
+
     </script>
 
     <!-- Modal: Perfil de Miembro -->

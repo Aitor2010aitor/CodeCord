@@ -384,9 +384,9 @@ async function generateTicketHTML(ticketChannel, ticketName, closedBy) {
         }
 
         // ── Iconos SVG de los botones ──
-        const SVG_LOCK  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 9V7C17 4.243 14.757 2 12 2S7 4.243 7 7v2H5v13h14V9h-2ZM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v2H9V7Zm3 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>`;
+        const SVG_LOCK = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 9V7C17 4.243 14.757 2 12 2S7 4.243 7 7v2H5v13h14V9h-2ZM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v2H9V7Zm3 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>`;
         const SVG_UNLOCK = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 9H9V7a3 3 0 0 1 6 0V5h2V7c0-2.757-2.243-5-5-5S7 4.243 7 7v2H5v13h14V9h-2Zm-5 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" opacity=".7"/></svg>`;
-        const SVG_CHECK  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17Z"/></svg>`;
+        const SVG_CHECK = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17Z"/></svg>`;
 
         function buildButtonIcon(btn) {
             if (!btn.emoji) return '';
@@ -607,8 +607,14 @@ const client = new Client({
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
+        ,
+        GatewayIntentBits.GuildMessageReactions
     ],
-    partials: [Partials.GuildMember]
+    partials: [Partials.GuildMember,
+    Partials.Message,
+    Partials.Reaction,
+    Partials.User
+    ]
 });
 
 // Colecciones para almacenar datos
@@ -3148,7 +3154,7 @@ client.on('messageCreate', async (message) => {
                 .setFooter({ text: 'Bot de Moderación del Servidor' })
                 .setTimestamp();
             const warnMsg = await message.channel.send({ embeds: [warnEmbed] }).catch(() => null);
-            if (warnMsg) setTimeout(() => warnMsg.delete().catch(() => {}), 8000);
+            if (warnMsg) setTimeout(() => warnMsg.delete().catch(() => { }), 8000);
 
             // Log de infracción
             const logEmbed = new EmbedBuilder()
@@ -3259,7 +3265,7 @@ client.on('messageCreate', async (message) => {
                 .setFooter({ text: 'Bot de Moderación del Servidor' })
                 .setTimestamp();
             const warnMsg = await message.channel.send({ embeds: [warnEmbed] }).catch(() => null);
-            if (warnMsg) setTimeout(() => warnMsg.delete().catch(() => {}), 8000);
+            if (warnMsg) setTimeout(() => warnMsg.delete().catch(() => { }), 8000);
 
             const logEmbed = new EmbedBuilder()
                 .setTitle('🛡️ Anti-Spam: Castigo Progresivo')
@@ -9259,5 +9265,64 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
 });
+
+
+// ==========================================
+// SISTEMA DE AUTOROL
+// ==========================================
+client.on('messageReactionAdd', async (reaction, user) => {
+    if (user.bot) return;
+    try {
+        if (reaction.partial) await reaction.fetch();
+        if (reaction.message.partial) await reaction.message.fetch();
+
+        const guildId = reaction.message.guildId;
+        if (!guildId) return;
+
+        const autoroles = configManager.loadGuildConfig(guildId, 'autoroles', []);
+        const config = autoroles.find(a => a.messageId === reaction.message.id);
+        if (!config) return;
+
+        const emojiIdentifier = reaction.emoji.id || reaction.emoji.name;
+        const targetReaction = config.reactions.find(r => r.emoji === emojiIdentifier);
+
+        if (targetReaction) {
+            const member = await reaction.message.guild.members.fetch(user.id);
+            if (member) {
+                await member.roles.add(targetReaction.roleId).catch(console.error);
+            }
+        }
+    } catch (e) {
+        console.error("Error en messageReactionAdd (Autorol):", e);
+    }
+});
+
+client.on('messageReactionRemove', async (reaction, user) => {
+    if (user.bot) return;
+    try {
+        if (reaction.partial) await reaction.fetch();
+        if (reaction.message.partial) await reaction.message.fetch();
+
+        const guildId = reaction.message.guildId;
+        if (!guildId) return;
+
+        const autoroles = configManager.loadGuildConfig(guildId, 'autoroles', []);
+        const config = autoroles.find(a => a.messageId === reaction.message.id);
+        if (!config) return;
+
+        const emojiIdentifier = reaction.emoji.id || reaction.emoji.name;
+        const targetReaction = config.reactions.find(r => r.emoji === emojiIdentifier);
+
+        if (targetReaction) {
+            const member = await reaction.message.guild.members.fetch(user.id);
+            if (member) {
+                await member.roles.remove(targetReaction.roleId).catch(console.error);
+            }
+        }
+    } catch (e) {
+        console.error("Error en messageReactionRemove (Autorol):", e);
+    }
+});
+
 
 client.login(process.env.BOT_TOKEN);

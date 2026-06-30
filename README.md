@@ -4,28 +4,25 @@
 
 > [!IMPORTANT]
 >
-> ## 🔧 Versión 5.0 - Novedades
+> ## 🔧 Versión 5.5 - Novedades del Panel Web
 >
-> ### 🛡️ Mejora del Sistema de Censura
+> ### 🆕 Nuevo Sistema de Auto-Roles (Reaction Roles)
 >
-> Se ha rediseñado completamente el sistema de censura de palabras para hacerlo mucho más preciso.
+> * Se ha añadido una nueva sección completa para crear y gestionar **Auto-Roles**.
+> * Permite configurar un mensaje Embed personalizado donde los usuarios pueden reaccionar con emojis específicos para obtener roles de forma automática en el servidor.
 >
-> **Antes:**
+> ### 🔄 Mejoras de Interfaz y Usabilidad (UI/UX)
 >
-> * El sistema detectaba coincidencias por letras o fragmentos de palabras.
-> * Esto provocaba falsos positivos y, en muchos casos, impedía enviar mensajes que realmente no contenían palabras prohibidas.
+> Se han implementado mejoras de calidad de vida en los formularios del Panel de Administración Web para facilitar la creación de contenido largo y configuraciones avanzadas:
+> 
+> * **Auto-Roles:**
+>   * La caja de descripción ahora se **auto-expande dinámicamente** hacia abajo al escribir textos largos, mejorando la navegación con la rueda del ratón.
+>   * El selector de emojis se actualizó a un campo de búsqueda inteligente que **permite introducir manualmente la ID** de cualquier emoji (o seleccionarlo de la lista).
+> * **Constructor de Embeds (Embed Builder):**
+>   * El campo principal ("Cuerpo") ahora se expande automáticamente al agregar texto o saltos de línea.
+> * **Auto Respuestas:**
+>   * Las cajas de edición para "Respuesta en texto" y "Descripción del Embed" heredan el mismo comportamiento auto-expandible.
 >
-> **Ahora:**
->
-> * La censura funciona mediante **frases o palabras completas**.
-> * Se eliminan los falsos positivos.
-> * Mayor precisión en la detección.
-> * Mejor experiencia para los usuarios.
-> * Configuración más fiable y eficiente.
-
----
-
-Este repositorio contiene un bot de Discord multifuncional de alto rendimiento integrado con un **Panel Web de Administración** interactivo que permite gestionar el bot y el servidor cómodamente a través de una interfaz gráfica moderna, rápida y segura.
 
 ---
 

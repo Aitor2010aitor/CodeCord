@@ -508,7 +508,7 @@ ${messages.reverse().map(m => `<div class="msg"><span class="author">${m.author.
                         .setDescription(`Canal: **${channel.name}**\nCerrado desde el panel de administración web.`)
                         .setColor(0xED4245)
                         .setTimestamp();
-                    await logChannel.send({ embeds: [logEmbed] }).catch(() => {});
+                    await logChannel.send({ embeds: [logEmbed] }).catch(() => { });
                 }
             }
         } catch (logErr) {
@@ -1579,9 +1579,9 @@ app.get('/api/guilds/:guildId/suggestions', async (req, res) => {
 
     try {
         // Usar configManager para cargar sugerencias desde la carpeta del servidor
-        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', { 
-            suggestionsChannelId: '', 
-            suggestions: [] 
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', {
+            suggestionsChannelId: '',
+            suggestions: []
         });
 
         res.json({
@@ -1606,9 +1606,9 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
         const { status, approvedBy, comments } = req.body;
 
         // Usar configManager para cargar y guardar sugerencias
-        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', { 
-            suggestionsChannelId: '', 
-            suggestions: [] 
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', {
+            suggestionsChannelId: '',
+            suggestions: []
         });
 
         const suggestion = suggestionsConfig.suggestions.find(s => s.id === suggestionId);
@@ -1691,10 +1691,10 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
             console.log(`⚠️ No se pudo enviar embed a ${suggestion.userTag}: ${e.message}`);
         }
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: 'Sugerencia actualizada',
-            suggestion 
+            suggestion
         });
     } catch (e) {
         console.error('Error actualizando sugerencia:', e);
@@ -1714,9 +1714,9 @@ app.post('/api/guilds/:guildId/suggestions-channel', async (req, res) => {
         if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
         // Usar configManager para guardar el canal de sugerencias
-        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', { 
-            suggestionsChannelId: '', 
-            suggestions: [] 
+        const suggestionsConfig = configManager.loadGuildConfig(guild.id, 'suggestions', {
+            suggestionsChannelId: '',
+            suggestions: []
         });
 
         suggestionsConfig.suggestionsChannelId = channelId;
@@ -1971,7 +1971,7 @@ app.get('/api/guilds/:guildId/ticket-panels', (req, res) => {
         const config = configManager.loadGuildConfig(guild.id, 'tickets', {});
         const panelChannelId = config.panelChannelId;
         const panelMessageId = config.panelMessageId;
-        
+
         if (!panelChannelId || !panelMessageId) {
             return res.json({ panels: [] });
         }
@@ -2000,7 +2000,7 @@ app.get('/api/guilds/:guildId/ticket-panels', (req, res) => {
 app.post('/api/guilds/:guildId/update-ticket-panel/:messageId', async (req, res) => {
     const { channelId, logChannelId, message, buttons, maxTicketsPerUser } = req.body;
     const messageId = req.params.messageId;
-    
+
     if (!botClient) return res.json({ error: 'Bot no conectado' });
     const guild = botClient.guilds.cache.get(req.params.guildId);
     if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
@@ -2143,8 +2143,12 @@ app.get('/api/guilds/:guildId/roles', (req, res) => {
     const guild = botClient.guilds.cache.get(req.params.guildId);
     if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
 
+    const botMember = guild.members.me;
+    const botHighestRole = botMember ? botMember.roles.highest.position : 0;
+
     const roles = guild.roles.cache
         .filter(r => r.id !== guild.id) // quitar @everyone
+        .filter(r => r.position < botHighestRole) // Solo roles que el bot puede dar
         .sort((a, b) => b.position - a.position)
         .map(r => ({ id: r.id, name: r.name, color: r.hexColor }));
 
@@ -2158,12 +2162,12 @@ app.get('/', (req, res) => {
 function startAdminPanel(client) {
     setBotClient(client);
     updateBotStats();
-    
+
     // Ejecutar procesamiento de sorteos inmediatamente al iniciar
     console.log('🎯 Iniciando verificación de sorteos programados...');
     processScheduledGiveaways().catch(err => console.error('Error en verificación inicial de sorteos:', err));
-    
-    
+
+
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`\n---------------------------------------------------`);
         console.log(`✅ Panel de CodeCord-Style iniciado con éxito`);
@@ -2172,5 +2176,70 @@ function startAdminPanel(client) {
         console.log(`---------------------------------------------------\n`);
     });
 }
+
+
+app.get('/api/guilds/:guildId/emojis', (req, res) => {
+    if (!botClient) return res.json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const emojis = guild.emojis.cache.map(e => ({
+        id: e.id,
+        name: e.name,
+        animated: e.animated,
+        url: e.url
+    }));
+    res.json(emojis);
+});
+
+app.post('/api/guilds/:guildId/autorol', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const { channelId, embed, reactions } = req.body;
+    if (!channelId || !reactions || reactions.length === 0) {
+        return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    const channel = guild.channels.cache.get(channelId);
+    if (!channel || !channel.isTextBased()) {
+        return res.status(404).json({ error: 'Canal no válido o no encontrado' });
+    }
+
+    try {
+        const { EmbedBuilder } = require('discord.js');
+        const embedMsg = new EmbedBuilder()
+            .setColor(embed.color || '#5865f2');
+
+        if (embed.title) embedMsg.setTitle(embed.title);
+        if (embed.description) embedMsg.setDescription(embed.description);
+
+        const sentMessage = await channel.send({ embeds: [embedMsg] });
+
+        // Agregar reacciones
+        for (const r of reactions) {
+            try {
+                await sentMessage.react(r.emoji);
+            } catch (e) {
+                console.error(`No se pudo reaccionar con el emoji ${r.emoji}`, e);
+            }
+        }
+
+        // Guardar configuración
+        const autoroles = configManager.loadGuildConfig(guild.id, 'autoroles', []);
+        autoroles.push({
+            messageId: sentMessage.id,
+            channelId: sentMessage.channel.id,
+            reactions: reactions // [{emoji, roleId}]
+        });
+        configManager.saveGuildConfig(guild.id, 'autoroles', autoroles);
+
+        res.json({ success: true, messageId: sentMessage.id });
+    } catch (e) {
+        console.error("Error al crear autorol:", e);
+        res.status(500).json({ error: 'Error interno al enviar el mensaje o reaccionar' });
+    }
+});
 
 module.exports = { startAdminPanel, handleGiveawayInteraction };
