@@ -2,6 +2,7 @@
 require('dotenv').config();
 const configManager = require('./scripts/config-manager.js');
 const { startAdminPanel, handleGiveawayInteraction } = require('./WEB/admin-panel.js');
+const { initAntiRaid } = require('./scripts/antiraid.js');
 // Manejadores globales para capturar errores y mostrar trazas
 process.on('uncaughtException', (err) => {
     console.error('❌ Uncaught Exception:', err);
@@ -606,9 +607,10 @@ const client = new Client({
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
-        ,
-        GatewayIntentBits.GuildMessageReactions
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildModeration,
+        GatewayIntentBits.GuildExpressions
     ],
     partials: [Partials.GuildMember,
     Partials.Message,
@@ -799,7 +801,7 @@ async function closeTicketChannel(ticketChannel, closedBy, replyCallback = null)
     }, 5000);
 }
 
-// Sistema Anti-Raid
+// Sistema Anti-Raid (V1 - existente, no modificar)
 client.antiRaid = {
     messageTracker: new Map(), // Rastrear mensajes por usuario
     channelActions: new Map(), // Rastrear creación/eliminación de canales
@@ -809,6 +811,9 @@ client.antiRaid = {
     adminRole: new Map(), // Rol autorizado para configurar automoderación
     infractions: new Map() // Rastrear infracciones progresivas por usuario
 };
+
+// Sistema Anti-Raid V2 (12 módulos: canales, roles, emojis, bans, kicks, webhooks)
+let antiRaidV2 = initAntiRaid(client);
 
 function loadStaffConfig() {
     try {
@@ -1503,8 +1508,12 @@ function getLogChannelByGuild(guild) {
 }
 
 // NUEVO: Registrar actividad persistente para el panel web
-async function logBotActivity(guildId, type, message) {
-    const activityPath = path.join(__dirname, 'config', 'bot-activity.json');
+async function logBotActivity(guildId, type, message, embedData = null) {
+    const dataDir = path.join(__dirname, 'data');
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const activityPath = path.join(dataDir, 'bot-activity.json');
     let activity = [];
     try {
         if (fs.existsSync(activityPath)) {
@@ -1512,12 +1521,27 @@ async function logBotActivity(guildId, type, message) {
         }
     } catch (e) { }
 
-    activity.unshift({
+    const entry = {
         guildId,
         type,
         message,
         timestamp: new Date().toISOString()
-    });
+    };
+
+    if (embedData) {
+        entry.embed = {
+            title: embedData.title || null,
+            description: embedData.description || null,
+            color: embedData.color || null,
+            fields: embedData.fields || [],
+            thumbnail: embedData.thumbnail || null,
+            image: embedData.image || null,
+            author: embedData.author || null,
+            footer: embedData.footer || null
+        };
+    }
+
+    activity.unshift(entry);
 
     // Mantener solo los últimos 50
     if (activity.length > 50) activity = activity.slice(0, 50);
@@ -1527,10 +1551,43 @@ async function logBotActivity(guildId, type, message) {
     } catch (e) { }
 }
 
+async function deleteUserMessagesInGuild(guild, userId) {
+    try {
+        console.log(`🧹 Iniciando eliminación de mensajes para el usuario ${userId} en todo el servidor: ${guild.name}`);
+        const textChannels = guild.channels.cache.filter(c => 
+            (c.type === ChannelType.GuildText || c.type === ChannelType.GuildAnnouncement || c.type === ChannelType.PublicThread || c.type === ChannelType.PrivateThread) && 
+            c.permissionsFor(guild.members.me)?.has(PermissionsBitField.Flags.ViewChannel) &&
+            c.permissionsFor(guild.members.me)?.has(PermissionsBitField.Flags.ManageMessages)
+        );
+
+        const deletePromises = Array.from(textChannels.values()).map(async (channel) => {
+            try {
+                const messages = await channel.messages.fetch({ limit: 100 }).catch(() => null);
+                if (!messages) return;
+                const userMessages = messages.filter(m => m.author.id === userId);
+                if (userMessages.size > 0) {
+                    await channel.bulkDelete(userMessages, true).catch(async (err) => {
+                        for (const msg of userMessages.values()) {
+                            await msg.delete().catch(() => {});
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error(`Error eliminando mensajes de ${userId} en canal ${channel.name}:`, err);
+            }
+        });
+
+        await Promise.all(deletePromises);
+        console.log(`✅ Finalizada la eliminación de mensajes para el usuario ${userId} en todo el servidor.`);
+    } catch (error) {
+        console.error('Error en deleteUserMessagesInGuild:', error);
+    }
+}
+
 async function sendLogEmbed(guild, embed, eventType = null) {
     try {
         // Registrar en actividad reciente
-        await logBotActivity(guild.id, eventType || 'INFO', embed.data.title || embed.data.description || 'Evento sin descripción');
+        await logBotActivity(guild.id, eventType || 'INFO', embed.data.title || embed.data.description || 'Evento sin descripción', embed.data);
         // Cargar config granular si existe
         // logsConfigPath replaced by configManager
         let granularConfig = null;
@@ -3071,14 +3128,19 @@ client.on('messageCreate', async (message) => {
 
         if (sameLetterMessages.length >= 3) {
             console.log(`🚨 REPETICIÓN DETECTADA: ${message.author.tag} repitió "${message.content}" 3 veces`);
-            // Eliminar mensajes repetidos
+            // Eliminar mensajes repetidos (instantáneo con bulkDelete)
             try {
-                const messagesToDelete = sameLetterMessages.slice(-3);
-                for (const msgData of messagesToDelete) {
-                    try {
-                        const msg = await message.channel.messages.fetch(msgData.messageId);
-                        await msg.delete();
-                    } catch (e) { }
+                const idsToDelete = sameLetterMessages.slice(-3).map(m => m.messageId);
+                try {
+                    await message.channel.bulkDelete(idsToDelete, true);
+                } catch (bulkErr) {
+                    // Fallback individual si bulkDelete falla (mensajes >14 días)
+                    for (const msgId of idsToDelete) {
+                        try {
+                            const msg = await message.channel.messages.fetch(msgId);
+                            await msg.delete();
+                        } catch (e) { }
+                    }
                 }
             } catch (error) {
                 console.error('Error eliminando mensajes repetidos:', error);
@@ -3182,14 +3244,19 @@ client.on('messageCreate', async (message) => {
     if (recentMessages.length > settings.maxMessages) {
         console.log(`🚨 SPAM DETECTADO: ${message.author.tag} envió ${recentMessages.length} mensajes en ${settings.timeWindow / 1000}s`);
         try {
-            // Eliminar todos los mensajes recientes del spammer
+            // Eliminar todos los mensajes recientes del spammer (instantáneo con bulkDelete)
             try {
-                const messagesToDelete = recentMessages.map(msg => msg.messageId);
-                for (const messageId of messagesToDelete) {
-                    try {
-                        const msg = await message.channel.messages.fetch(messageId);
-                        await msg.delete();
-                    } catch (e) { }
+                const spamIds = recentMessages.map(msg => msg.messageId);
+                try {
+                    await message.channel.bulkDelete(spamIds, true);
+                } catch (bulkErr) {
+                    // Fallback individual si bulkDelete falla (mensajes >14 días)
+                    for (const messageId of spamIds) {
+                        try {
+                            const msg = await message.channel.messages.fetch(messageId);
+                            await msg.delete();
+                        } catch (e) { }
+                    }
                 }
             } catch (e) {
                 console.error('Error eliminando mensajes de spam:', e);
@@ -3822,6 +3889,21 @@ client.on('guildMemberRemove', async (member) => {
         .setTimestamp();
 
     await sendLogEmbed(member.guild, embed, isBanned ? 'guildBanAdd' : (isKick ? 'guildMemberKick' : 'guildMemberRemove'));
+
+    // Notificar en el ticket si el usuario salió del servidor
+    try {
+        const ticketChannel = member.guild.channels.cache.find(c => 
+            c.type === ChannelType.GuildText && 
+            c.name.toLowerCase().startsWith(`ticket-${member.user.id}`)
+        );
+
+        if (ticketChannel) {
+            await ticketChannel.send('⚠️ **Este usuario se ha ido del servidor.**');
+            console.log(`✅ Notificado en el canal de ticket (${ticketChannel.name}) que el usuario ${member.user.tag} ha salido del servidor.`);
+        }
+    } catch (ticketErr) {
+        console.error('Error al notificar salida de usuario en canal de ticket:', ticketErr);
+    }
 });
 
 // LOG: Roles modificados / Miembro actualizado / Nickname / Timeout
@@ -4841,6 +4923,9 @@ client.on('interactionCreate', async (interaction) => {
             if (!hasStaffPermission(interaction.member, interaction.guild)) {
                 return interaction.reply({ content: '❌ No tienes permisos de staff para usar este comando.', ephemeral: true });
             }
+
+            await interaction.deferReply();
+
             try {
                 // Enviar MD al usuario antes de banearlo (si está en el servidor)
                 try {
@@ -4861,16 +4946,23 @@ client.on('interactionCreate', async (interaction) => {
                 // Banear al usuario directamente usando guild.bans.create() 
                 // Esto permite banear usuarios que NO están en el servidor
                 let deleteMessageSeconds = 0;
+                let deleteOnBan = false;
                 try {
                     const modConfig = configManager.loadGuildConfig(interaction.guild.id, 'moderation', {});
                     if (modConfig.actions?.deleteOnBan) {
                         deleteMessageSeconds = 604800; // 7 días en segundos
+                        deleteOnBan = true;
                     }
                 } catch (configErr) {
                     console.error('Error al cargar config de moderación en ban:', configErr);
                 }
 
                 await interaction.guild.bans.create(user.id, { deleteMessageSeconds, reason });
+
+                // Eliminación manual de mensajes de todo el servidor si está activo
+                if (deleteOnBan) {
+                    await deleteUserMessagesInGuild(interaction.guild, user.id);
+                }
 
                 // Crear embed bonito para el ban
                 const banEmbed = new EmbedBuilder()
@@ -4884,10 +4976,10 @@ client.on('interactionCreate', async (interaction) => {
                 // Enviar log al canal configurado directamente
                 await sendLogEmbed(interaction.guild, banEmbed, 'guildBanAdd');
 
-                return interaction.reply({ embeds: [banEmbed] });
+                return interaction.editReply({ embeds: [banEmbed] });
             } catch (e) {
                 console.error('Error al banear:', e);
-                return interaction.reply({ content: '❌ No pude banear a ese usuario. Verifica que exista o que tenga menor rango que yo.', ephemeral: true });
+                return interaction.editReply({ content: '❌ No pude banear a ese usuario. Verifica que exista o que tenga menor rango que yo.' });
             }
         }
 
@@ -5005,11 +5097,13 @@ client.on('interactionCreate', async (interaction) => {
                 return interaction.reply({ content: '❌ No tienes permisos de staff para usar este comando.', ephemeral: true });
             }
 
+            await interaction.deferReply();
+
             try {
                 const member = await interaction.guild.members.fetch(user.id);
 
                 if (!member.kickable) {
-                    return interaction.reply({ content: '❌ No puedo expulsar a este usuario (puede tener un rol superior al mío).', ephemeral: true });
+                    return interaction.editReply({ content: '❌ No puedo expulsar a este usuario (puede tener un rol superior al mío).' });
                 }
 
                 // Enviar MD al usuario antes de expulsarlo
@@ -5035,12 +5129,7 @@ client.on('interactionCreate', async (interaction) => {
                 try {
                     const modConfig = configManager.loadGuildConfig(interaction.guild.id, 'moderation', {});
                     if (modConfig.actions?.deleteOnKick) {
-                        const channelMessages = await interaction.channel.messages.fetch({ limit: 100 });
-                        const userMessages = channelMessages.filter(m => m.author.id === user.id);
-                        for (const msg of userMessages.values()) {
-                            await msg.delete().catch(() => { });
-                        }
-                        console.log(`✅ Mensajes recientes del usuario expulsado ${user.tag} eliminados del canal.`);
+                        await deleteUserMessagesInGuild(interaction.guild, user.id);
                     }
                 } catch (configErr) {
                     console.error('Error al cargar config o eliminar mensajes de usuario kickeado:', configErr);
@@ -5055,10 +5144,10 @@ client.on('interactionCreate', async (interaction) => {
                     .setFooter({ text: `Expulsado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}` })
                     .setTimestamp();
                 await sendLogEmbed(interaction.guild, kickEmbed, 'guildMemberKick');
-                return interaction.reply({ embeds: [kickEmbed] });
+                return interaction.editReply({ embeds: [kickEmbed] });
             } catch (e) {
                 console.error('Error al expulsar:', e);
-                return interaction.reply({ content: '❌ No pude expulsar a ese usuario.', ephemeral: true });
+                return interaction.editReply({ content: '❌ No pude expulsar a ese usuario.' });
             }
         }
 
@@ -6775,11 +6864,14 @@ client.on('interactionCreate', async (interaction) => {
                 // Guardar configuración en archivo para persistencia
                 try {
                     let colorData = {};
-                    if (fs.existsSync(path.join(__dirname, 'config', 'color-roles.json'))) {
-                        colorData = (function () { const gId = (typeof interaction !== 'undefined' ? interaction.guild?.id : (typeof message !== 'undefined' ? message.guild?.id : null)); return gId ? { [gId]: configManager.loadGuildConfig(gId, 'colorroles', {}) } : {}; })();
+                    const gId = interaction.guild?.id;
+                    if (gId) {
+                        colorData = { [gId]: configManager.loadGuildConfig(gId, 'colorroles', {}) };
                     }
                     colorData[guild.id] = { roleId: targetRole.id, speed: speed };
-                    (function () { const gId = (typeof interaction !== 'undefined' ? interaction.guild?.id : (typeof message !== 'undefined' ? message.guild?.id : null)); if (gId) configManager.saveGuildConfig(gId, 'colorroles', colorData[gId] || colorData); })();
+                    if (gId) {
+                        configManager.saveGuildConfig(gId, 'colorroles', colorData[gId]);
+                    }
                 } catch (saveError) {
                     console.error('Error guardando configuración de color:', saveError);
                 }
@@ -6821,10 +6913,9 @@ client.on('interactionCreate', async (interaction) => {
 
                 // Eliminar configuración guardada
                 try {
-                    if (fs.existsSync(path.join(__dirname, 'config', 'color-roles.json'))) {
-                        let colorData = (function () { const gId = (typeof interaction !== 'undefined' ? interaction.guild?.id : (typeof message !== 'undefined' ? message.guild?.id : null)); return gId ? { [gId]: configManager.loadGuildConfig(gId, 'colorroles', {}) } : {}; })();
-                        delete colorData[guild.id];
-                        (function () { const gId = (typeof interaction !== 'undefined' ? interaction.guild?.id : (typeof message !== 'undefined' ? message.guild?.id : null)); if (gId) configManager.saveGuildConfig(gId, 'colorroles', colorData[gId] || colorData); })();
+                    const gId = interaction.guild?.id;
+                    if (gId) {
+                        configManager.saveGuildConfig(gId, 'colorroles', {});
                     }
                 } catch (saveError) {
                     console.error('Error eliminando configuración de color:', saveError);

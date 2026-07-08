@@ -4,25 +4,34 @@
 
 > [!IMPORTANT]
 >
-> ## 🔧 Versión 5.5 - Novedades del Panel Web
+> ## 🚀 Versión 7.0 - Novedades
 >
-> ### 🆕 Nuevo Sistema de Auto-Roles (Reaction Roles)
+> ### 🛡️ Sistema Antiraid (12 Módulos)
 >
-> * Se ha añadido una nueva sección completa para crear y gestionar **Auto-Roles**.
-> * Permite configurar un mensaje Embed personalizado donde los usuarios pueden reaccionar con emojis específicos para obtener roles de forma automática en el servidor.
+> * Monitoriza **12 tipos de acciones**: crear/borrar/editar canales, crear/borrar/editar roles, crear/borrar emojis, expulsar/banear/desbanear usuarios, editar webhooks.
+> * Ventana deslizante de **60 segundos** para detección de abusos.
+> * Respuesta automática: **aislamiento** (quita todos los roles) seguido de **ban o kick**.
+> * Lista blanca para excluir usuarios (admins, bots, etc.).
+> * Logs enviados al canal configurado en la sección **Logs** del panel.
+> * Configuración individual por módulo (activado/desactivado, límite de acciones, acción a tomar).
 >
-> ### 🔄 Mejoras de Interfaz y Usabilidad (UI/UX)
+> ### 📜 Logs Visuales en Actividad Reciente
 >
-> Se han implementado mejoras de calidad de vida en los formularios del Panel de Administración Web para facilitar la creación de contenido largo y configuraciones avanzadas:
-> 
-> * **Auto-Roles:**
->   * La caja de descripción ahora se **auto-expande dinámicamente** hacia abajo al escribir textos largos, mejorando la navegación con la rueda del ratón.
->   * El selector de emojis se actualizó a un campo de búsqueda inteligente que **permite introducir manualmente la ID** de cualquier emoji (o seleccionarlo de la lista).
-> * **Constructor de Embeds (Embed Builder):**
->   * El campo principal ("Cuerpo") ahora se expande automáticamente al agregar texto o saltos de línea.
-> * **Auto Respuestas:**
->   * Las cajas de edición para "Respuesta en texto" y "Descripción del Embed" heredan el mismo comportamiento auto-expandible.
+> * Los eventos de logs (mensaje eliminado, miembro unido, etc.) ahora se muestran **visualmente** con el embed completo en el panel.
+> * Incluye título, descripción, campos, color y pie del embed original.
+> * Botón **Limpiar** para vaciar el historial de actividad.
+> * Filtro automático: los cambios de configuración del panel ya no aparecen en la actividad reciente.
 >
+> ### 🎫 Botón "Abrir en Discord" en Tickets
+>
+> * Cada ticket activo en la gestión de tickets ahora tiene un botón para **abrir el canal directamente en Discord**.
+> * Enlace directo al canal del ticket con solo un clic.
+>
+> ### ⚡ Mejoras Internas
+>
+> * Nuevos intents de Discord: `GuildModeration` y `GuildExpressions` para detección de bans, kicks y cambios de emojis.
+> * Sistema Antiraid V2 separado del anti-spam clásico para evitar conflictos.
+> * Actualización automática de configuración en memoria al guardar desde el panel.
 
 ---
 
@@ -36,6 +45,16 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Estado del bot.
 * Tiempo activo (Uptime).
 * Información de servidores, usuarios y canales.
+* **Actividad Reciente**: muestra los últimos eventos del bot con embeds visuales completos.
+
+### 🛡️ Sistema Antiraid
+
+* **12 módulos** de monitorización: crear/borrar/editar canales, crear/borrar/editar roles, crear/borrar emojis, expulsar/banear/desbanear usuarios, editar webhooks.
+* Ventana deslizante de **60 segundos** para detección de abusos.
+* Respuesta automática: **aislamiento** (quita todos los roles) + **ban o kick**.
+* Lista blanca para excluir usuarios (admins, bots, etc.).
+* Configuración individual por módulo desde el panel web.
+* Logs enviados al canal configurado en la sección **Logs**.
 
 ### 🎫 Gestión de Tickets
 
@@ -45,6 +64,7 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Formularios personalizados.
 * Vista previa del panel.
 * Gestión de roles de soporte.
+* **Botón "Abrir en Discord"** en cada ticket activo.
 
 ### 🎉 Sistema de Sorteos
 
@@ -56,8 +76,6 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Sistema optimizado y corregido.
 
 ### 🛡️ Sistema de Censura
-
-**Mejorado en la versión 5.0.**
 
 * Crear listas de palabras o frases bloqueadas.
 * Detección mediante palabras y frases completas.
@@ -79,14 +97,15 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Creación visual de anuncios.
 * Configuración de títulos, colores, imágenes y descripción.
 * Envío directo al canal seleccionado.
+* Carga y edición de embeds existentes por ID de mensaje.
 
 ### ⚙️ Sistema de Logs
 
-* Mensajes eliminados.
-* Mensajes editados.
-* Cambios de roles.
-* Entradas y salidas de usuarios.
-* Configuración individual por evento.
+* Mensajes eliminados, editados, cambios de roles, entradas/salidas de usuarios.
+* **Configuración individual por evento** (canal y color por evento).
+* Logs visuales con embed completo en **Actividad Reciente** del panel.
+* Botón **Limpiar** para vaciar el historial de logs.
+* Configuración de logs unificada para todos los sistemas del bot.
 
 ### 👋 Sistema de Bienvenidas
 

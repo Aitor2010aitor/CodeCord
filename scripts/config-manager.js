@@ -90,8 +90,11 @@ function saveGuildConfig(guildId, configType, data) {
 }
 
 function migrateExistingConfigs() {
-    console.log('[CONFIG] Iniciando migración de configuraciones a carpetas por servidor...');
     const configDir = path.join(__dirname, '..', 'config');
+    if (!fs.existsSync(configDir)) {
+        return;
+    }
+    console.log('[CONFIG] Iniciando migración de configuraciones a carpetas por servidor...');
     const parentDir = path.join(__dirname, '..', 'servidores');
     
     if (!fs.existsSync(parentDir)) {

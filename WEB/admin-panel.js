@@ -12,38 +12,25 @@ const os = require('os');
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: '',
-    port: ,
-    requireDiscordAuth: false
+    url: process.env.PANEL_URL || 'a_qui_el_lik',
+    port: parseInt(process.env.PORT || process.env.PANEL_PORT || 'puerto_qui', 10),
+    requireDiscordAuth: process.env.REQUIRE_DISCORD_AUTH === 'true'
 };
 
-try {
-    const configPath = path.join(__dirname, '..', 'config', 'panel-config.json');
-    if (fs.existsSync(configPath)) {
-        const pConf = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-        if (pConf.url) panelConfig.url = pConf.url;
-        if (pConf.port) panelConfig.port = pConf.port;
-        if (pConf.requireDiscordAuth !== undefined) {
-            panelConfig.requireDiscordAuth = pConf.requireDiscordAuth;
+// Auto-extraer puerto de la URL si se especifica
+let tempUrl = panelConfig.url.trim();
+if (tempUrl) {
+    if (tempUrl.endsWith('/')) tempUrl = tempUrl.slice(0, -1);
+
+    try {
+        const parsedUrl = new URL(tempUrl.startsWith('http') ? tempUrl : 'http://' + tempUrl);
+        if (parsedUrl.port) {
+            panelConfig.port = parseInt(parsedUrl.port, 10);
         }
-
-        // Auto-extraer puerto de la URL si se especifica
-        let tempUrl = panelConfig.url.trim();
-        if (tempUrl) {
-            if (tempUrl.endsWith('/')) tempUrl = tempUrl.slice(0, -1);
-
-
-            try {
-                const parsedUrl = new URL(tempUrl.startsWith('http') ? tempUrl : 'http://' + tempUrl);
-                if (parsedUrl.port) {
-                    panelConfig.port = parseInt(parsedUrl.port);
-                }
-            } catch (err) {
-                // Ignorar error de URL inválida
-            }
-        }
+    } catch (err) {
+        // Ignorar error de URL inválida
     }
-} catch (e) { }
+}
 // =====================================================================
 
 const session = require('express-session');
@@ -75,7 +62,11 @@ const Store = session.Store;
 class SimpleFileStore extends Store {
     constructor() {
         super();
-        this.path = path.join(__dirname, '..', 'config', 'sessions.json');
+        const dataDir = path.join(__dirname, '..', 'data');
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
+        }
+        this.path = path.join(dataDir, 'sessions.json');
         this.sessions = {};
         if (fs.existsSync(this.path)) {
             try { this.sessions = JSON.parse(fs.readFileSync(this.path, 'utf8')); } catch (e) { }
@@ -96,7 +87,7 @@ class SimpleFileStore extends Store {
 
 app.use(session({
     store: new SimpleFileStore(),
-    secret: 'bot-admin-panel-secret',
+    secret: process.env.SESSION_SECRET || 'bot-admin-panel-secret-fallback-key',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 * 30 } // 30 dias
@@ -111,7 +102,11 @@ const upload = multer({ storage: storage });
 
 // NUEVO: Función para registrar actividad desde el panel
 function logPanelActivity(guildId, type, message) {
-    const activityPath = path.join(__dirname, '..', 'config', 'bot-activity.json');
+    const dataDir = path.join(__dirname, '..', 'data');
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const activityPath = path.join(dataDir, 'bot-activity.json');
     let activity = [];
     try {
         if (fs.existsSync(activityPath)) {
@@ -193,6 +188,9 @@ app.get('/login', (req, res) => {
 
 // Ruta de Bypass de Login (Desarrollo / Pruebas)
 app.get('/login/bypass', (req, res) => {
+    if (panelConfig.requireDiscordAuth || process.env.DISABLE_BYPASS === 'true') {
+        return res.status(403).send('El bypass de inicio de sesión está desactivado ya que la autenticación de Discord es requerida o el bypass ha sido inhabilitado.');
+    }
     // Generar un usuario de sesión simulado para no requerir Discord OAuth2
     req.session.user = {
         id: '123456789',
@@ -359,7 +357,7 @@ function getTicketLogs() {
 
 // Endpoint para obtener logs del bot (actividad real)
 app.get('/api/logs', (req, res) => {
-    const activityPath = path.join(__dirname, '..', 'config', 'bot-activity.json');
+    const activityPath = path.join(__dirname, '..', 'data', 'bot-activity.json');
     try {
         if (fs.existsSync(activityPath)) {
             const activity = JSON.parse(fs.readFileSync(activityPath, 'utf8'));
@@ -367,6 +365,16 @@ app.get('/api/logs', (req, res) => {
         }
     } catch (e) { }
     res.json([]);
+});
+
+app.post('/api/logs/clear', (req, res) => {
+    const activityPath = path.join(__dirname, '..', 'data', 'bot-activity.json');
+    try {
+        fs.writeFileSync(activityPath, JSON.stringify([]), 'utf8');
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
 });
 
 app.get('/api/status', (req, res) => {
@@ -606,22 +614,6 @@ app.get('/api/guilds/:guildId/members', async (req, res) => {
 });
 
 // Endpoints para configuración de logs (según la imagen de CodeCord)
-const logsConfigPath = path.join(__dirname, '..', 'config', 'logs-config.json');
-
-function loadLogsConfig() {
-    try {
-        if (fs.existsSync(logsConfigPath)) {
-            return JSON.parse(fs.readFileSync(logsConfigPath, 'utf8'));
-        }
-    } catch (e) { console.error('Error cargando logs-config.json:', e); }
-    return {};
-}
-
-function saveLogsConfig(config) {
-    try {
-        fs.writeFileSync(logsConfigPath, JSON.stringify(config, null, 2), 'utf8');
-    } catch (e) { console.error('Error guardando logs-config.json:', e); }
-}
 
 app.get('/api/guilds/:guildId/logs-config', (req, res) => {
     const config = configManager.loadGuildConfig(req.params.guildId, 'logs', {});
@@ -663,24 +655,41 @@ app.post('/api/guilds/:guildId/moderation-config', (req, res) => {
     res.json({ success: true });
 });
 
+// Endpoints para configuración Antiraid (12 módulos)
+app.get('/api/guilds/:guildId/antiraid-config', (req, res) => {
+    const defaultConfig = {
+        whitelist: [],
+        modulos: {
+            crearCanales: { activado: false, limite: 1, accion: 'ban' },
+            borrarCanales: { activado: false, limite: 1, accion: 'ban' },
+            editarCanales: { activado: false, limite: 1, accion: 'ban' },
+            crearRoles: { activado: false, limite: 1, accion: 'ban' },
+            borrarRoles: { activado: false, limite: 1, accion: 'ban' },
+            editarRoles: { activado: false, limite: 1, accion: 'ban' },
+            crearEmojis: { activado: false, limite: 1, accion: 'ban' },
+            borrarEmojis: { activado: false, limite: 1, accion: 'ban' },
+            expulsarUsuarios: { activado: false, limite: 1, accion: 'ban' },
+            banearUsuarios: { activado: false, limite: 1, accion: 'ban' },
+            desbanearUsuarios: { activado: false, limite: 1, accion: 'ban' },
+            editarWebhooks: { activado: false, limite: 1, accion: 'ban' }
+        }
+    };
+    const config = configManager.loadGuildConfig(req.params.guildId, 'antiraid', defaultConfig);
+    res.json(config);
+});
+
+app.post('/api/guilds/:guildId/antiraid-config', (req, res) => {
+    configManager.saveGuildConfig(req.params.guildId, 'antiraid', req.body);
+    logPanelActivity(req.params.guildId, 'ANTIRAID', 'Configuración Antiraid actualizada');
+    // Si el bot está conectado, refrescar la config en memoria
+    if (botClient && botClient.antiRaidV2) {
+        const config = configManager.loadGuildConfig(req.params.guildId, 'antiraid', {});
+        botClient.antiRaidV2.configs.set(req.params.guildId, config);
+    }
+    res.json({ success: true });
+});
 
 // Endpoints para configuración de bienvenidas
-const welcomeConfigPath = path.join(__dirname, '..', 'config', 'welcome-config.json');
-
-function loadWelcomeConfig() {
-    try {
-        if (fs.existsSync(welcomeConfigPath)) {
-            return JSON.parse(fs.readFileSync(welcomeConfigPath, 'utf8'));
-        }
-    } catch (e) { console.error('Error cargando welcome-config.json:', e); }
-    return {};
-}
-
-function saveWelcomeConfig(config) {
-    try {
-        fs.writeFileSync(welcomeConfigPath, JSON.stringify(config, null, 2), 'utf8');
-    } catch (e) { console.error('Error guardando welcome-config.json:', e); }
-}
 
 app.get('/api/guilds/:guildId/welcome-config', (req, res) => {
     const config = configManager.loadGuildConfig(req.params.guildId, 'welcome', { enabled: false, channel: '', message: '¡Bienvenido {user} a {server}!', color: '#5865f2' });
@@ -723,24 +732,7 @@ app.get('/api/guilds/:guildId/channels', (req, res) => {
     res.json(channels);
 });
 
-const giveawaysConfigPath = path.join(__dirname, '..', 'config', 'giveaways-config.json');
 
-function loadGiveawaysConfig() {
-    try {
-        if (fs.existsSync(giveawaysConfigPath)) {
-            return JSON.parse(fs.readFileSync(giveawaysConfigPath, 'utf8'));
-        }
-    } catch (e) { console.error('Error cargando giveaways-config.json:', e); }
-    return { guilds: {} };
-}
-
-function saveGiveawaysConfig(config) {
-    try {
-        fs.writeFileSync(giveawaysConfigPath, JSON.stringify(config, null, 2), 'utf8');
-    } catch (e) {
-        console.error('Error guardando giveaways-config.json:', e);
-    }
-}
 
 function getGuildGiveawayData(guildId) {
     const data = configManager.loadGuildConfig(guildId, 'giveaways', {});
@@ -1378,7 +1370,7 @@ app.post('/api/guilds/:guildId/send', async (req, res) => {
 
 // Endpoint para "Embed" (crear embed)
 app.post('/api/guilds/:guildId/embed', async (req, res) => {
-    const { channelId, title, description, color, image, footer } = req.body;
+    const { channelId, title, description, color, image, footer, author } = req.body;
     if (!botClient) return res.json({ error: 'Bot no conectado' });
 
     const guild = botClient.guilds.cache.get(req.params.guildId);
@@ -1394,6 +1386,7 @@ app.post('/api/guilds/:guildId/embed', async (req, res) => {
             .setDescription(description || null)
             .setColor(color || '#5865f2');
 
+        if (author) embed.setAuthor({ name: author });
         if (image) embed.setImage(image);
         if (footer) embed.setFooter({ text: footer });
 
@@ -1403,6 +1396,90 @@ app.post('/api/guilds/:guildId/embed', async (req, res) => {
         res.status(500).json({ error: 'Error enviando embed' });
     }
 });
+
+// Endpoint para cargar un embed existente por ID de mensaje
+app.get('/api/guilds/:guildId/embed/:channelId/:messageId', async (req, res) => {
+    if (!botClient) return res.json({ error: 'Bot no conectado' });
+
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const channel = guild.channels.cache.get(req.params.channelId);
+    if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
+
+    try {
+        const msg = await channel.messages.fetch(req.params.messageId);
+        if (!msg) return res.status(404).json({ error: 'Mensaje no encontrado' });
+
+        const embed = msg.embeds[0];
+        if (!embed) return res.status(400).json({ error: 'El mensaje no contiene un embed' });
+
+        // Extraer color como hex
+        let colorHex = '#5865f2';
+        if (embed.color !== null && embed.color !== undefined) {
+            colorHex = '#' + embed.color.toString(16).padStart(6, '0');
+        }
+
+        res.json({
+            success: true,
+            embed: {
+                title: embed.title || '',
+                description: embed.description || '',
+                color: colorHex,
+                image: embed.image?.url || '',
+                thumbnail: embed.thumbnail?.url || '',
+                footer: embed.footer?.text || '',
+                author: embed.author?.name || '',
+            },
+            channelId: req.params.channelId,
+            messageId: req.params.messageId
+        });
+    } catch (e) {
+        console.error('Error cargando embed:', e);
+        res.status(500).json({ error: 'No se pudo cargar el mensaje. Verifica el ID y el canal.' });
+    }
+});
+
+// Endpoint para editar un embed existente por ID de mensaje
+app.put('/api/guilds/:guildId/embed/:channelId/:messageId', async (req, res) => {
+    const { title, description, color, image, footer, author, thumbnail } = req.body;
+    if (!botClient) return res.json({ error: 'Bot no conectado' });
+
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const channel = guild.channels.cache.get(req.params.channelId);
+    if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
+
+    try {
+        const msg = await channel.messages.fetch(req.params.messageId);
+        if (!msg) return res.status(404).json({ error: 'Mensaje no encontrado' });
+
+        // Solo el bot puede editar sus propios mensajes
+        if (msg.author.id !== botClient.user.id) {
+            return res.status(403).json({ error: 'Solo se pueden editar mensajes del bot' });
+        }
+
+        const { EmbedBuilder } = require('discord.js');
+        const embed = new EmbedBuilder()
+            .setTitle(title || null)
+            .setDescription(description || null)
+            .setColor(color || '#5865f2');
+
+        if (author) embed.setAuthor({ name: author });
+        if (thumbnail) embed.setThumbnail(thumbnail);
+        if (image) embed.setImage(image);
+        if (footer) embed.setFooter({ text: footer });
+
+        await msg.edit({ embeds: [embed] });
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error editando embed:', e);
+        res.status(500).json({ error: 'Error al editar el embed: ' + e.message });
+    }
+});
+
+
 
 // Endpoint para "Ticket Panel"
 app.post('/api/guilds/:guildId/send-ticket-panel', async (req, res) => {
@@ -1691,6 +1768,67 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
             console.log(`⚠️ No se pudo enviar embed a ${suggestion.userTag}: ${e.message}`);
         }
 
+        // 📨 ACTUALIZAR MENSAJE EN DISCORD
+        try {
+            const channelId = suggestionsConfig.suggestionsChannelId;
+            if (channelId && suggestion.messageId) {
+                const channel = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
+                if (channel) {
+                    const message = await channel.messages.fetch(suggestion.messageId).catch(() => null);
+                    if (message && message.embeds && message.embeds.length > 0) {
+                        const { EmbedBuilder } = require('discord.js');
+
+                        let embedTitle = '🆕 Nueva Sugerencia';
+                        let embedColor = 0x5865F2;
+
+                        if (status === 'approved') {
+                            embedTitle = '✅ Sugerencia Aprobada';
+                            embedColor = 0x00FF00;
+                        } else if (status === 'rejected') {
+                            embedTitle = '❌ Sugerencia Rechazada';
+                            embedColor = 0xFF0000;
+                        }
+
+                        const originalEmbed = message.embeds[0];
+                        const updatedEmbed = EmbedBuilder.from(originalEmbed)
+                            .setTitle(embedTitle)
+                            .setColor(embedColor);
+
+                        // Limpiar campos anteriores para evitar duplicados
+                        updatedEmbed.setFields([]);
+
+                        // Añadir estado actual
+                        if (status === 'approved') {
+                            updatedEmbed.addFields({ name: '📌 Estado', value: `Aprobada por ${approvedBy || 'Staff'}`, inline: true });
+                        } else if (status === 'rejected') {
+                            updatedEmbed.addFields({ name: '📌 Estado', value: 'Rechazada por el Staff', inline: true });
+                        }
+
+                        // Añadir comentarios del staff
+                        if (suggestion.comments && suggestion.comments.length > 0) {
+                            const commentText = suggestion.comments
+                                .map(c => typeof c === 'string' ? c : (c.text || ''))
+                                .filter(Boolean)
+                                .map(text => `• ${text}`)
+                                .join('\n');
+                            if (commentText) {
+                                updatedEmbed.addFields({
+                                    name: '💬 Comentarios del Staff:',
+                                    value: commentText,
+                                    inline: false
+                                });
+                            }
+                        }
+
+                        await message.edit({ embeds: [updatedEmbed] });
+                        console.log(`✅ Mensaje de sugerencia ${suggestion.id} editado en Discord.`);
+                    }
+                }
+            }
+        } catch (discordError) {
+            console.error('Error al editar mensaje de sugerencia en Discord:', discordError);
+        }
+
         res.json({
             success: true,
             message: 'Sugerencia actualizada',
@@ -1863,7 +2001,6 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
 });
 
 // ===== AUTO-RESPUESTAS =====
-const autoResponsesPath = path.join(__dirname, '..', 'config', 'auto-responses.json');
 
 function loadAutoResponses(guildId) {
     if (guildId) {

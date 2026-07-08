@@ -661,6 +661,9 @@
             <a href="#moderation" class="nav-link" onclick="showSection('moderation')">
                 <i class="fas fa-shield-alt"></i> <span>Moderación / AutoMod</span>
             </a>
+            <a href="#antiraid" class="nav-link" onclick="showSection('antiraid')">
+                <i class="fas fa-shield-virus"></i> <span>Antiraid</span>
+            </a>
             <a href="#say" class="nav-link" onclick="showSection('say')">
                 <i class="fas fa-comment-dots"></i> <span>Enviar Mensaje</span>
             </a>
@@ -962,6 +965,42 @@
             </div>
         </div>
 
+        <!-- Antiraid Section -->
+        <div id="antiraid" class="section">
+            <div class="section-header" style="margin-bottom: 8px;">
+                <span class="section-title">🛡️ Sistema Antiraid (12 Módulos)</span>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="loadAntiraidConfig()" class="view-btn" style="background: rgba(255,255,255,0.1);">
+                        <i class="fas fa-sync"></i> Recargar
+                    </button>
+                    <button onclick="saveAntiraidConfig()" class="view-btn" style="background: var(--success); color: #181825; font-weight: 700;">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;">
+                Monitoriza 12 tipos de acciones. Cuando un usuario supera el límite configurado, el bot le quita todos los roles (aislamiento) y ejecuta la acción (ban/kick) automáticamente.
+                <br><strong style="color: var(--warning);">⚠️ El rol del bot debe estar por encima de los roles de los usuarios objetivo.</strong>
+            </p>
+
+            <div style="margin-bottom: 20px; background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 1.1rem; font-weight: 700; color: white;"><i class="fas fa-exclamation-triangle" style="color: var(--warning); margin-right: 8px;"></i>LISTA BLANCA (IDs separados por coma)</label>
+                <input type="text" id="ar-whitelist" class="log-select" placeholder="123456789, 987654321" style="margin: 0 0 8px 0; max-width: 500px;">
+                <div style="margin-top: 4px; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                    <strong style="color: white;">¿Qué es esto?</strong> Aquí pones los IDs de usuarios que <strong style="color: #69db7c;">NO</strong> quieres que el antiraid toque. 
+                    Ejemplo: IDs de bots, administradores, o usuarios de confianza. Separa cada ID con una coma.
+                </div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: white; background: rgba(255, 193, 7, 0.15); padding: 10px 14px; border-radius: 6px; border-left: 4px solid var(--warning);">
+                    <i class="fas fa-info-circle" style="color: var(--warning); margin-right: 8px;"></i>
+                    Los logs del antiraid <strong style="color: #ff6b6b;">NO</strong> se configuran aquí. Debes ir a la sección <strong style="color: var(--warning);">Logs</strong> para configurar el canal donde se enviarán
+                </div>
+            </div>
+
+            <div id="antiraid-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+                <div class="loading"><div class="spinner"></div>Cargando módulos...</div>
+            </div>
+        </div>
+
         <!-- Welcome Section -->
         <div id="welcome" class="section">
             <div class="section-header">
@@ -1136,6 +1175,23 @@
             <div style="display: grid; grid-template-columns: 1fr 400px; gap: 32px; align-items: start;">
                 <!-- Editor -->
                 <div class="stat-card" style="flex-direction: column; align-items: stretch; padding: 24px; gap: 20px;">
+
+                    <!-- NUEVA SECCIÓN: Cargar embed por ID -->
+                    <div id="eb-load-section" style="background: rgba(88,101,242,0.08); border: 1px solid rgba(88,101,242,0.3); border-radius: 10px; padding: 16px;">
+                        <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted);">✏️ EDITAR EMBED EXISTENTE (opcional)</label>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <input type="text" id="eb-message-id" placeholder="ID del mensaje de Discord..."
+                                class="log-select" style="flex: 1; margin: 0; min-width: 180px;"
+                                oninput="onEbMessageIdInput()">
+                            <select id="eb-load-channel" class="log-select" style="flex: 1; margin: 0; min-width: 140px;"></select>
+                            <button onclick="loadEmbedFromMessage()" class="view-btn"
+                                style="background: rgba(88,101,242,0.5); color: white; padding: 8px 14px; white-space: nowrap;">
+                                <i class="fas fa-cloud-download-alt"></i> Cargar
+                            </button>
+                        </div>
+                        <div id="eb-load-status" style="font-size: 0.78rem; margin-top: 8px; color: var(--text-muted);">Pega el ID de un mensaje del bot para editar su embed.</div>
+                    </div>
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
                             <label
@@ -1184,10 +1240,23 @@
                             class="log-select" style="margin: 0;">
                     </div>
 
-                    <button onclick="sendEB()" class="view-btn"
+                    <!-- Botón ENVIAR (modo creación) -->
+                    <button id="eb-send-btn" onclick="sendEB()" class="view-btn"
                         style="width: 100%; padding: 16px; font-weight: 700; background: var(--success); color: #181825; font-size: 1rem;">
                         <i class="fas fa-magic"></i> Enviar Embed
                     </button>
+
+                    <!-- Botón EDITAR (modo edición, oculto por defecto) -->
+                    <div id="eb-edit-actions" style="display: none; gap: 10px;">
+                        <button onclick="editEB()" class="view-btn"
+                            style="flex: 1; padding: 16px; font-weight: 700; background: var(--accent); color: white; font-size: 1rem;">
+                            <i class="fas fa-pen"></i> Editar Embed
+                        </button>
+                        <button onclick="clearEbEditMode()" class="view-btn"
+                            style="padding: 16px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem;">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Live Preview -->
@@ -1818,11 +1887,11 @@
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600;">🎯 CANAL DE
-                    SUGERENCIAS APROBADAS</label>
+                <label style="display: block; margin-bottom: 4px; font-size: 0.9rem; font-weight: 600;">📨 CANAL DE SUGERENCIAS</label>
+                <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">El bot enviará aquí las sugerencias que los usuarios creen con <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;">/sugerencia</code></div>
                 <div style="display: flex; gap: 10px;">
                     <select id="sg-channel" class="log-select" style="flex: 1;">
-                        <option value="">Seleccionar canal...</option>
+                        <option value="">Seleccionar canal donde se envían las sugerencias...</option>
                     </select>
                     <button onclick="saveSuggestionsChannel()" class="view-btn"
                         style="background: var(--success); color: white; padding: 8px 16px;">
@@ -2068,6 +2137,9 @@
         <div id="logs" class="section">
             <div class="section-header">
                 <span class="section-title">📜 Historial de Actividad</span>
+                <button onclick="clearRecentActivity()" class="view-btn" style="background: rgba(255, 75, 75, 0.2); color: #ff4b4b; font-size: 0.8rem;">
+                    <i class="fas fa-trash-alt"></i> Limpiar
+                </button>
             </div>
             <div id="logs-container">
                 <div class="loading">
@@ -2221,7 +2293,9 @@
             if (sectionId === 'suggestions') loadSuggestions();
             if (sectionId === 'giveaways') loadGiveaways();
             if (sectionId === 'servers') loadServers();
+            if (sectionId === 'logs') loadLogs();
             if (sectionId === 'autorol') loadAutorolData();
+            if (sectionId === 'antiraid') loadAntiraidConfig();
         }
 
         function showSection(sectionId) {
@@ -2246,7 +2320,8 @@
                 'giveaways': 'Sorteos',
                 'members': 'Lista de Miembros',
                 'logs': 'Historial de Actividad',
-                'servers': 'Servidores Conectados'
+                'servers': 'Servidores Conectados',
+                'antiraid': 'Sistema Antiraid'
             };
             document.getElementById('section-title-header').innerText = titles[sectionId] || 'Panel';
             refreshSection(sectionId);
@@ -2482,10 +2557,10 @@
         }
 
         function loadChannelsForEB() {
-            const ebSelect = document.getElementById('eb-channel');
-            let options = '<option value="">Seleccionar canal...</option>';
-            guildChannels.forEach(c => { options += `<option value="${c.id}"># ${c.name}</option>`; });
-            ebSelect.innerHTML = options;
+            const options = '<option value="">Seleccionar canal...</option>' +
+                guildChannels.map(c => `<option value="${c.id}"># ${c.name}</option>`).join('');
+            document.getElementById('eb-channel').innerHTML = options;
+            document.getElementById('eb-load-channel').innerHTML = options;
         }
 
         async function loadModerationConfig() {
@@ -2698,6 +2773,107 @@
             document.getElementById('eb-p-thumb-container').style.display = thumb ? 'block' : 'none';
         }
 
+        // Estado del modo edición de embed
+        let ebEditMode = { active: false, channelId: null, messageId: null };
+
+        function onEbMessageIdInput() {
+            const val = document.getElementById('eb-message-id').value.trim();
+            if (!val) clearEbEditMode();
+        }
+
+        function clearEbEditMode() {
+            ebEditMode = { active: false, channelId: null, messageId: null };
+            document.getElementById('eb-message-id').value = '';
+            document.getElementById('eb-load-status').textContent = 'Pega el ID de un mensaje del bot para editar su embed.';
+            document.getElementById('eb-load-status').style.color = 'var(--text-muted)';
+            document.getElementById('eb-send-btn').style.display = 'block';
+            document.getElementById('eb-edit-actions').style.display = 'none';
+            // Limpiar formulario
+            ['eb-author','eb-title','eb-desc','eb-thumbnail','eb-image','eb-footer'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.value = ''; if (el.tagName === 'TEXTAREA') el.style.height = ''; }
+            });
+            document.getElementById('eb-color').value = '#5865f2';
+            updateEBPreview();
+        }
+
+        async function loadEmbedFromMessage() {
+            const messageId = document.getElementById('eb-message-id').value.trim();
+            const channelId = document.getElementById('eb-load-channel').value;
+            const statusEl = document.getElementById('eb-load-status');
+
+            if (!currentGuildId) return showToast('error', 'Selecciona un servidor primero');
+            if (!channelId) return showToast('error', 'Selecciona el canal donde está el mensaje');
+            if (!messageId) return showToast('error', 'Introduce el ID del mensaje');
+
+            statusEl.textContent = '⏳ Cargando embed...';
+            statusEl.style.color = 'var(--accent)';
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/embed/${channelId}/${messageId}`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    statusEl.textContent = '❌ ' + (data.error || 'Error al cargar');
+                    statusEl.style.color = 'var(--danger)';
+                    return;
+                }
+
+                const e = data.embed;
+                document.getElementById('eb-author').value = e.author || '';
+                document.getElementById('eb-title').value = e.title || '';
+                document.getElementById('eb-desc').value = e.description || '';
+                document.getElementById('eb-color').value = e.color || '#5865f2';
+                document.getElementById('eb-thumbnail').value = e.thumbnail || '';
+                document.getElementById('eb-image').value = e.image || '';
+                document.getElementById('eb-footer').value = e.footer || '';
+
+                // Ajustar altura del textarea
+                const ta = document.getElementById('eb-desc');
+                ta.style.height = '';
+                ta.style.height = ta.scrollHeight + 'px';
+
+                updateEBPreview();
+
+                // Activar modo edición
+                ebEditMode = { active: true, channelId, messageId };
+                document.getElementById('eb-send-btn').style.display = 'none';
+                document.getElementById('eb-edit-actions').style.display = 'flex';
+
+                statusEl.textContent = '✅ Embed cargado. Edita los campos y pulsa "Editar Embed".';
+                statusEl.style.color = 'var(--success)';
+
+            } catch (e) {
+                statusEl.textContent = '❌ Error de conexión';
+                statusEl.style.color = 'var(--danger)';
+            }
+        }
+
+        async function editEB() {
+            if (!ebEditMode.active) return;
+            const title = document.getElementById('eb-title').value;
+            const description = document.getElementById('eb-desc').value;
+            const color = document.getElementById('eb-color').value;
+            const image = document.getElementById('eb-image').value;
+            const thumbnail = document.getElementById('eb-thumbnail').value;
+            const footer = document.getElementById('eb-footer').value;
+            const author = document.getElementById('eb-author').value;
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/embed/${ebEditMode.channelId}/${ebEditMode.messageId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, color, image, thumbnail, footer, author })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('success', '✅ Embed editado correctamente en Discord');
+                } else {
+                    showToast('error', data.error || 'Error al editar el embed');
+                }
+            } catch (e) { showToast('error', '❌ Error de conexión'); }
+        }
+
         async function sendEB() {
             const channelId = document.getElementById('eb-channel').value;
             const title = document.getElementById('eb-title').value;
@@ -2705,12 +2881,13 @@
             const color = document.getElementById('eb-color').value;
             const image = document.getElementById('eb-image').value;
             const footer = document.getElementById('eb-footer').value;
+            const author = document.getElementById('eb-author').value;
             if (!channelId) return showToast('Selecciona un canal', 'info');
             try {
                 const res = await fetch(`/api/guilds/${currentGuildId}/embed`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ channelId, title, description, color, image, footer })
+                    body: JSON.stringify({ channelId, title, description, color, image, footer, author })
                 });
                 if (res.ok) showToast('✅ Embed enviado con éxito');
             } catch (e) { showToast('❌ Error al enviar el embed', 'error'); }
@@ -2996,6 +3173,9 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <a href="https://discord.com/channels/${currentGuildId}/${t.channelId}" target="_blank" class="view-btn" style="background: rgba(88,101,242,0.2); color: #8b9cff; padding: 8px 14px; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fab fa-discord"></i> Abrir en Discord
+                            </a>
                             <button onclick="closeTicketFromPanel('${t.channelId}', '${t.channelName}')" class="view-btn" style="background: var(--danger); color: white; padding: 8px 14px; font-size: 0.8rem;">
                                 <i class="fas fa-lock"></i> Cerrar
                             </button>
@@ -3241,36 +3421,22 @@
 
         async function loadLogs() {
             const container = document.getElementById('logs-container');
-            const recentContainer = document.getElementById('recent-activity');
             try {
                 const res = await fetch('/api/logs');
                 const logs = await res.json();
+                const filtered = logs.filter(l => !l.type || !l.type.startsWith('PANEL_'));
 
-                if (logs.length === 0) {
-                    const empty = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay actividad reciente.</p>';
-                    container.innerHTML = empty;
-                    recentContainer.innerHTML = empty;
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay actividad reciente.</p>';
                     return;
                 }
 
-                let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
-                logs.forEach(log => {
-                    const date = new Date(log.timestamp).toLocaleString();
-                    html += `
-                    <div style="background: rgba(255,255,255,0.03); padding: 12px 16px; border-radius: 8px; border-left: 3px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <span style="font-weight: 600; color: var(--accent); margin-right: 8px;">[${log.type}]</span>
-                            <span>${log.message}</span>
-                        </div>
-                        <span style="font-size: 0.8rem; color: var(--text-muted);">${date}</span>
-                    </div>`;
-                });
+                let html = '<div style="display: flex; flex-direction: column;">';
+                filtered.forEach(l => { html += renderLogEmbed(l); });
                 html += '</div>';
                 container.innerHTML = html;
-                if (recentContainer) recentContainer.innerHTML = html;
             } catch (e) {
                 container.innerHTML = '<p>Error cargando logs</p>';
-                if (recentContainer) recentContainer.innerHTML = '<p>Error cargando actividad</p>';
             }
         }
 
@@ -3292,25 +3458,86 @@
             } catch (e) { }
         }
 
+        function renderLogEmbed(l) {
+            const date = new Date(l.timestamp).toLocaleString();
+            const time = new Date(l.timestamp).toLocaleTimeString();
+            const color = l.embed?.color ? '#' + l.embed.color.toString(16).padStart(6, '0') : 'var(--accent)';
+            const hasEmbed = l.embed && (l.embed.title || l.embed.description);
+
+            let html = `<div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border-left: 3px solid ${color}; margin-bottom: 8px;">`;
+
+            // Header: tipo + hora
+            html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 600; color: ${color}; font-size: 0.8rem;">[${l.type}]</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">${time}</span>
+            </div>`;
+
+            if (hasEmbed) {
+                // Embed visual card
+                html += `<div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 14px; border-left: 4px solid ${color};">`;
+                if (l.embed.author) {
+                    html += `<div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">${l.embed.author.name || ''}</div>`;
+                }
+                if (l.embed.title) {
+                    html += `<div style="font-weight: 700; color: white; font-size: 1rem; margin-bottom: 8px;">${l.embed.title}</div>`;
+                }
+                if (l.embed.description) {
+                    html += `<div style="color: #dcddde; font-size: 0.9rem; line-height: 1.4; margin-bottom: 8px;">${l.embed.description}</div>`;
+                }
+                if (l.embed.fields && l.embed.fields.length > 0) {
+                    html += '<div style="margin-top: 8px;">';
+                    l.embed.fields.slice(0, 3).forEach(f => {
+                        html += `<div style="margin-bottom: 4px;"><span style="font-weight: 600; color: #b9bbbe; font-size: 0.8rem;">${f.name}:</span> <span style="color: #dcddde; font-size: 0.85rem;">${(f.value || '').substring(0, 200)}</span></div>`;
+                    });
+                    if (l.embed.fields.length > 3) {
+                        html += `<div style="color: var(--text-muted); font-size: 0.75rem;">+${l.embed.fields.length - 3} campos más</div>`;
+                    }
+                    html += '</div>';
+                }
+                if (l.embed.footer) {
+                    html += `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">${l.embed.footer.text || ''}</div>`;
+                }
+                html += '</div>';
+            } else {
+                html += `<div style="color: #dcddde; font-size: 0.9rem;">${l.message}</div>`;
+            }
+
+            html += '<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;">' + date + '</div>';
+            html += '</div>';
+            return html;
+        }
+
         async function loadActivity() {
             const container = document.getElementById('recent-activity');
             try {
                 const res = await fetch('/api/logs');
                 const logs = await res.json();
-                if (logs.length === 0) {
-                    container.innerHTML = '<p>No hay actividad reciente</p>';
+                const filtered = logs.filter(l => !l.type || !l.type.startsWith('PANEL_'));
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay actividad reciente</p>';
                     return;
                 }
-                let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
-                logs.slice(0, 5).forEach(l => {
-                    html += `<div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--accent);">
-                        <span>${l.message}</span>
-                        <span style="font-size: 0.8rem; color: var(--text-muted);">${new Date(l.timestamp).toLocaleTimeString()}</span>
-                    </div>`;
-                });
+                let html = '<div style="display: flex; flex-direction: column;">';
+                filtered.slice(0, 8).forEach(l => { html += renderLogEmbed(l); });
                 html += '</div>';
                 container.innerHTML = html;
             } catch (e) { }
+        }
+
+        async function clearRecentActivity() {
+            if (!confirm('¿Limpiar toda la actividad reciente?')) return;
+            try {
+                const res = await fetch('/api/logs/clear', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Actividad reciente limpiada', 'success');
+                    loadActivity();
+                } else {
+                    showToast('Error al limpiar', 'error');
+                }
+            } catch (e) {
+                showToast('Error de conexión', 'error');
+            }
         }
 
         function switchTicketTab(tabId) {
@@ -4322,10 +4549,11 @@
                 if (res.ok) {
                     showToast('success', 'Auto-Rol configurado correctamente');
 
+                    // Solo limpiar el mensaje del embed (título y descripción)
+                    // Las filas de roles se mantienen para poder reutilizarlas
                     document.getElementById('autorol-title').value = '';
                     document.getElementById('autorol-desc').value = '';
-                    document.getElementById('autorol-rows-container').innerHTML = '';
-                    addAutorolRow();
+                    document.getElementById('autorol-desc').style.height = '';
 
                 } else {
                     const err = await res.json();
@@ -4333,6 +4561,138 @@
                 }
             } catch (e) {
                 showToast('error', 'Error de conexión');
+            }
+        }
+
+        // ==========================================
+        // SISTEMA ANTIRAID
+        // ==========================================
+
+        const MODULOS_ANTIRAID = {
+            crearCanales: { nombre: 'Crear Canales', desc: 'Límite de canales creados por minuto', icono: 'fa-plus-circle' },
+            borrarCanales: { nombre: 'Borrar Canales', desc: 'Límite de canales eliminados por minuto', icono: 'fa-minus-circle' },
+            editarCanales: { nombre: 'Editar Canales', desc: 'Límite de canales editados por minuto', icono: 'fa-edit' },
+            crearRoles: { nombre: 'Crear Roles', desc: 'Límite de roles creados por minuto', icono: 'fa-user-plus' },
+            borrarRoles: { nombre: 'Borrar Roles', desc: 'Límite de roles eliminados por minuto', icono: 'fa-user-minus' },
+            editarRoles: { nombre: 'Editar Roles', desc: 'Límite de roles editados por minuto', icono: 'fa-user-cog' },
+            crearEmojis: { nombre: 'Crear Emojis', desc: 'Límite de emojis creados por minuto', icono: 'fa-smile' },
+            borrarEmojis: { nombre: 'Borrar Emojis', desc: 'Límite de emojis eliminados por minuto', icono: 'fa-trash-alt' },
+            expulsarUsuarios: { nombre: 'Expulsar Usuarios', desc: 'Límite de expulsiones (kick) por minuto', icono: 'fa-user-slash' },
+            banearUsuarios: { nombre: 'Banear Usuarios', desc: 'Límite de baneos por minuto', icono: 'fa-gavel' },
+            desbanearUsuarios: { nombre: 'Desbanear Usuarios', desc: 'Límite de desbaneos por minuto', icono: 'fa-undo' },
+            editarWebhooks: { nombre: 'Editar Webhooks', desc: 'Límite de cambios en webhooks por minuto', icono: 'fa-link' }
+        };
+
+        async function loadAntiraidConfig() {
+            const grid = document.getElementById('antiraid-modules-grid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando módulos...</div>';
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/antiraid-config`);
+                const config = await res.json();
+
+                document.getElementById('ar-whitelist').value = (config.whitelist || []).join(', ');
+
+                const modulos = config.modulos || {};
+                let html = '';
+                for (const [key, info] of Object.entries(MODULOS_ANTIRAID)) {
+                    const modConfig = modulos[key] || { activado: false, limite: 1, accion: 'ban' };
+                    html += renderAntiraidCard(key, modConfig, info);
+                }
+                grid.innerHTML = html;
+            } catch (e) {
+                console.error('Error cargando antiraid:', e);
+                grid.innerHTML = '<div style="color: var(--danger); padding: 20px;">Error al cargar la configuración antiraid</div>';
+                showToast('Error al cargar configuración antiraid', 'error');
+            }
+        }
+
+        function renderAntiraidCard(moduloKey, modConfig, info) {
+            const activado = modConfig.activado ? true : false;
+            const limite = modConfig.limite || 1;
+            const accion = modConfig.accion || 'ban';
+
+            return `
+                <div class="antiraid-card" style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas ${info.icono}" style="font-size: 1.5rem; color: var(--accent); width: 28px; text-align: center;"></i>
+                            <div>
+                                <div style="font-weight: 700; color: white; font-size: 1rem;">${info.nombre}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">${info.desc}</div>
+                            </div>
+                        </div>
+                        <label class="switch" style="flex-shrink: 0;">
+                            <input type="checkbox" class="ar-toggle" data-modulo="${moduloKey}" ${activado ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div style="display: ${activado ? 'grid' : 'none'}; grid-template-columns: 1fr 1fr; gap: 12px;" class="ar-options-${moduloKey}">
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 0.75rem; color: var(--text-muted);">LÍMITE (acciones/min)</label>
+                            <input type="number" class="log-select ar-limite" data-modulo="${moduloKey}" value="${limite}" min="1" max="100" style="margin: 0; padding: 8px 10px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 0.75rem; color: var(--text-muted);">ACCIÓN</label>
+                            <select class="log-select ar-accion" data-modulo="${moduloKey}" style="margin: 0; padding: 8px 10px;">
+                                <option value="ban" ${accion === 'ban' ? 'selected' : ''}>Banear</option>
+                                <option value="kick" ${accion === 'kick' ? 'selected' : ''}>Expulsar (Kick)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle show/hide options when module is toggled
+        document.addEventListener('change', function (e) {
+            if (e.target.classList.contains('ar-toggle')) {
+                const modulo = e.target.dataset.modulo;
+                const optionsDiv = document.querySelector(`.ar-options-${modulo}`);
+                if (optionsDiv) {
+                    optionsDiv.style.display = e.target.checked ? 'grid' : 'none';
+                }
+            }
+        });
+
+        async function saveAntiraidConfig() {
+            if (!currentGuildId) return showToast('error', 'Selecciona un servidor');
+
+            const rawWhitelist = document.getElementById('ar-whitelist').value;
+            const whitelist = rawWhitelist.split(',')
+                .map(id => id.trim())
+                .filter(id => id.length > 0);
+
+            const modulos = {};
+            for (const key of Object.keys(MODULOS_ANTIRAID)) {
+                const toggle = document.querySelector(`.ar-toggle[data-modulo="${key}"]`);
+                const limiteInput = document.querySelector(`.ar-limite[data-modulo="${key}"]`);
+                const accionSelect = document.querySelector(`.ar-accion[data-modulo="${key}"]`);
+
+                modulos[key] = {
+                    activado: toggle ? toggle.checked : false,
+                    limite: limiteInput ? parseInt(limiteInput.value) || 1 : 1,
+                    accion: accionSelect ? accionSelect.value : 'ban'
+                };
+            }
+
+            const config = { whitelist, modulos };
+
+            try {
+                const res = await fetch(`/api/guilds/${currentGuildId}/antiraid-config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Configuración antiraid guardada correctamente', 'success');
+                } else {
+                    showToast(data.error || 'Error al guardar configuración antiraid', 'error');
+                }
+            } catch (e) {
+                console.error('Error guardando antiraid:', e);
+                showToast('Error de conexión al guardar antiraid', 'error');
             }
         }
 

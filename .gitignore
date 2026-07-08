@@ -27,8 +27,19 @@ tickets/
 *.pdf
 *.ico
 
-# Archivos de configuración del bot
-config.json
-settings.json
-config/sessions.json
-config/bot-activity.json
+# Toda la carpeta de configuración
+config/
+
+# Carpeta de datos locales de ejecución y sesiones
+data/
+
+# Archivos subidos y configuraciones de servidores locales
+servidores/
+uploads/
+sancion/
+
+# Archivos comprimidos y copias de seguridad de desarrollo
+*.rar
+*.zip
+*.7z
+*.tar.gz
