@@ -1,5 +1,11 @@
 # 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
 
+> 💬 **Servidor oficial de Discord**
+>
+> Únete al servidor oficial de CodeCord para recibir soporte, consultar novedades, reportar errores y conocer las próximas actualizaciones.
+>
+> 🔗 **[Entrar al servidor de Discord](https://discord.gg/PzSNTqFCuW)**
+
 ---
 
 > [!IMPORTANT]
@@ -125,5 +131,3 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Eliminación automática de mensajes de usuarios expulsados.
 * Eliminación automática de mensajes de usuarios baneados.
 * Configuración desde el panel administrativo.
-
----
