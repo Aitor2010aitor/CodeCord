@@ -1,8 +1,12 @@
 # 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
 
-> 💬 **Servidor oficial de Discord**
+---
+
+> [!IMPORTANT]
 >
-> Únete al servidor oficial de CodeCord para recibir soporte, consultar novedades, reportar errores y conocer las próximas actualizaciones.
+> ## 💬 Servidor oficial de Discord
+>
+> Únete al servidor oficial de CodeCord para recibir soporte, consultar novedades, reportar errores y estar al día de las actualizaciones.
 >
 > 🔗 **[Entrar al servidor de Discord](https://discord.gg/PzSNTqFCuW)**
 
@@ -10,34 +14,52 @@
 
 > [!IMPORTANT]
 >
-> ## 🚀 Versión 7.0 - Novedades
+> ## 🚀 Versión 9.0 - Novedades
 >
-> ### 🛡️ Sistema Antiraid (12 Módulos)
+> ### 🔐 Inicio de Sesión Obligatorio con Discord (OAuth2)
 >
-> * Monitoriza **12 tipos de acciones**: crear/borrar/editar canales, crear/borrar/editar roles, crear/borrar emojis, expulsar/banear/desbanear usuarios, editar webhooks.
-> * Ventana deslizante de **60 segundos** para detección de abusos.
-> * Respuesta automática: **aislamiento** (quita todos los roles) seguido de **ban o kick**.
-> * Lista blanca para excluir usuarios (admins, bots, etc.).
-> * Logs enviados al canal configurado en la sección **Logs** del panel.
-> * Configuración individual por módulo (activado/desactivado, límite de acciones, acción a tomar).
+> * El panel ahora **exige iniciar sesión con Discord** para acceder (`REQUIRE_DISCORD_AUTH=true`).
+> * Filtrado de servidores por permisos: solo ves los servidores donde tienes permisos de **Administrador** o **Gestionar Servidor**.
+> * Bloqueo total de API: si intentas acceder a un servidor que no te pertenece, la API devuelve error **403 No autorizado**.
+> * Archivo `VER-URLS-DISCORD.bat` actualizado para generar los enlaces de redirección OAuth2 desde tu `.env`.
 >
-> ### 📜 Logs Visuales en Actividad Reciente
+> ### 🏠 Secciones de Mensajes y Webhooks Separadas
 >
-> * Los eventos de logs (mensaje eliminado, miembro unido, etc.) ahora se muestran **visualmente** con el embed completo en el panel.
-> * Incluye título, descripción, campos, color y pie del embed original.
-> * Botón **Limpiar** para vaciar el historial de actividad.
-> * Filtro automático: los cambios de configuración del panel ya no aparecen en la actividad reciente.
+> * Sección **🤖 Enviar Mensaje como Bot** y sección independiente **🏠 Enviar como Servidor** (webhooks) con icono e identidad del servidor y badge `SERVIDOR` verde.
+> * Formato visual premium: **Barra de formato rápido** en los editores de texto para aplicar **negrita**, *cursiva*, subrayado, tachado, bloques de código, títulos (`#`, `##`, `###`), citas, listas y enlaces `[texto](url)`.
+> * **Vista previa en tiempo real realista**: Renderiza el markdown de Discord visualmente en la previsualización al instante.
 >
-> ### 🎫 Botón "Abrir en Discord" en Tickets
+> ### 🧭 Direccionamiento por Enlaces URL Directos
 >
-> * Cada ticket activo en la gestión de tickets ahora tiene un botón para **abrir el canal directamente en Discord**.
-> * Enlace directo al canal del ticket con solo un clic.
+> * El panel ahora soporta rutas URL directas en el navegador (`/embed`, `/enbet` y `/say-server`) para abrir secciones directamente.
+> * Actualización dinámica de la URL (`history.pushState`) al cambiar de pestaña en el menú.
 >
-> ### ⚡ Mejoras Internas
+> ### 📝 Mensajes Eliminados en Logs
 >
-> * Nuevos intents de Discord: `GuildModeration` y `GuildExpressions` para detección de bans, kicks y cambios de emojis.
-> * Sistema Antiraid V2 separado del anti-spam clásico para evitar conflictos.
-> * Actualización automática de configuración en memoria al guardar desde el panel.
+> * El evento `messageDelete` ahora guarda y muestra el **contenido del mensaje borrado** en los logs del panel.
+> * Muestra quién borró el mensaje, en qué canal y el texto exacto.
+> * Si el mensaje no está disponible (caché), muestra un aviso en lugar de romperse.
+>
+> ### 💾 Persistencia del Servidor Seleccionado
+>
+> * El servidor que selecciones en el menú desplegable se **guarda automáticamente** en tu navegador (`localStorage`).
+> * Al recargar la página, se selecciona automáticamente el último servidor que tenías abierto.
+> * La **Actividad Reciente** y los **Logs** se filtran dinámicamente según el servidor seleccionado.
+>
+> ### 🎭 Auto-Rol al Entrar
+>
+> * Nueva opción en **Moderación y AutoMod**: "Rol Automático al Entrar".
+> * Selecciona el rol que se asignará automáticamente a los miembros nuevos cuando se unan al servidor.
+>
+> ### ✅ Retirar Rol al Verificarse
+>
+> * Nueva opción en **Verificación > Ajustes Avanzados**: "Rol a retirar al verificarse".
+> * El bot quita automáticamente el rol de no verificado cuando el usuario completa la verificación (reacción u OAuth2).
+>
+> ### 🧹 Limpieza de Consola
+>
+> * Eliminados los mensajes de spam en consola (`🔍 Anti-Spam check`, `🛡️ Procesando mensaje`, `📊 Spam check`).
+> * Corregido el error `TypeError: cb is not a function` al destruir sesiones.
 
 ---
 
@@ -131,3 +153,5 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Eliminación automática de mensajes de usuarios expulsados.
 * Eliminación automática de mensajes de usuarios baneados.
 * Configuración desde el panel administrativo.
+
+---

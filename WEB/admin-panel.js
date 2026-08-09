@@ -12,8 +12,8 @@ const os = require('os');
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: process.env.PANEL_URL || 'a_qui_el_lik',
-    port: parseInt(process.env.PORT || process.env.PANEL_PORT || 'puerto_qui', 10),
+    url: process.env.PANEL_URL || 'LIK-DE-WEB',
+    port: parseInt(process.env.PORT || process.env.PANEL_PORT || 'PUERTO_AQUI ', 10),
     requireDiscordAuth: process.env.REQUIRE_DISCORD_AUTH === 'true'
 };
 
@@ -81,7 +81,7 @@ class SimpleFileStore extends Store {
     destroy(sid, cb) {
         delete this.sessions[sid];
         fs.writeFileSync(this.path, JSON.stringify(this.sessions));
-        cb(null);
+        if (typeof cb === 'function') cb(null);
     }
 }
 
@@ -131,22 +131,23 @@ function logPanelActivity(guildId, type, message) {
 // Configuración de Discord OAuth2 (Añadir a .env)
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI || `${panelConfig.url}/callback`;
+
+function getRedirectUri(type = 'callback') {
+    if (type === 'callback' && process.env.REDIRECT_URI) return process.env.REDIRECT_URI;
+    if (type === 'verify-callback' && process.env.VERIFY_REDIRECT_URI) return process.env.VERIFY_REDIRECT_URI;
+
+    let url = panelConfig.url.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'http://' + url;
+    }
+    if (url.endsWith('/')) url = url.slice(0, -1);
+    return `${url}/${type}`;
+}
+
+const REDIRECT_URI = getRedirectUri('callback');
 
 // Middleware de autenticación
 function isAuthenticated(req, res, next) {
-    if (panelConfig.requireDiscordAuth === false) {
-        if (!req.session.user) {
-            req.session.user = {
-                id: '123456789',
-                username: 'Admin Local',
-                avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-                tag: 'Admin#0000',
-                bypass: true
-            };
-        }
-        return next();
-    }
     if (req.session.user) {
         return next();
     }
@@ -159,57 +160,48 @@ app.get('/login', (req, res) => {
     const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds`;
     const botAvatar = botClient?.user?.displayAvatarURL() || 'https://cdn.discordapp.com/embed/avatars/0.png';
     const botName = botClient?.user?.username || 'Bot Admin';
+    const errorMsg = req.query.error === 'no_admin_perms' ? 'Acceso denegado: Tu cuenta no es administradora del bot.' : '';
+
     res.send(`
         <!DOCTYPE html>
-        <html>
+        <html lang="es">
         <head>
-            <title>Login - ${botName}</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Iniciar Sesión - ${botName}</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <style>
-                body { background: #0f0f13; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                .login-card { background: #181825; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 350px; }
-                .login-btn { background: #5865F2; color: white; padding: 15px 30px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; margin-bottom: 12px; }
-                .login-btn:hover { background: #4752c4; transform: translateY(-3px); }
-                img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 20px; border: 3px solid #5865f2; }
+                body { background: #0f0f13; color: white; font-family: 'Inter', system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+                .login-card { background: #181825; padding: 40px 30px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); width: 100%; max-width: 380px; }
+                .bot-logo { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid #5865f2; box-shadow: 0 0 20px rgba(88,101,242,0.4); object-fit: cover; }
+                h2 { margin: 0 0 6px; font-size: 1.6rem; font-weight: 800; }
+                p { color: #a9a9b3; font-size: 0.9rem; margin-bottom: 25px; line-height: 1.4; }
+                .error-box { background: rgba(243,139,168,0.15); border: 1px solid #f38ba8; color: #f38ba8; padding: 10px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; }
+                .discord-btn { background: #5865f2; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; box-shadow: 0 5px 15px rgba(88,101,242,0.3); }
+                .discord-btn:hover { background: #4752c4; transform: translateY(-2px); }
             </style>
         </head>
         <body>
             <div class="login-card">
-                <img src="${botAvatar}" id="bot-logo">
+                <img src="${botAvatar}" class="bot-logo">
                 <h2>${botName}</h2>
-                <p style="color: #a0a0a0; margin-bottom: 30px;">Inicia sesión con Discord para gestionar el bot.</p>
-                <a href="${url}" class="login-btn"><i class="fab fa-discord"></i> Iniciar Sesión</a>
-                <a href="/login/bypass" style="color: var(--accent); font-size: 0.85rem; text-decoration: none; opacity: 0.7; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">🔑 Acceso de Administrador (Sin Discord)</a>
+                <p>Panel de Administración Web</p>
+
+                ${errorMsg ? `<div class="error-box"><i class="fas fa-exclamation-circle"></i> ${errorMsg}</div>` : ''}
+
+                <a href="${url}" class="discord-btn"><i class="fab fa-discord"></i> Iniciar Sesión con Discord</a>
             </div>
         </body>
         </html>
     `);
 });
 
-// Ruta de Bypass de Login (Desarrollo / Pruebas)
-app.get('/login/bypass', (req, res) => {
-    if (panelConfig.requireDiscordAuth || process.env.DISABLE_BYPASS === 'true') {
-        return res.status(403).send('El bypass de inicio de sesión está desactivado ya que la autenticación de Discord es requerida o el bypass ha sido inhabilitado.');
-    }
-    // Generar un usuario de sesión simulado para no requerir Discord OAuth2
-    req.session.user = {
-        id: '123456789',
-        username: 'Admin Local',
-        avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-        tag: 'Admin#0000',
-        bypass: true
-    };
-    logPanelActivity('SYSTEM', 'BYPASS_LOGIN', 'Inicio de sesión simulado realizado sin OAuth2');
-    res.redirect('/');
-});
-
-// Ruta de Callback
+// Ruta de Callback para Login de Discord (Administradores)
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) return res.redirect('/login');
 
     try {
-        // Intercambiar código por token (usando fetch si está disponible, sino https)
         const params = new URLSearchParams({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
@@ -228,18 +220,43 @@ app.get('/callback', async (req, res) => {
 
         if (tokenData.error) throw new Error(tokenData.error_description);
 
-        // Obtener info del usuario
         const userRes = await fetch('https://discord.com/api/users/@me', {
             headers: { Authorization: `Bearer ${tokenData.access_token}` }
         });
         const userData = await userRes.json();
 
-        // Guardar en sesión
+        const guildsRes = await fetch('https://discord.com/api/users/@me/guilds', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` }
+        });
+        const userGuildsRaw = await guildsRes.json();
+
+        let allowedGuilds = [];
+        if (Array.isArray(userGuildsRaw)) {
+            allowedGuilds = userGuildsRaw.filter(g => {
+                try {
+                    const isOwner = g.owner === true;
+                    const perms = BigInt(g.permissions || 0);
+                    return isOwner || (perms & 8n) === 8n || (perms & 32n) === 32n;
+                } catch (err) {
+                    return false;
+                }
+            }).map(g => g.id);
+        }
+
+        // Si el usuario no es administrador en ningún servidor del bot, denegar acceso al panel
+        if (allowedGuilds.length === 0) {
+            console.log(`[OAuth2] Denegado acceso al panel a usuario no administrador: ${userData.username}`);
+            return res.redirect('/login?error=no_admin_perms');
+        }
+
+        userData.isAdmin = true;
         req.session.user = userData;
+        req.session.userGuilds = allowedGuilds;
+        logPanelActivity(allowedGuilds[0] || 'SYSTEM', 'DISCORD_ADMIN_LOGIN', `Admin ${userData.username} inició sesión vía Discord`);
         res.redirect('/');
     } catch (e) {
-        console.error('Error en OAuth2:', e);
-        res.send('Error en la autenticación. Asegúrate de configurar CLIENT_ID y CLIENT_SECRET.');
+        console.error('Error en OAuth2 Admin Login:', e);
+        res.redirect('/login?error=invalid_password');
     }
 });
 
@@ -248,29 +265,52 @@ app.get('/logout', (req, res) => {
     res.redirect('/login');
 });
 
-// Proteger rutas estáticas y API
+// Proteger estrictamente el panel y todas las rutas API
 app.use((req, res, next) => {
-    if (req.path === '/login' || req.path === '/callback' || req.path.startsWith('/public') || req.path.startsWith('/uploads')) return next();
-    if (panelConfig.requireDiscordAuth === false) {
-        if (!req.session.user) {
-            req.session.user = {
-                id: '123456789',
-                username: 'Admin Local',
-                avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-                tag: 'Admin#0000',
-                bypass: true
-            };
-        }
+    const publicPaths = ['/login', '/login/password', '/callback', '/verify-callback', '/logout'];
+    if (publicPaths.includes(req.path) || req.path.startsWith('/public') || req.path.startsWith('/uploads')) {
         return next();
     }
-    if (!req.session.user) return res.redirect('/login');
+
+    // Si el usuario no ha iniciado sesión como Administrador, rechazar acceso
+    if (!req.session.user || !req.session.user.id) {
+        if (req.path.startsWith('/api/')) {
+            return res.status(401).json({ error: 'No autorizado. Inicia sesión como administrador.' });
+        }
+        return res.redirect('/login');
+    }
+
+    // Autorización por servidor para las rutas de la API
+    if (req.path.startsWith('/api/guilds/') && !req.session.user.isAdmin && req.session.user.id !== 'admin') {
+        const match = req.path.match(/^\/api\/guilds\/(\d+)/);
+        if (match) {
+            const guildId = match[1];
+            const allowedGuilds = req.session.userGuilds || [];
+            if (!allowedGuilds.includes(guildId)) {
+                return res.status(403).json({ error: 'No tienes permisos de Administrador en este servidor.' });
+            }
+        }
+    }
+
     next();
 });
 
 // Ruta para subir imágenes
 app.post('/api/upload', upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No se subió ninguna imagen' });
-    const imageUrl = `/uploads/${req.file.filename}`;
+    let baseUrl = '';
+    const host = req.get('host');
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    if (host) {
+        baseUrl = `${protocol}://${host}`;
+    } else {
+        baseUrl = panelConfig.url.trim();
+        if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+            baseUrl = 'http://' + baseUrl;
+        }
+        if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+    }
+    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     res.json({ url: imageUrl });
 });
 
@@ -360,7 +400,14 @@ app.get('/api/logs', (req, res) => {
     const activityPath = path.join(__dirname, '..', 'data', 'bot-activity.json');
     try {
         if (fs.existsSync(activityPath)) {
-            const activity = JSON.parse(fs.readFileSync(activityPath, 'utf8'));
+            let activity = JSON.parse(fs.readFileSync(activityPath, 'utf8'));
+
+            // Filtrar logs si el usuario no tiene bypass
+            if (req.session.user && !req.session.user.bypass) {
+                const allowed = req.session.userGuilds || [];
+                activity = activity.filter(log => !log.guildId || allowed.includes(log.guildId));
+            }
+
             return res.json(activity);
         }
     } catch (e) { }
@@ -564,7 +611,15 @@ app.get('/api/guilds', (req, res) => {
         return res.json({ error: 'Bot no conectado' });
     }
 
-    const guilds = botClient.guilds.cache.map(guild => ({
+    let botGuilds = Array.from(botClient.guilds.cache.values());
+
+    // Filtrar si no es un login bypass
+    if (req.session.user && !req.session.user.bypass) {
+        const allowed = req.session.userGuilds || [];
+        botGuilds = botGuilds.filter(g => allowed.includes(g.id));
+    }
+
+    const guilds = botGuilds.map(guild => ({
         id: guild.id,
         name: guild.name,
         members: guild.memberCount,
@@ -572,9 +627,24 @@ app.get('/api/guilds', (req, res) => {
         icon: guild.iconURL() || 'https://cdn.discordapp.com/embed/avatars/0.png'
     }));
 
-    console.log(`[DEBUG] /api/guilds devolviendo ${guilds.length} servidores`);
+
     res.json(guilds);
 });
+
+// Info básica de un servidor (nombre + icono)
+app.get('/api/guilds/:guildId/info', (req, res) => {
+    if (!botClient) return res.json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+    res.json({
+        id: guild.id,
+        name: guild.name,
+        icon: guild.iconURL({ size: 128, extension: 'png' }) || 'https://cdn.discordapp.com/embed/avatars/0.png',
+        members: guild.memberCount
+    });
+});
+
+
 
 // Endpoint para obtener miembros de un servidor específico
 app.get('/api/guilds/:guildId/members', async (req, res) => {
@@ -1350,8 +1420,104 @@ app.post('/api/guilds/:guildId/giveaways-permissions', (req, res) => {
     res.json({ success: true, permissions: guildData.permissions });
 });
 
+// Helper para construir el payload enriquecido de Discord con múltiples imágenes posicionadas
+function ensureAbsoluteUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (url.startsWith('/uploads/')) {
+        let baseUrl = panelConfig.url.trim();
+        if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+            baseUrl = 'http://' + baseUrl;
+        }
+        if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+        return `${baseUrl}${url}`;
+    }
+    return url;
+}
+
+function stripImageTags(text) {
+    if (!text || typeof text !== 'string') return '';
+    return text.replace(/\{\d+\}/g, '').replace(/  +/g, ' ').trim();
+}
+
+function buildRichPayload({ message, embedData, additionalImages }) {
+    const { EmbedBuilder } = require('discord.js');
+    const embeds = [];
+    const images = (additionalImages || []).filter(img => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
+
+    let content = stripImageTags(message || '');
+
+    let mainEmbed = null;
+    const titleText = embedData && embedData.title ? stripImageTags(embedData.title) : '';
+    const descText = embedData && embedData.description ? stripImageTags(embedData.description) : '';
+    const footerText = embedData && embedData.footer ? stripImageTags(embedData.footer) : '';
+    const authorText = embedData && embedData.author ? stripImageTags(embedData.author) : '';
+    const imageText = embedData && embedData.image ? ensureAbsoluteUrl(stripImageTags(embedData.image)) : '';
+    const thumbText = embedData && embedData.thumbnail ? ensureAbsoluteUrl(stripImageTags(embedData.thumbnail)) : '';
+
+    const hasEmbedData = titleText || descText || imageText || thumbText || footerText || authorText || (embedData && embedData.color);
+
+    if (hasEmbedData || images.length > 0) {
+        mainEmbed = new EmbedBuilder();
+        if (titleText) mainEmbed.setTitle(titleText);
+        if (descText) mainEmbed.setDescription(descText);
+        if (embedData && embedData.color) mainEmbed.setColor(embedData.color);
+        if (footerText) mainEmbed.setFooter({ text: footerText });
+        if (authorText) mainEmbed.setAuthor({ name: authorText });
+        if (imageText) mainEmbed.setImage(imageText);
+        if (thumbText) mainEmbed.setThumbnail(thumbText);
+
+        // Attach first additional image directly to mainEmbed if mainEmbed has no image/thumbnail set yet
+        let firstImgUsed = false;
+        if (images.length > 0) {
+            const firstImg = images[0];
+            const firstUrl = ensureAbsoluteUrl(firstImg.url);
+            if (firstUrl && firstUrl.trim().length > 0) {
+                if (firstImg.size === 'small') {
+                    if (!mainEmbed.data.thumbnail) {
+                        mainEmbed.setThumbnail(firstUrl);
+                        firstImgUsed = true;
+                    }
+                } else {
+                    if (!mainEmbed.data.image) {
+                        mainEmbed.setImage(firstUrl);
+                        firstImgUsed = true;
+                    }
+                }
+            }
+        }
+
+        // Only push mainEmbed if it contains at least one valid Discord embed property
+        if (mainEmbed.data.title || mainEmbed.data.description || mainEmbed.data.image || mainEmbed.data.thumbnail || mainEmbed.data.footer || mainEmbed.data.author) {
+            embeds.push(mainEmbed);
+        } else {
+            mainEmbed = null;
+        }
+
+        // Any remaining additional images attached as secondary embeds
+        const startIndex = firstImgUsed ? 1 : 0;
+        for (let i = startIndex; i < images.length; i++) {
+            const img = images[i];
+            const imageUrl = ensureAbsoluteUrl(img.url);
+            if (!imageUrl || imageUrl.trim().length === 0) continue;
+            const emb = new EmbedBuilder();
+            if (embedData && embedData.color) emb.setColor(embedData.color);
+            if (img.size === 'small') {
+                emb.setThumbnail(imageUrl);
+            } else {
+                emb.setImage(imageUrl);
+            }
+            embeds.push(emb);
+        }
+    }
+
+    const payload = {};
+    if (content && content.length > 0) payload.content = content;
+    if (embeds.length > 0) payload.embeds = embeds;
+    return payload;
+}
+
 app.post('/api/guilds/:guildId/send', async (req, res) => {
-    const { channelId, message } = req.body;
+    const { channelId, message, embedData, additionalImages } = req.body;
     if (!botClient) return res.json({ error: 'Bot no conectado' });
 
     const guild = botClient.guilds.cache.get(req.params.guildId);
@@ -1361,16 +1527,65 @@ app.post('/api/guilds/:guildId/send', async (req, res) => {
     if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
     try {
-        await channel.send(message);
+        const payload = buildRichPayload({ message, embedData, additionalImages });
+        if (!payload.content && (!payload.embeds || payload.embeds.length === 0)) {
+            return res.status(400).json({ error: 'El mensaje no puede estar vacío' });
+        }
+        await channel.send(payload);
         res.json({ success: true });
     } catch (e) {
-        res.status(500).json({ error: 'Error enviando mensaje' });
+        console.error('[send]', e);
+        res.status(500).json({ error: 'Error enviando mensaje: ' + e.message });
+    }
+});
+
+// Enviar mensaje como el servidor (con nombre e icono del servidor) usando webhook
+app.post('/api/guilds/:guildId/send-as-server', async (req, res) => {
+    const { channelId, message, embedData, additionalImages } = req.body;
+    if (!botClient) return res.json({ error: 'Bot no conectado' });
+
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const channel = guild.channels.cache.get(channelId);
+    if (!channel || !channel.isTextBased()) return res.status(404).json({ error: 'Canal no encontrado' });
+
+    try {
+        // Obtener o crear webhook en el canal
+        const webhooks = await channel.fetchWebhooks();
+        let wh = webhooks.find(w => w.name === '__PanelBot__' && w.token);
+        if (!wh) {
+            wh = await channel.createWebhook({
+                name: '__PanelBot__',
+                reason: 'Panel de administración - enviar como servidor'
+            });
+        }
+
+        const serverIcon = guild.iconURL({ size: 128, extension: 'png' }) || undefined;
+        const serverName = guild.name;
+
+        const basePayload = buildRichPayload({ message, embedData, additionalImages });
+        if (!basePayload.content && (!basePayload.embeds || basePayload.embeds.length === 0)) {
+            return res.status(400).json({ error: 'El mensaje no puede estar vacío' });
+        }
+
+        const payload = {
+            username: serverName,
+            avatarURL: serverIcon,
+            ...basePayload
+        };
+
+        await wh.send(payload);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('[send-as-server]', e);
+        res.status(500).json({ error: 'Error enviando como servidor: ' + e.message });
     }
 });
 
 // Endpoint para "Embed" (crear embed)
 app.post('/api/guilds/:guildId/embed', async (req, res) => {
-    const { channelId, title, description, color, image, footer, author } = req.body;
+    const { channelId, title, description, color, image, footer, author, thumbnail, additionalImages } = req.body;
     if (!botClient) return res.json({ error: 'Bot no conectado' });
 
     const guild = botClient.guilds.cache.get(req.params.guildId);
@@ -1380,20 +1595,13 @@ app.post('/api/guilds/:guildId/embed', async (req, res) => {
     if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
     try {
-        const { EmbedBuilder } = require('discord.js');
-        const embed = new EmbedBuilder()
-            .setTitle(title || null)
-            .setDescription(description || null)
-            .setColor(color || '#5865f2');
-
-        if (author) embed.setAuthor({ name: author });
-        if (image) embed.setImage(image);
-        if (footer) embed.setFooter({ text: footer });
-
-        await channel.send({ embeds: [embed] });
+        const embedData = { title, description, color, image, footer, author, thumbnail };
+        const payload = buildRichPayload({ embedData, additionalImages });
+        await channel.send(payload);
         res.json({ success: true });
     } catch (e) {
-        res.status(500).json({ error: 'Error enviando embed' });
+        console.error('[embed]', e);
+        res.status(500).json({ error: 'Error enviando embed: ' + e.message });
     }
 });
 
@@ -2292,7 +2500,10 @@ app.get('/api/guilds/:guildId/roles', (req, res) => {
     res.json(roles);
 });
 
-app.get('/', (req, res) => {
+app.get(['/', '/embed', '/enbet', '/say-server', '/say'], (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
@@ -2378,5 +2589,681 @@ app.post('/api/guilds/:guildId/autorol', async (req, res) => {
         res.status(500).json({ error: 'Error interno al enviar el mensaje o reaccionar' });
     }
 });
+
+
+// =====================================================================
+// 🛡️ APIS Y RUTAS DEL SISTEMA DE VERIFICACIÓN
+// =====================================================================
+
+// GET: Obtener config de verificación
+app.get('/api/guilds/:guildId/verification', (req, res) => {
+    const config = configManager.loadGuildConfig(req.params.guildId, 'verification', {
+        reaction: { enabled: false, channelId: '', emoji: '✅', roleId: '', title: 'Verificación por Reacción', description: 'Reacciona a este mensaje con ✅ para verificarte.', color: '#5865f2' },
+        oauth: { enabled: false, channelId: '', roleId: '', title: 'Verificación por OAuth2', description: 'Haz clic en el botón de abajo para verificar tu cuenta y acceder al servidor.', buttonText: 'Verificarse', color: '#5865f2' },
+        settings: { unverifiedRoleId: '' }
+    });
+    if (!config.settings) config.settings = { unverifiedRoleId: '' };
+    res.json(config);
+});
+
+// POST: Guardar config de verificación
+app.post('/api/guilds/:guildId/verification', (req, res) => {
+    const guildId = req.params.guildId;
+    const body = req.body;
+
+    const reaction = body.reaction || {};
+    const oauth = body.oauth || {};
+
+    // Conservar messageId previos (no los manda el frontend)
+    const oldConfig = configManager.loadGuildConfig(guildId, 'verification', {});
+    if (oldConfig.reaction?.messageId && !reaction.messageId) reaction.messageId = oldConfig.reaction.messageId;
+    if (oldConfig.oauth?.messageId && !oauth.messageId) oauth.messageId = oldConfig.oauth.messageId;
+
+    // Conservar settings existentes (no los manda este endpoint)
+    const existingSettings = oldConfig.settings || { unverifiedRoleId: '' };
+
+    const config = { reaction, oauth, settings: existingSettings };
+
+    console.log(`🛡️  [Verificación] Config guardada · ${guildId} · reacción: ${reaction.channelId ? '✅' : '—'} · OAuth: ${oauth.channelId ? '✅' : '—'}`);
+
+    configManager.saveGuildConfig(guildId, 'verification', config);
+    logPanelActivity(guildId, 'VERIFICATION_CONFIG', 'Configuración de verificación guardada');
+    res.json({ success: true });
+});
+
+// POST: Guardar ajustes de verificación (rol sin verificar)
+app.post('/api/guilds/:guildId/verification/settings', (req, res) => {
+    const guildId = req.params.guildId;
+    const { unverifiedRoleId, removeRoleId } = req.body;
+
+    const oldConfig = configManager.loadGuildConfig(guildId, 'verification', {});
+    oldConfig.settings = {
+        unverifiedRoleId: unverifiedRoleId || '',
+        removeRoleId: removeRoleId || ''
+    };
+
+    configManager.saveGuildConfig(guildId, 'verification', oldConfig);
+    logPanelActivity(guildId, 'VERIFICATION_SETTINGS', `Roles ajustados: sin verificar (${unverifiedRoleId || 'ninguno'}), retirar al verificar (${removeRoleId || 'ninguno'})`);
+    console.log(`⚙️  [Verificación Ajustes] Sin verificar: ${unverifiedRoleId || 'desactivado'} | Retirar al verificar: ${removeRoleId || 'desactivado'} · Guild: ${guildId}`);
+    res.json({ success: true });
+});
+
+// POST: Enviar mensaje de verificación por reacción
+app.post('/api/guilds/:guildId/verification/send-reaction', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const config = configManager.loadGuildConfig(guild.id, 'verification', {});
+    const rConfig = config.reaction;
+
+    if (!rConfig || !rConfig.channelId || !rConfig.roleId) {
+        const missing = [];
+        if (!rConfig) missing.push('config completa');
+        else {
+            if (!rConfig.channelId) missing.push('canal');
+            if (!rConfig.roleId) missing.push('rol');
+        }
+        return res.status(400).json({ error: `Faltan campos requeridos: ${missing.join(', ')}. Guarda la configuración primero.` });
+    }
+
+    const channel = guild.channels.cache.get(rConfig.channelId);
+    if (!channel || !channel.isTextBased()) {
+        return res.status(404).json({ error: 'Canal no encontrado o no es de texto.' });
+    }
+
+    try {
+        const { EmbedBuilder } = require('discord.js');
+        const images = (rConfig.additionalImages || []).filter(img => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
+        const title = stripImageTags(rConfig.title || 'Verificación por Reacción');
+        const desc = stripImageTags(rConfig.description || 'Reacciona al emoji para verificar.');
+
+        const embed = new EmbedBuilder()
+            .setColor(rConfig.color || '#5865f2');
+        if (title) embed.setTitle(title);
+        if (desc) embed.setDescription(desc);
+
+        let firstImgUsed = false;
+        if (images.length > 0) {
+            const firstImg = images[0];
+            const firstUrl = ensureAbsoluteUrl(firstImg.url);
+            if (firstUrl && firstUrl.trim().length > 0) {
+                if (firstImg.size === 'small') {
+                    embed.setThumbnail(firstUrl);
+                } else {
+                    embed.setImage(firstUrl);
+                }
+                firstImgUsed = true;
+            }
+        }
+
+        const embeds = [embed];
+        const startIndex = firstImgUsed ? 1 : 0;
+        for (let i = startIndex; i < images.length; i++) {
+            const img = images[i];
+            const imageUrl = ensureAbsoluteUrl(img.url);
+            const emb = new EmbedBuilder();
+            if (rConfig.color) emb.setColor(rConfig.color);
+            if (img.size === 'small') {
+                emb.setThumbnail(imageUrl);
+            } else {
+                emb.setImage(imageUrl);
+            }
+            embeds.push(emb);
+        }
+
+        const sentMsg = await channel.send({ embeds });
+
+        try {
+            await sentMsg.react(rConfig.emoji || '✅');
+        } catch (e) {
+            console.error('Error al reaccionar en el canal de Discord:', e);
+        }
+
+        rConfig.messageId = sentMsg.id;
+        rConfig.enabled = true;
+        configManager.saveGuildConfig(guild.id, 'verification', config);
+
+        logPanelActivity(guild.id, 'VERIFICATION_SEND', 'Mensaje de verificación por reacción enviado');
+        console.log(`✅ [Verificación] Mensaje de reacción enviado · #${channel.name} (${guild.name}) · emoji: ${rConfig.emoji || '✅'}`);
+        res.json({ success: true, messageId: sentMsg.id });
+    } catch (err) {
+        console.error('Error al enviar reacción de verificación:', err);
+        res.status(500).json({ error: 'Error al enviar el mensaje a Discord: ' + err.message });
+    }
+});
+
+// POST: Enviar panel de verificación OAuth2
+app.post('/api/guilds/:guildId/verification/send-oauth', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const config = configManager.loadGuildConfig(guild.id, 'verification', {});
+    const oConfig = config.oauth;
+
+    if (!oConfig || !oConfig.channelId || !oConfig.roleId) {
+        const missing = [];
+        if (!oConfig) missing.push('config completa');
+        else {
+            if (!oConfig.channelId) missing.push('canal');
+            if (!oConfig.roleId) missing.push('rol');
+        }
+        return res.status(400).json({ error: `Faltan campos requeridos: ${missing.join(', ')}. Guarda la configuración primero.` });
+    }
+
+    const channel = guild.channels.cache.get(oConfig.channelId);
+    if (!channel || !channel.isTextBased()) {
+        return res.status(404).json({ error: 'Canal no encontrado o no es de texto.' });
+    }
+
+    try {
+        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const verifyCallbackUri = getRedirectUri('verify-callback');
+        const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(verifyCallbackUri)}&response_type=code&scope=identify%20guilds.join&state=${guild.id}`;
+
+        const images = (oConfig.additionalImages || []).filter(img => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
+        const title = stripImageTags(oConfig.title || 'Verificación Requerida');
+        const desc = stripImageTags(oConfig.description || 'Haz clic abajo para verificar tu cuenta y acceder al servidor.');
+
+        const embed = new EmbedBuilder()
+            .setColor(oConfig.color || '#5865f2');
+        if (title) embed.setTitle(title);
+        if (desc) embed.setDescription(desc);
+
+        let firstImgUsed = false;
+        if (images.length > 0) {
+            const firstImg = images[0];
+            const firstUrl = ensureAbsoluteUrl(firstImg.url);
+            if (firstUrl && firstUrl.trim().length > 0) {
+                if (firstImg.size === 'small') {
+                    embed.setThumbnail(firstUrl);
+                } else {
+                    embed.setImage(firstUrl);
+                }
+                firstImgUsed = true;
+            }
+        }
+
+        const embeds = [embed];
+        const startIndex = firstImgUsed ? 1 : 0;
+        for (let i = startIndex; i < images.length; i++) {
+            const img = images[i];
+            const imageUrl = ensureAbsoluteUrl(img.url);
+            const emb = new EmbedBuilder();
+            if (oConfig.color) emb.setColor(oConfig.color);
+            if (img.size === 'small') {
+                emb.setThumbnail(imageUrl);
+            } else {
+                emb.setImage(imageUrl);
+            }
+            embeds.push(emb);
+        }
+
+        const button = new ButtonBuilder()
+            .setLabel(oConfig.buttonText || 'Verificarse')
+            .setStyle(ButtonStyle.Link)
+            .setURL(oauthUrl)
+            .setEmoji('🛡️');
+
+        const row = new ActionRowBuilder().addComponents(button);
+
+        const sentMsg = await channel.send({ embeds, components: [row] });
+
+        oConfig.messageId = sentMsg.id;
+        oConfig.enabled = true;
+        configManager.saveGuildConfig(guild.id, 'verification', config);
+
+        logPanelActivity(guild.id, 'VERIFICATION_SEND', 'Panel de verificación OAuth2 enviado');
+        console.log(`✅ [Verificación] Panel OAuth2 enviado · #${channel.name} (${guild.name}) · rol: ${oConfig.roleId}`);
+        res.json({ success: true, messageId: sentMsg.id });
+    } catch (err) {
+        console.error('Error al enviar panel OAuth2:', err);
+        res.status(500).json({ error: 'Error al enviar el mensaje a Discord: ' + err.message });
+    }
+});
+
+// GET: Obtener lista de usuarios verificados
+app.get('/api/guilds/:guildId/verification/users', (req, res) => {
+    const verifiedUsers = configManager.loadGuildConfig(req.params.guildId, 'verified-users', []);
+    res.json(verifiedUsers);
+});
+
+// POST: Re-unir / restaurar usuario al servidor
+app.post('/api/guilds/:guildId/verification/users/:userId/rejoin', async (req, res) => {
+    if (!botClient) return res.status(500).json({ error: 'Bot no conectado' });
+    const guild = botClient.guilds.cache.get(req.params.guildId);
+    if (!guild) return res.status(404).json({ error: 'Servidor no encontrado' });
+
+    const userId = req.params.userId;
+    const verifiedUsers = configManager.loadGuildConfig(guild.id, 'verified-users', []);
+    const user = verifiedUsers.find(u => u.userId === userId);
+
+    if (!user || !user.accessToken) {
+        return res.status(404).json({ error: 'Usuario no registrado o sin token guardado.' });
+    }
+
+    try {
+        const config = configManager.loadGuildConfig(guild.id, 'verification', {});
+        const roleId = config.oauth?.roleId;
+
+        const options = {
+            accessToken: user.accessToken
+        };
+        if (roleId) {
+            options.roles = [roleId];
+        }
+
+        await guild.members.add(userId, options);
+        logPanelActivity(guild.id, 'VERIFICATION_REJOIN', `Usuario ${user.username} restaurado/añadido al servidor`);
+        res.json({ success: true });
+    } catch (err) {
+        console.error(`Error al re-unir usuario ${userId}:`, err);
+        res.status(500).json({ error: 'Error al unir usuario al servidor: ' + err.message });
+    }
+});
+
+// DELETE: Eliminar usuario de la base de datos de verificados
+app.delete('/api/guilds/:guildId/verification/users/:userId', (req, res) => {
+    const guildId = req.params.guildId;
+    const userId = req.params.userId;
+    let verifiedUsers = configManager.loadGuildConfig(guildId, 'verified-users', []);
+    const initialLength = verifiedUsers.length;
+    verifiedUsers = verifiedUsers.filter(u => u.userId !== userId);
+
+    if (verifiedUsers.length === initialLength) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    configManager.saveGuildConfig(guildId, 'verified-users', verifiedUsers);
+    logPanelActivity(guildId, 'VERIFICATION_REMOVE', `Usuario con ID ${userId} eliminado de la base de datos de verificados`);
+    res.json({ success: true });
+});
+
+// GET: Callback de verificación OAuth2
+app.get('/verify-callback', async (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    const { code, state: guildId } = req.query;
+    if (!code || !guildId) {
+        return res.status(400).send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head><meta charset="UTF-8"><title>Error de Verificación</title></head>
+            <body style="background:#0f0f13;color:#ff5555;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
+                <div style="text-align:center;">
+                    <div style="font-size:3rem;margin-bottom:10px;">⚠️</div>
+                    <h2>Faltan parámetros de verificación</h2>
+                    <p style="color:#aaa;">La solicitud no incluye el código de autorización o el servidor.</p>
+                </div>
+            </body>
+            </html>
+        `);
+    }
+
+    try {
+        const verifyCallbackUri = getRedirectUri('verify-callback');
+        const params = new URLSearchParams({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            code: code,
+            grant_type: 'authorization_code',
+            redirect_uri: verifyCallbackUri,
+            scope: 'identify guilds.join'
+        });
+
+        const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            body: params,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+        const tokenData = await tokenRes.json();
+
+        if (tokenData.error) {
+            console.error('Error al intercambiar token:', tokenData);
+            throw new Error(tokenData.error_description || tokenData.error);
+        }
+
+        // Obtener información del usuario verificado
+        const userRes = await fetch('https://discord.com/api/users/@me', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` }
+        });
+        const userData = await userRes.json();
+
+        if (!userData.id) {
+            throw new Error('No se pudo recuperar la información de usuario de Discord.');
+        }
+
+        if (!botClient) {
+            throw new Error('El bot no está en ejecución actualmente.');
+        }
+
+        const guild = botClient.guilds.cache.get(guildId);
+        if (!guild) {
+            throw new Error('No se encontró el servidor o el bot no está en él.');
+        }
+
+        const verificationConfig = configManager.loadGuildConfig(guildId, 'verification', {});
+        const roleId = verificationConfig.oauth?.roleId || verificationConfig.roleId;
+
+        // Roles a retirar tras verificar (tanto el unverifiedRoleId como el removeRoleId)
+        const unverifiedRoleId = verificationConfig.settings?.unverifiedRoleId || verificationConfig.unverifiedRoleId;
+        const removeRoleId = verificationConfig.settings?.removeRoleId || verificationConfig.removeRoleId;
+        const rolesToRemove = [removeRoleId, unverifiedRoleId].filter(id => id && typeof id === 'string' && id.trim().length > 0);
+
+        console.log(`[Verify OAuth] Procesando ${userData.username} (${userData.id}) en Guild: ${guild.name} (${guildId})`);
+        console.log(`[Verify OAuth] Config -> Rol a dar: ${roleId || 'NINGUNO'} | Roles a quitar: ${rolesToRemove.join(', ') || 'NINGUNO'}`);
+
+        let member = null;
+        try {
+            member = await guild.members.fetch(userData.id);
+        } catch (err) {
+            // El usuario no está en el servidor aún
+        }
+
+        let alreadyVerified = false;
+        let roleNameAssigned = '';
+
+        if (roleId) {
+            const roleObj = guild.roles.cache.get(roleId);
+            if (roleObj) roleNameAssigned = roleObj.name;
+        }
+
+        if (member) {
+            if (roleId) {
+                if (member.roles.cache.has(roleId)) {
+                    alreadyVerified = true;
+                } else {
+                    try {
+                        await member.roles.add(roleId);
+                    } catch (err) {
+                        console.error('[Verify OAuth] Error al añadir rol:', err);
+                        if (err.code === 50013) {
+                            throw new Error(`El bot no tiene permisos suficientes para asignar el rol verificado${roleNameAssigned ? ' (' + roleNameAssigned + ')' : ''}. Asegúrate de que el rol del bot esté MÁS ARRIBA en los ajustes del servidor y tenga el permiso 'Gestionar Roles'.`);
+                        }
+                        throw err;
+                    }
+                }
+            }
+
+            // Retirar roles (sin verificar / quitar)
+            for (const rId of rolesToRemove) {
+                if (member.roles.cache.has(rId)) {
+                    try {
+                        await member.roles.remove(rId);
+                        console.log(`[Verificación OAuth2] Se retiró el rol ${rId} a ${member.user.tag}`);
+                    } catch (err) {
+                        console.error(`[Verify OAuth] Error al retirar rol ${rId}:`, err);
+                    }
+                }
+            }
+        } else {
+            // Usuario no está en la guild: añadirlo vía OAuth scope guilds.join
+            const options = { accessToken: tokenData.access_token };
+            if (roleId) options.roles = [roleId];
+            try {
+                await guild.members.add(userData.id, options);
+            } catch (err) {
+                console.error('[Verify OAuth] Error uniendo usuario a la guild:', err);
+                if (err.code === 50013) {
+                    throw new Error("El bot no tiene permisos suficientes para añadir miembros a este servidor.");
+                }
+                throw err;
+            }
+        }
+
+        // Guardar la información en verified-users.json
+        const verifiedUsers = configManager.loadGuildConfig(guildId, 'verified-users', []);
+        const existingIdx = verifiedUsers.findIndex(u => u.userId === userData.id);
+        const userInfo = {
+            userId: userData.id,
+            username: userData.global_name || userData.username,
+            avatar: userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png',
+            accessToken: tokenData.access_token,
+            refreshToken: tokenData.refresh_token,
+            verifiedAt: new Date().toISOString()
+        };
+
+        if (existingIdx !== -1) {
+            verifiedUsers[existingIdx] = userInfo;
+        } else {
+            verifiedUsers.push(userInfo);
+        }
+        configManager.saveGuildConfig(guildId, 'verified-users', verifiedUsers);
+        logPanelActivity(guildId, 'VERIFICATION', `Usuario ${userData.username} verificado mediante OAuth2`);
+
+        const botName = botClient.user.username;
+        const userAvatar = userInfo.avatar;
+        const guildIcon = guild.iconURL({ extension: 'png', size: 128 }) || 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Verificación Completada - ${guild.name}</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    body {
+                        background: #0f0f13;
+                        color: #ffffff;
+                        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        margin: 0;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    }
+                    .card {
+                        background: #181825;
+                        border: 1px solid rgba(255, 255, 255, 0.08);
+                        border-radius: 24px;
+                        padding: 40px 30px;
+                        text-align: center;
+                        box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+                        width: 100%;
+                        max-width: 440px;
+                        animation: fadeInUp 0.5s ease-out;
+                    }
+                    .avatar-container {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 15px;
+                        margin-bottom: 25px;
+                        position: relative;
+                    }
+                    .avatar {
+                        width: 72px;
+                        height: 72px;
+                        border-radius: 50%;
+                        border: 3px solid #5865f2;
+                        box-shadow: 0 0 20px rgba(88, 101, 242, 0.4);
+                        object-fit: cover;
+                    }
+                    .guild-avatar {
+                        width: 72px;
+                        height: 72px;
+                        border-radius: 50%;
+                        border: 3px solid #57f287;
+                        box-shadow: 0 0 20px rgba(87, 242, 135, 0.3);
+                        object-fit: cover;
+                    }
+                    .verify-badge {
+                        width: 42px;
+                        height: 42px;
+                        background: #57f287;
+                        color: #0f0f13;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.4rem;
+                        font-weight: 900;
+                        box-shadow: 0 0 15px rgba(87, 242, 135, 0.5);
+                    }
+                    h2 {
+                        margin: 0 0 10px;
+                        font-size: 1.6rem;
+                        font-weight: 800;
+                        color: #ffffff;
+                    }
+                    .status-pill {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        background: rgba(87, 242, 135, 0.12);
+                        color: #57f287;
+                        padding: 6px 16px;
+                        border-radius: 20px;
+                        font-size: 0.85rem;
+                        font-weight: 700;
+                        margin-bottom: 20px;
+                        border: 1px solid rgba(87, 242, 135, 0.3);
+                    }
+                    p {
+                        color: #a9a9b3;
+                        font-size: 0.95rem;
+                        line-height: 1.6;
+                        margin: 0 0 30px;
+                    }
+                    .role-info {
+                        background: rgba(255,255,255,0.04);
+                        border-radius: 12px;
+                        padding: 12px 16px;
+                        margin-bottom: 25px;
+                        font-size: 0.9rem;
+                        color: #dcddde;
+                    }
+                    .role-tag {
+                        color: #5865f2;
+                        font-weight: 700;
+                    }
+                    .close-btn {
+                        background: #5865f2;
+                        color: white;
+                        padding: 14px 28px;
+                        border: none;
+                        border-radius: 14px;
+                        font-weight: 700;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+                    .close-btn:hover {
+                        background: #4752c4;
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 20px rgba(88,101,242,0.4);
+                    }
+                    @keyframes fadeInUp {
+                        from { opacity: 0; transform: translateY(20px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="avatar-container">
+                        <img src="${userAvatar}" class="avatar" title="${userData.username}">
+                        <div class="verify-badge"><i class="fas fa-check"></i></div>
+                        <img src="${guildIcon}" class="guild-avatar" title="${guild.name}">
+                    </div>
+                    
+                    <div class="status-pill">
+                        <i class="fas fa-shield-alt"></i> ${alreadyVerified ? 'Cuenta Ya Verificada' : 'Verificación Exitosa'}
+                    </div>
+
+                    <h2>${alreadyVerified ? '¡Ya tenías acceso!' : '¡Acceso Concedido!'}</h2>
+                    
+                    <p>Hola, <strong>${userData.global_name || userData.username}</strong>.<br>
+                    ${alreadyVerified ? 'Tu cuenta ya estaba verificada en' : 'Has verificado tu cuenta correctamente en'} <strong>${guild.name}</strong>.</p>
+                    
+                    ${roleNameAssigned ? `<div class="role-info"><i class="fas fa-user-tag"></i> Rol asignado: <span class="role-tag">@${roleNameAssigned}</span></div>` : ''}
+                    
+                    <button class="close-btn" onclick="window.close()">Volver a Discord</button>
+                </div>
+            </body>
+            </html>
+        `);
+    } catch (e) {
+        console.error('Error en /verify-callback:', e);
+        res.status(500).send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Error de Verificación</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    body {
+                        background: #0f0f13;
+                        color: #ffffff;
+                        font-family: 'Inter', system-ui, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        margin: 0;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    }
+                    .card {
+                        background: #181825;
+                        border: 1px solid rgba(243, 139, 168, 0.2);
+                        border-radius: 24px;
+                        padding: 40px 30px;
+                        text-align: center;
+                        max-width: 440px;
+                        width: 100%;
+                    }
+                    .icon {
+                        font-size: 3rem;
+                        color: #f38ba8;
+                        margin-bottom: 15px;
+                    }
+                    h2 {
+                        color: #f38ba8;
+                        margin: 0 0 10px;
+                        font-size: 1.5rem;
+                    }
+                    p {
+                        color: #a9a9b3;
+                        font-size: 0.95rem;
+                        line-height: 1.6;
+                        margin-bottom: 25px;
+                    }
+                    button {
+                        background: #2b2b3b;
+                        color: white;
+                        border: 1px solid rgba(255,255,255,0.1);
+                        padding: 12px 24px;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        font-weight: 700;
+                        width: 100%;
+                    }
+                    button:hover {
+                        background: #36364a;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h2>No se pudo completar la verificación</h2>
+                    <p>${e.message}</p>
+                    <button onclick="window.close()">Cerrar ventana</button>
+                </div>
+            </body>
+            </html>
+        `);
+    }
+});
+
 
 module.exports = { startAdminPanel, handleGiveawayInteraction };

@@ -66,22 +66,84 @@ function getGuildConfigPath(guildId, configType) {
     return path.join(configDir, `${configType}.json`);
 }
 
-function loadGuildConfig(guildId, configType, defaultVal = {}) {
-    const filePath = getGuildConfigPath(guildId, configType);
-    if (fs.existsSync(filePath)) {
-        try {
-            return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        } catch (e) {
-            console.error(`Error reading config ${configType} for guild ${guildId}:`, e);
-        }
+function normalizeVerificationConfig(config) {
+    if (!config || typeof config !== 'object') return config;
+    const norm = { ...config };
+    if (!norm.oauth) {
+        norm.oauth = {
+            enabled: norm.enabled ?? (norm.method === 'oauth'),
+            roleId: norm.roleId || '',
+            channelId: norm.channelId || '',
+            title: norm.embed?.title || norm.title || 'Verificación por OAuth2',
+            description: norm.embed?.description || norm.description || 'Haz clic en el botón para verificarte.',
+            color: norm.embed?.color || norm.color || '#5865f2',
+            buttonText: norm.buttonText || 'Verificarse',
+            messageId: norm.messageId || ''
+        };
     }
-    return defaultVal;
+    if (!norm.reaction) {
+        norm.reaction = {
+            enabled: norm.enabled ?? (norm.method === 'reaction'),
+            emoji: norm.emoji || '✅',
+            roleId: norm.roleId || '',
+            channelId: norm.channelId || '',
+            title: 'Verificación por Reacción',
+            description: 'Reacciona a este mensaje para verificarte.',
+            color: '#5865f2'
+        };
+    }
+    if (!norm.settings) {
+        norm.settings = {
+            unverifiedRoleId: norm.unverifiedRoleId || '',
+            removeRoleId: norm.removeRoleId || ''
+        };
+    }
+    return norm;
+}
+
+function loadGuildConfig(guildId, configType, defaultVal = {}) {
+    const guildDir = getGuildFolder(guildId);
+    const configSubPath = path.join(guildDir, 'configuracion', `${configType}.json`);
+    const rootSubPath = path.join(guildDir, `${configType}.json`);
+
+    let rawData = null;
+    if (fs.existsSync(configSubPath)) {
+        try {
+            rawData = JSON.parse(fs.readFileSync(configSubPath, 'utf8'));
+        } catch (e) {}
+    }
+
+    if ((!rawData || Object.keys(rawData).length === 0) && fs.existsSync(rootSubPath)) {
+        try {
+            rawData = JSON.parse(fs.readFileSync(rootSubPath, 'utf8'));
+        } catch (e) {}
+    }
+
+    if (!rawData) return defaultVal;
+
+    if (configType === 'verification') {
+        return normalizeVerificationConfig(rawData);
+    }
+    return rawData;
 }
 
 function saveGuildConfig(guildId, configType, data) {
-    const filePath = getGuildConfigPath(guildId, configType);
+    const guildDir = getGuildFolder(guildId);
+    const configDir = path.join(guildDir, 'configuracion');
+    if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true });
+    }
+    const configSubPath = path.join(configDir, `${configType}.json`);
+    const rootSubPath = path.join(guildDir, `${configType}.json`);
+
     try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+        const jsonStr = JSON.stringify(data, null, 2);
+        fs.writeFileSync(configSubPath, jsonStr, 'utf8');
+        if (configType === 'verification' || configType === 'verified-users' || fs.existsSync(rootSubPath)) {
+            try {
+                fs.writeFileSync(rootSubPath, jsonStr, 'utf8');
+            } catch (e) {}
+        }
         return true;
     } catch (e) {
         console.error(`Error writing config ${configType} for guild ${guildId}:`, e);

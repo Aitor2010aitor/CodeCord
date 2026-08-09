@@ -1,14 +1,34 @@
 require('dotenv').config();
 const { SlashCommandBuilder, REST, Routes, PermissionsBitField } = require('discord.js');
 
+const fs = require('fs');
+const path = require('path');
+
 // Asegurar valores limpios
 const DEPLOY_CLIENT_ID = (process.env.CLIENT_ID || '').toString().trim();
-const GUILD_IDS = [
+
+const envGuilds = [
   process.env.GUILD_ID_1?.toString().trim(),
   process.env.GUILD_ID_2?.toString().trim(),
   process.env.GUILD_ID_3?.toString().trim(),
   process.env.GUILD_ID?.toString().trim()
 ].filter(Boolean);
+
+// Detectar servidores de la carpeta servidores/
+const detectedGuilds = [];
+try {
+  const servidoresDir = path.join(__dirname, '..', 'servidores');
+  if (fs.existsSync(servidoresDir)) {
+    const folders = fs.readdirSync(servidoresDir);
+    for (const folder of folders) {
+      const match = folder.match(/_(\d+)$/);
+      if (match) detectedGuilds.push(match[1]);
+    }
+  }
+} catch (e) {}
+
+const GUILD_IDS = [...new Set([...envGuilds, ...detectedGuilds])];
+
 
 const commands = [
   new SlashCommandBuilder()
@@ -354,27 +374,29 @@ const commands = [
     .toJSON(),
 ];
 
+
 const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 
 (async () => {
   try {
-    console.log('Registrando comandos slash...');
+    console.log(`🚀 [CodeCord Deploy] Registrando ${commands.length} comandos Slash en Discord API...`);
+
     if (GUILD_IDS.length > 0) {
       for (const guildId of GUILD_IDS) {
         await rest.put(
           Routes.applicationGuildCommands(DEPLOY_CLIENT_ID, guildId),
           { body: commands }
         );
-        console.log(`Comandos registrados correctamente en el servidor ${guildId}`);
+        console.log(`✅ Comandos Slash registrados instantáneamente en el servidor: ${guildId}`);
       }
-    } else {
-      await rest.put(
-        Routes.applicationCommands(DEPLOY_CLIENT_ID),
-        { body: commands }
-      );
-      console.log('Comandos registrados globalmente.');
     }
+
+    await rest.put(
+      Routes.applicationCommands(DEPLOY_CLIENT_ID),
+      { body: commands }
+    );
+    console.log('🌍 Comandos Slash registrados globalmente en todas las guilds.');
   } catch (error) {
-    console.error('Error registrando comandos:', error);
+    console.error('❌ Error registrando comandos Slash:', error);
   }
 })();

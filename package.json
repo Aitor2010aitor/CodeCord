@@ -1,32 +1,22 @@
 {
   "name": "bot-codecord",
   "version": "1.0.0",
-  "description": "𝐒𝐎𝐘 𝐁𝐎𝐓 𝐃𝐄 𝐋𝐔𝐆𝐆𝐀𝐌𝐄𝐒 𝐂𝐎𝐌𝐔𝐍𝐈𝐓𝐘 - Bot multifuncional",
+  "description": "CodeCord - Bot Multifuncional Avanzado para Discord",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "deploy": "node scripts/deploy-commands.js"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.16.1",
     "@discordjs/ws": "^2.0.4",
-    "@distube/yt-dlp": "^2.0.1",
-    "@distube/ytdl-core": "^4.16.12",
     "discord.js": "^14.23.2",
-    "distube": "^5.0.7",
     "dotenv": "^16.6.1",
     "express": "^4.22.2",
     "express-session": "^1.18.0",
-    "ffmpeg-static": "^5.2.0",
     "is-ci": "^4.1.0",
     "jimp": "^0.22.10",
-    "libsodium-wrappers": "^0.7.11",
     "multer": "^1.4.5-lts.1",
     "openai": "^6.3.0",
-    "opusscript": "^0.0.8",
-    "pdfkit": "^0.17.2",
-    "prism-media": "^1.3.5",
-    "yt-search": "^2.13.1",
-    "ytdl-core": "^4.11.5"
+    "pdfkit": "^0.17.2"
   }
 }
