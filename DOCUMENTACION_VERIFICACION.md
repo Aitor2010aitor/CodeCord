@@ -9,7 +9,7 @@ Esta guía explica cómo configurar el **Sistema de Verificación** de tu bot ta
 ### 1. Accede al portal
 
 Abre → https://discord.com/developers/applications  
-Selecciona tu aplicación (ID).
+Selecciona tu aplicación (1510197054406656141).
 
 ---
 
@@ -20,8 +20,8 @@ Selecciona tu aplicación (ID).
 3. Haz clic en **Add Redirect** y añade EXACTAMENTE estas dos URLs:
 
 ```
-http://EJEMBLO/callback
-http:/EJEMBLO/verify-callback
+http://de3.bot-hosting.net:22550/callback
+http://de3.bot-hosting.net:22550/verify-callback
 ```
 
 ⚠️ Si la URL no coincide exactamente (incluyendo http:// y el puerto), Discord rechazará la autenticación.
@@ -67,15 +67,15 @@ En **Bot → Privileged Gateway Intents**, activa:
 | Activado | Activa/desactiva este método |
 | Rol | Rol que recibirá el usuario tras autorizar |
 | Canal | Canal donde se enviará el botón de verificación |
-| Redirect URI | http://EJEMBLO/verify-callback |
+| Redirect URI | http://de3.bot-hosting.net:22550/verify-callback |
 
 ---
 
 ## 🔑 Variables de Entorno requeridas (.env)
 
 ```
-CLIENT_ID=
-CLIENT_SECRET=
+CLIENT_ID=1510197054406656141
+CLIENT_SECRET=KkCGsbO8aZ-Lm4apQ4UIh5pCO2LsvHCo
 ```
 
 ---

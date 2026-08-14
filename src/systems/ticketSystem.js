@@ -1,4 +1,4 @@
-// Archivo: src/systems/ticketSystem.js
+﻿// Archivo: src/systems/ticketSystem.js
 
 /**
  * @file ticketSystem.js
@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
-const { EmbedBuilder, PermissionsBitField } = require('discord.js');
+const { MessageFlags, EmbedBuilder, PermissionsBitField  } = require('discord.js');
 const configManager = require('../../scripts/config-manager.js');
 
 /**
@@ -545,7 +545,7 @@ async function closeTicketChannel(ticketChannel, closedBy, replyCallback = null)
 
     if (replyCallback) {
         try {
-            await replyCallback({ content: '⚠️ Cerrando el ticket...', embeds: [closingEmbed], ephemeral: true });
+            await replyCallback({ content: '⚠️ Cerrando el ticket...', embeds: [closingEmbed], flags: MessageFlags.Ephemeral });
         } catch (error) {
             console.error('Error enviando respuesta de cierre:', error);
         }

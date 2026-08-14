@@ -12,6 +12,7 @@ const { initWebServer } = require('../server.js');
 const { loadStaffConfig } = require('../systems/ticketSystem.js');
 const { loadLogChannelConfig } = require('../systems/loggerSystem.js');
 const { findWaitingRoom } = require('../systems/voiceSystem.js');
+const { startColorRotation } = require('../systems/colorSystem.js');
 
 
 let hasInitialized = false;
@@ -56,6 +57,13 @@ async function onClientReady(client) {
                             if (guild) {
                                 client.colorRoles.set(guildId, colorData.roleId);
                                 console.log(`🎨 [CodeCord] Rol de color cargado para el servidor ${guild.name}`);
+
+                                // Reanudar la rotación automática de colores
+                                const speed = colorData.speed && !isNaN(colorData.speed)
+                                    ? Math.min(Math.max(Number(colorData.speed), 1), 3600)
+                                    : 5;
+                                startColorRotation(client, guild, speed);
+                                console.log(`🎨 [CodeCord] Rotación de colores reanudada para ${guild.name} (${speed}s)`);
                             }
                         }
                     }
@@ -112,11 +120,6 @@ async function onClientReady(client) {
 }
 
 module.exports = [
-    {
-        name: 'ready',
-        once: true,
-        execute: onClientReady
-    },
     {
         name: 'clientReady',
         once: true,

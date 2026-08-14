@@ -49,7 +49,7 @@ async function processAutoResponses(message) {
             }
 
             if (matches) {
-                console.log(`[CodeCord AUTO-RESPUESTAS] Disparador "${ar.trigger}" coincidente en "${message.guild.name}".`);
+                console.log(`[CodeCord AUTO-RESPUESTAS] Disparador "${ar.trigger}" usado por ${message.author.tag} (${message.author.id}) en "${message.guild.name}" | Canal: #${message.channel.name}`);
 
                 let responseText = ar.response || '';
                 if (ar.randomResponses && ar.randomResponses.length > 0) {

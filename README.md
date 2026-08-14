@@ -1,3 +1,4 @@
+
 # 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
 
 ---
@@ -14,11 +15,11 @@
 
 > [!IMPORTANT]
 >
-> ## 🚀 Versión 9.0 - Novedades
+> ## 🚀 Versión 9.50 - Novedades
 >
 > ### 🔐 Inicio de Sesión Obligatorio con Discord (OAuth2)
 >
-> * El panel ahora **exige iniciar sesión con Discord** para acceder (`REQUIRE_DISCORD_AUTH=true`).
+> * El panel ahora **exige iniciar sesión con Discord** para acceder (`LOGIN = true` en `WEB/admin-panel.js`, **línea 21**).
 > * Filtrado de servidores por permisos: solo ves los servidores donde tienes permisos de **Administrador** o **Gestionar Servidor**.
 > * Bloqueo total de API: si intentas acceder a un servidor que no te pertenece, la API devuelve error **403 No autorizado**.
 > * Archivo `VER-URLS-DISCORD.bat` actualizado para generar los enlaces de redirección OAuth2 desde tu `.env`.
@@ -60,12 +61,28 @@
 >
 > * Eliminados los mensajes de spam en consola (`🔍 Anti-Spam check`, `🛡️ Procesando mensaje`, `📊 Spam check`).
 > * Corregido el error `TypeError: cb is not a function` al destruir sesiones.
+>
+> ### 🎧 Comandos de Voz
+>
+> * El comando `/voiceinterface` ahora es **efímero (solo tú lo ves)**: únicamente la persona que ejecuta el comando puede ver el panel interactivo de salas de voz temporales.
+> * El panel privado sigue siendo totalmente funcional: los botones (NOMBRE, LÍMITE, PRIVACIDAD, INVITAR, EXPULSAR, BAN, UNBAN, REIVINDICAR, TRANSFERIR, ELIMINAR, INFO) solo pueden ser usados por quien lo abrió.
+>
+> ### 🖥️ Panel Web
+>
+> * Nueva opción **LOGIN** en `WEB/admin-panel.js` (**línea 21**): cambia `true` o `false` para activar o desactivar el inicio de sesión en el panel de administración.
+> * Con `LOGIN = true` (recomendado) el panel exige iniciar sesión con Discord; con `false` el panel se abre directamente sin pedir login.
 
 ---
 
 ## 🖥️ ¿Qué es y qué hace el Panel Web de Administración?
 
 El panel web te permite controlar la configuración del bot en tiempo real desde tu navegador, evitando tener que modificar archivos JSON manualmente o utilizar largos comandos dentro de Discord.
+
+### 🔐 Inicio de Sesión (Login)
+
+* Opción **LOGIN** en `WEB/admin-panel.js` (**línea 21**): cambia `true` o `false` para activar o desactivar el inicio de sesión del panel.
+* Con `LOGIN = true` (recomendado) el panel exige iniciar sesión con Discord (OAuth2) para entrar.
+* Con `LOGIN = false` el panel se abre directamente sin pedir iniciar sesión.
 
 ### 📊 Panel de Control (Dashboard)
 
@@ -153,5 +170,14 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Eliminación automática de mensajes de usuarios expulsados.
 * Eliminación automática de mensajes de usuarios baneados.
 * Configuración desde el panel administrativo.
+
+---
+
+## 🎧 Comandos de Voz (Discord)
+
+### 🎶 /voiceinterface
+
+* Publica el panel interactivo de salas de voz temporales (**efímero**: solo la persona que ejecuta el comando puede verlo).
+* Controla tu sala privada desde los botones: NOMBRE, LÍMITE, PRIVACIDAD, INVITAR, EXPULSAR, BAN, UNBAN, REIVINDICAR, TRANSFERIR, ELIMINAR e INFO.
 
 ---

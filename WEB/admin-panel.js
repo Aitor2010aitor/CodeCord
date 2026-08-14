@@ -7,15 +7,20 @@ const fs = require('fs');
 const configManager = require('../scripts/config-manager.js');
 const path = require('path');
 const os = require('os');
+const { MessageFlags } = require('discord.js');
 
 // =====================================================================
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: process.env.PANEL_URL || 'LIK-DE-WEB',
-    port: parseInt(process.env.PORT || process.env.PANEL_PORT || 'PUERTO_AQUI ', 10),
+    url: process.env.PANEL_URL || 'aqui_el-lik',
+    port: parseInt(process.env.PORT || process.env.PANEL_PORT || 'aqui_el_puerto', 10),
     requireDiscordAuth: process.env.REQUIRE_DISCORD_AUTH === 'true'
 };
+
+// LOGIN: true = pide Discord | false = abre directo
+const LOGIN = false;                      // ← EDITA ESTA: true = pide Discord | false = abre directo
+const loginRequired = LOGIN === true;    // Se calcula sola; NO la toques
 
 // Auto-extraer puerto de la URL si se especifica
 let tempUrl = panelConfig.url.trim();
@@ -157,6 +162,8 @@ function isAuthenticated(req, res, next) {
 // Ruta de Login
 app.get('/login', (req, res) => {
     if (req.session.user) return res.redirect('/');
+    // Si el inicio de sesión está desactivado ('no'), ir directo al panel
+    if (!loginRequired) return res.redirect('/');
     const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds`;
     const botAvatar = botClient?.user?.displayAvatarURL() || 'https://cdn.discordapp.com/embed/avatars/0.png';
     const botName = botClient?.user?.username || 'Bot Admin';
@@ -269,6 +276,11 @@ app.get('/logout', (req, res) => {
 app.use((req, res, next) => {
     const publicPaths = ['/login', '/login/password', '/callback', '/verify-callback', '/logout'];
     if (publicPaths.includes(req.path) || req.path.startsWith('/public') || req.path.startsWith('/uploads')) {
+        return next();
+    }
+
+    // Si el inicio de sesión está desactivado ('no'), el panel se abre sin login
+    if (!loginRequired) {
         return next();
     }
 
@@ -529,7 +541,7 @@ app.post('/api/guilds/:guildId/close-ticket', async (req, res) => {
         if (!channel) return res.status(404).json({ error: 'Canal de ticket no encontrado' });
 
         // Generar log del ticket antes de cerrar
-        const { EmbedBuilder } = require('discord.js');
+        const { MessageFlags, EmbedBuilder } = require('discord.js');
         try {
             const messages = await channel.messages.fetch({ limit: 100 });
             const transcript = messages.reverse().map(m =>
@@ -899,9 +911,7 @@ async function processGuildScheduledGiveaways(guild, guildData) {
             console.warn(`⚠️ Fecha de fin inválida para sorteo ${giveaway.id}: ${giveaway.endTime}`);
         }
 
-        if (giveaway.status === 'scheduled') {
-            console.log(`🔎 Sorteo programado ${giveaway.id}: inicia ${new Date(startMs).toLocaleString('es-ES')} (ahora ${new Date(now).toLocaleString('es-ES')})`);
-        }
+        // Sin log por cada sorteo para no spamear la consola cada 30 segundos
 
         if (giveaway.status === 'scheduled' && now >= startMs) {
             giveaway.status = 'active';
@@ -914,10 +924,20 @@ async function processGuildScheduledGiveaways(guild, guildData) {
             } catch (err) {
                 console.error(`⚠️ No se pudo actualizar el mensaje al activar sorteo ${giveaway.id}:`, err);
             }
+            saveGuildGiveawayData(guild.id, guildData);
             console.log(`✅ Sorteo activado: ${giveaway.prize} en servidor ${guild.name}`);
+            if (!Number.isNaN(endMs) && now >= endMs) {
+                try {
+                    await finalizeGiveaway(guild, giveaway);
+                } catch (err) {
+                    console.error(`❌ Error finalizando sorteo ${giveaway.id}:`, err);
+                }
+                console.log(`🏆 Sorteo finalizado inmediatamente: ${giveaway.prize} en servidor ${guild.name}`);
+            }
+            continue;
         }
 
-        if ((giveaway.status === 'active' || giveaway.status === 'scheduled') && !Number.isNaN(endMs) && now >= endMs) {
+        if (giveaway.status === 'active' && !Number.isNaN(endMs) && now >= endMs) {
             try {
                 await finalizeGiveaway(guild, giveaway);
             } catch (err) {
@@ -986,7 +1006,7 @@ async function updateGiveawayMessage(guild, giveaway) {
         }
 
         const embed = formatGiveawayEmbed(guild, giveaway);
-        const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const { MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
         const joinButton = new ButtonBuilder()
             .setCustomId(`giveaway_join_${giveaway.id}`)
             .setLabel(giveaway.status === 'active' ? 'Participar' : giveaway.status === 'scheduled' ? 'Sorteo programado' : 'Sorteo cerrado')
@@ -1001,7 +1021,6 @@ async function updateGiveawayMessage(guild, giveaway) {
             message = await channel.messages.fetch(giveaway.messageId).catch(() => null);
             if (message) {
                 await message.edit({ embeds: [embed], components: [actionRow] });
-                console.log(`✏️ Mensaje de sorteo ${giveaway.id} actualizado (${giveaway.status})`);
                 return true;
             }
             console.warn(`⚠️ Mensaje ${giveaway.messageId} del sorteo ${giveaway.id} no encontrado, buscando mensaje existente...`);
@@ -1011,7 +1030,6 @@ async function updateGiveawayMessage(guild, giveaway) {
         if (existingMessage) {
             giveaway.messageId = existingMessage.id;
             await existingMessage.edit({ embeds: [embed], components: [actionRow] });
-            console.log(`🔍 Mensaje existente usado para el sorteo ${giveaway.id}: ${existingMessage.id}`);
             return true;
         }
 
@@ -1030,25 +1048,43 @@ async function ensureGiveawayMessages(guild, guildData) {
     let changed = false;
 
     for (const giveaway of guildData.giveaways) {
+        // No procesar sorteos finalizados o cancelados
         if (giveaway.status === 'ended' || giveaway.status === 'cancelled') continue;
         if (!giveaway.channelId) continue;
 
         const channel = guild.channels.cache.get(giveaway.channelId);
         if (!channel || !channel.isTextBased()) continue;
 
-        let createdOrUpdated = false;
-        if (!giveaway.messageId) {
-            createdOrUpdated = await updateGiveawayMessage(guild, giveaway);
-        } else {
+        // Si ya tiene messageId, verificar que existe; si no existe intentar buscar y editar, NO crear nuevo salvo que no haya ninguno
+        if (giveaway.messageId) {
             const message = await channel.messages.fetch(giveaway.messageId).catch(() => null);
             if (!message) {
-                createdOrUpdated = await updateGiveawayMessage(guild, giveaway);
-            } else {
-                createdOrUpdated = false;
+                // El mensaje fue borrado: buscar existente antes de crear nuevo
+                const existing = await findExistingGiveawayMessage(channel, giveaway);
+                if (existing) {
+                    giveaway.messageId = existing.id;
+                    const embed = formatGiveawayEmbed(guild, giveaway);
+                    const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+                    const joinButton = new ButtonBuilder()
+                        .setCustomId(`giveaway_join_${giveaway.id}`)
+                        .setLabel(giveaway.status === 'active' ? 'Participar' : 'Sorteo programado')
+                        .setStyle(ButtonStyle.Success)
+                        .setEmoji('🎉')
+                        .setDisabled(giveaway.status !== 'active');
+                    await existing.edit({ embeds: [embed], components: [new ActionRowBuilder().addComponents(joinButton)] }).catch(() => null);
+                    changed = true;
+                } else {
+                    // No hay ningún mensaje, crear uno
+                    const created = await updateGiveawayMessage(guild, giveaway);
+                    if (created) changed = true;
+                }
             }
+            // Si el mensaje existe, no hacer nada (evitar ediciones innecesarias cada 30s)
+        } else {
+            // Sin messageId: crear mensaje por primera vez
+            const created = await updateGiveawayMessage(guild, giveaway);
+            if (created) changed = true;
         }
-
-        if (createdOrUpdated) changed = true;
     }
 
     return changed;
@@ -1069,7 +1105,6 @@ async function finalizeGiveaway(guild, giveaway, actor = null, forceNew = false)
 
     giveaway.status = 'ended';
     giveaway.endedAt = new Date().toISOString();
-    giveaway.announcementSent = true;
 
     if (!newWinnerId) {
         giveaway.winnerId = null;
@@ -1105,31 +1140,36 @@ async function finalizeGiveaway(guild, giveaway, actor = null, forceNew = false)
 
     await updateGiveawayMessage(guild, giveaway);
 
-    try {
-        if (giveaway.announcementSent) {
-            return giveaway;
+    // Enviar anuncio del ganador (sólo si no se envió antes)
+    if (!giveaway.announcementSent) {
+        try {
+            const channel = guild.channels.cache.get(giveaway.channelId);
+            if (channel && channel.isTextBased()) {
+                const mention = giveaway.winnerId ? `<@${giveaway.winnerId}>` : 'Nadie';
+                const everyone = giveaway.mentionEveryone ? ' @everyone' : '';
+                const content = giveaway.winnerId
+                    ? `🎉 ¡Sorteo terminado! ${mention} ha ganado **${giveaway.prize}**.${everyone}`
+                    : `⚠️ El sorteo **${giveaway.prize}** ha terminado sin participantes.${everyone}`;
+                await channel.send({
+                    content,
+                    allowedMentions: { parse: ['users', 'everyone'] }
+                }).catch(() => null);
+            }
+        } catch (announcementError) {
+            console.error('Error enviando anuncio de sorteo finalizado:', announcementError);
         }
-
-        const channel = guild.channels.cache.get(giveaway.channelId);
-        if (channel && channel.isTextBased()) {
-            const mention = giveaway.winnerId ? `<@${giveaway.winnerId}>` : 'Nadie';
-            const everyone = giveaway.mentionEveryone ? ' @everyone' : '';
-            const content = giveaway.winnerId
-                ? `🎉 ¡Sorteo terminado! ${mention} ha ganado **${giveaway.prize}**.${everyone}`
-                : `⚠️ El sorteo **${giveaway.prize}** ha terminado sin participantes.${everyone}`;
-            await channel.send({
-                content,
-                allowedMentions: { parse: ['users', 'everyone'] }
-            }).catch(() => null);
+        giveaway.announcementSent = true;
+        // Guardar el flag para no reenviar en próximas ejecuciones
+        if (giveawayIndex >= 0) {
+            guildData.giveaways[giveawayIndex] = giveaway;
+            saveGuildGiveawayData(guild.id, guildData);
         }
-    } catch (announcementError) {
-        console.error('Error enviando anuncio de sorteo finalizado:', announcementError);
     }
 
     return giveaway;
 }
 
-async function processScheduledGiveaways() {
+async function processScheduledGiveaways(isStartup = false) {
     if (!botClient) return;
     if (isProcessingGiveaways) return;
     isProcessingGiveaways = true;
@@ -1141,7 +1181,8 @@ async function processScheduledGiveaways() {
                 if (!guildData.giveaways || guildData.giveaways.length === 0) continue;
 
                 const changedSchedule = await processGuildScheduledGiveaways(guild, guildData);
-                const changedMessages = await ensureGiveawayMessages(guild, guildData);
+                // En el arranque omitir ensureGiveawayMessages para no re-enviar mensajes masivamente al reiniciar el bot
+                const changedMessages = isStartup ? false : await ensureGiveawayMessages(guild, guildData);
                 if (changedSchedule || changedMessages) saveGuildGiveawayData(guild.id, guildData);
             } catch (guildError) {
                 console.error(`Error procesando sorteos en servidor ${guild.name} (${guild.id}):`, guildError);
@@ -1170,18 +1211,18 @@ async function handleGiveawayInteraction(interaction) {
         const guildData = getGuildGiveawayData(guildId);
         const giveaway = guildData.giveaways.find(g => g.id === giveawayId);
         if (!giveaway) {
-            await interaction.reply({ content: '❌ Sorteo no encontrado o ya no está disponible.', ephemeral: true });
+            await interaction.reply({ content: '❌ Sorteo no encontrado o ya no está disponible.', flags: MessageFlags.Ephemeral });
             return true;
         }
 
         if (giveaway.status !== 'active') {
-            await interaction.reply({ content: '⚠️ Este sorteo no está activo en este momento.', ephemeral: true });
+            await interaction.reply({ content: '⚠️ Este sorteo no está activo en este momento.', flags: MessageFlags.Ephemeral });
             return true;
         }
 
         const userId = interaction.user.id;
         if (giveaway.participants.includes(userId)) {
-            await interaction.reply({ content: '✅ Ya estás participando en este sorteo.', ephemeral: true });
+            await interaction.reply({ content: '✅ Ya estás participando en este sorteo.', flags: MessageFlags.Ephemeral });
             return true;
         }
 
@@ -1189,11 +1230,11 @@ async function handleGiveawayInteraction(interaction) {
         saveGuildGiveawayData(guildId, guildData);
         await updateGiveawayMessage(guild, giveaway);
 
-        await interaction.reply({ content: '🎉 ¡Te has unido al sorteo! Mucha suerte.', ephemeral: true });
+        await interaction.reply({ content: '🎉 ¡Te has unido al sorteo! Mucha suerte.', flags: MessageFlags.Ephemeral });
         return true;
     } catch (error) {
         console.error('Error manejando interacción de sorteo:', error);
-        try { await interaction.reply({ content: '❌ Error procesando tu participación.', ephemeral: true }); } catch (e) { }
+        try { await interaction.reply({ content: '❌ Error procesando tu participación.', flags: MessageFlags.Ephemeral }); } catch (e) { }
         return true;
     }
 }
@@ -1269,7 +1310,7 @@ app.post('/api/guilds/:guildId/giveaways', async (req, res) => {
     };
 
     try {
-        const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const { MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
         const embed = formatGiveawayEmbed(guild, giveaway);
         const joinButton = new ButtonBuilder()
             .setCustomId(`giveaway_join_${giveaway.id}`)
@@ -1440,7 +1481,7 @@ function stripImageTags(text) {
 }
 
 function buildRichPayload({ message, embedData, additionalImages }) {
-    const { EmbedBuilder } = require('discord.js');
+    const { MessageFlags, EmbedBuilder } = require('discord.js');
     const embeds = [];
     const images = (additionalImages || []).filter(img => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
 
@@ -1494,6 +1535,8 @@ function buildRichPayload({ message, embedData, additionalImages }) {
         }
 
         // Any remaining additional images attached as secondary embeds
+        // small/medium → setThumbnail (appears compact in Discord)
+        // large/banner → setImage (appears full-width in Discord)
         const startIndex = firstImgUsed ? 1 : 0;
         for (let i = startIndex; i < images.length; i++) {
             const img = images[i];
@@ -1501,7 +1544,7 @@ function buildRichPayload({ message, embedData, additionalImages }) {
             if (!imageUrl || imageUrl.trim().length === 0) continue;
             const emb = new EmbedBuilder();
             if (embedData && embedData.color) emb.setColor(embedData.color);
-            if (img.size === 'small') {
+            if (img.size === 'small' || img.size === 'medium') {
                 emb.setThumbnail(imageUrl);
             } else {
                 emb.setImage(imageUrl);
@@ -1668,7 +1711,7 @@ app.put('/api/guilds/:guildId/embed/:channelId/:messageId', async (req, res) => 
             return res.status(403).json({ error: 'Solo se pueden editar mensajes del bot' });
         }
 
-        const { EmbedBuilder } = require('discord.js');
+        const { MessageFlags, EmbedBuilder } = require('discord.js');
         const embed = new EmbedBuilder()
             .setTitle(title || null)
             .setDescription(description || null)
@@ -1704,7 +1747,7 @@ app.post('/api/guilds/:guildId/send-ticket-panel', async (req, res) => {
     if (!logChannel) return res.status(404).json({ error: 'Canal de logs no encontrado' });
 
     try {
-        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const { MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
         const discordButtons = [];
         const buttonConfigs = [];
@@ -1915,7 +1958,7 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
         // 📨 ENVIAR EMBED AL USUARIO SI SE RECHAZA O APRUEBA
         try {
             const user = await botClient.users.fetch(suggestion.userId);
-            const { EmbedBuilder } = require('discord.js');
+            const { MessageFlags, EmbedBuilder } = require('discord.js');
 
             if (status === 'rejected') {
                 // Embed de RECHAZO
@@ -1984,7 +2027,7 @@ app.put('/api/guilds/:guildId/suggestions/:suggestionId', async (req, res) => {
                 if (channel) {
                     const message = await channel.messages.fetch(suggestion.messageId).catch(() => null);
                     if (message && message.embeds && message.embeds.length > 0) {
-                        const { EmbedBuilder } = require('discord.js');
+                        const { MessageFlags, EmbedBuilder } = require('discord.js');
 
                         let embedTitle = '🆕 Nueva Sugerencia';
                         let embedColor = 0x5865F2;
@@ -2152,7 +2195,7 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
         let mdSent = false;
         try {
             const user = await botClient.users.fetch(suggestion.userId);
-            const { EmbedBuilder } = require('discord.js');
+            const { MessageFlags, EmbedBuilder } = require('discord.js');
             const embed = new EmbedBuilder()
                 .setTitle('💬 Comentario en tu Sugerencia')
                 .setDescription(`**Tu sugerencia:**\n${suggestion.text}\n\n**Comentario del staff:**\n${comment}`)
@@ -2183,7 +2226,7 @@ app.post('/api/guilds/:guildId/suggestions/:suggestionId/comment', async (req, r
                     return res.status(403).json({ error: 'Bot sin permisos para enviar en el canal de sugerencias' });
                 }
 
-                const { EmbedBuilder } = require('discord.js');
+                const { MessageFlags, EmbedBuilder } = require('discord.js');
                 const channelEmbed = new EmbedBuilder()
                     .setTitle('💬 Comentario del Staff')
                     .setDescription(`**En respuesta a sugerencia ID: ${suggestionId}**\n\n${comment}`)
@@ -2354,7 +2397,7 @@ app.post('/api/guilds/:guildId/update-ticket-panel/:messageId', async (req, res)
     if (!channel) return res.status(404).json({ error: 'Canal no encontrado' });
 
     try {
-        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const { MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
         const discordButtons = [];
         const buttonConfigs = [];
@@ -2507,16 +2550,35 @@ app.get(['/', '/embed', '/enbet', '/say-server', '/say'], (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
+let panelStarted = false;
+
 function startAdminPanel(client) {
+    if (panelStarted) {
+        console.warn('⚠️ [CodeCord] El panel ya estaba iniciado; se ignora la doble inicialización para evitar mensajes duplicados.');
+        return;
+    }
+    panelStarted = true;
+
     setBotClient(client);
     updateBotStats();
 
     // Ejecutar procesamiento de sorteos inmediatamente al iniciar
     console.log('🎯 Iniciando verificación de sorteos programados...');
-    processScheduledGiveaways().catch(err => console.error('Error en verificación inicial de sorteos:', err));
+    processScheduledGiveaways(true).catch(err => console.error('Error en verificación inicial de sorteos:', err));
 
 
-    app.listen(PORT, '0.0.0.0', () => {
+    const http = require('http');
+    const server = http.createServer(app);
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.warn(`⚠️ [CodeCord] El puerto ${PORT} ya está en uso (¿otra instancia del bot en ejecución?). El bot seguirá funcionando en Discord.`);
+        } else {
+            console.error('❌ [CodeCord] Error del servidor web:', err);
+        }
+    });
+
+    server.listen(PORT, '0.0.0.0', () => {
         console.log(`\n---------------------------------------------------`);
         console.log(`✅ Panel de CodeCord-Style iniciado con éxito`);
         console.log(`🌐 URL Local: http://localhost:${PORT}`);
@@ -2556,7 +2618,7 @@ app.post('/api/guilds/:guildId/autorol', async (req, res) => {
     }
 
     try {
-        const { EmbedBuilder } = require('discord.js');
+        const { MessageFlags, EmbedBuilder } = require('discord.js');
         const embedMsg = new EmbedBuilder()
             .setColor(embed.color || '#5865f2');
 
@@ -2673,7 +2735,7 @@ app.post('/api/guilds/:guildId/verification/send-reaction', async (req, res) => 
     }
 
     try {
-        const { EmbedBuilder } = require('discord.js');
+        const { MessageFlags, EmbedBuilder } = require('discord.js');
         const images = (rConfig.additionalImages || []).filter(img => img && img.url && typeof img.url === 'string' && img.url.trim().length > 0);
         const title = stripImageTags(rConfig.title || 'Verificación por Reacción');
         const desc = stripImageTags(rConfig.description || 'Reacciona al emoji para verificar.');
@@ -2758,7 +2820,7 @@ app.post('/api/guilds/:guildId/verification/send-oauth', async (req, res) => {
     }
 
     try {
-        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+        const { MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
         const verifyCallbackUri = getRedirectUri('verify-callback');
         const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(verifyCallbackUri)}&response_type=code&scope=identify%20guilds.join&state=${guild.id}`;
 

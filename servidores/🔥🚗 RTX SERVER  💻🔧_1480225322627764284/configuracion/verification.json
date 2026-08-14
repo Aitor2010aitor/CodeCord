@@ -1,0 +1,27 @@
+{
+  "reaction": {
+    "enabled": false,
+    "emoji": "✅",
+    "roleId": "",
+    "channelId": "",
+    "title": "Verificación por Reacción",
+    "description": "Reacciona a este mensaje con ✅ para verificarte.",
+    "color": "#5865f2",
+    "additionalImages": []
+  },
+  "oauth": {
+    "enabled": true,
+    "roleId": "1490748504682004601",
+    "channelId": "1490748906428960941",
+    "title": "Verificación por OAuth2",
+    "description": "Haz clic en el botón de abajo para verificar tu cuenta.",
+    "color": "#5865f2",
+    "buttonText": "Verificarse",
+    "additionalImages": [],
+    "messageId": "1528934633461514353"
+  },
+  "settings": {
+    "unverifiedRoleId": "1490766958503919726",
+    "removeRoleId": ""
+  }
+}

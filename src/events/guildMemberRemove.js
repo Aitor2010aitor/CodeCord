@@ -18,7 +18,7 @@ module.exports = {
      */
     async execute(member, client) {
         try {
-            console.log(`📤 [CodeCord] Usuario salió: ${member.user.tag} de ${member.guild.name}`);
+            console.log(`📤 [CodeCord] Usuario salió: ${member.user.tag} (${member.user.id}) de ${member.guild.name} (${member.guild.id}) | Miembros restantes: ${member.guild.memberCount}`);
 
             const leaveEmbed = new EmbedBuilder()
                 .setTitle('📤 Usuario Salido')

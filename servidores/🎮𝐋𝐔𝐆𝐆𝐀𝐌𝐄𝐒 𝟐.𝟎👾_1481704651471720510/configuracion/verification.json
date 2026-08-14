@@ -1,0 +1,22 @@
+{
+  "reaction": {
+    "enabled": false,
+    "emoji": "✅",
+    "roleId": "",
+    "channelId": "",
+    "title": "Verificación por Reacción",
+    "description": "Reacciona a este mensaje con ✅ para verificarte.",
+    "color": "#5865f2"
+  },
+  "oauth": {
+    "enabled": true,
+    "roleId": "1481709136726069308",
+    "channelId": "1481707396811325542",
+    "title": "Verificación por OAuth2",
+    "description": "Haz clic en el botón de abajo para verificar tu cuenta y acceder al servidor.",
+    "color": "#5865f2",
+    "buttonText": "Verificarse",
+    "redirectUri": "",
+    "messageId": "1525908108826775704"
+  }
+}

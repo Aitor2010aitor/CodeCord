@@ -20,7 +20,7 @@ module.exports = {
      */
     async execute(member, client) {
         try {
-            console.log(`👤 [CodeCord] Nuevo miembro: ${member.user.tag} en ${member.guild.name}`);
+            console.log(`👤 [CodeCord] Nuevo miembro: ${member.user.tag} (${member.user.id}) en ${member.guild.name} (${member.guild.id}) | Miembros: ${member.guild.memberCount}`);
 
             // 1. Auto-rol al entrar
             try {

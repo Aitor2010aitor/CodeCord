@@ -1,0 +1,1375 @@
+[
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:44:42.286Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537487077690572910",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:44:34.389Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Crear sala",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537487036234211368",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:44:32.145Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🧮-interface",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "0",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537487035063861298",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:44:31.570Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "4",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537487033784606832",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:44:21.522Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486468975566971",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:44:18.916Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Crear sala",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486472012234765",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:44:15.026Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🎛️-interface",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486470401761350",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:44:11.546Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486934123741254",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:44:07.817Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486934123741254",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:42:17.821Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Crear sala",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486472012234765",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:42:17.336Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🎛️-interface",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "0",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486470401761350",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:42:16.921Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "4",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486468975566971",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:42:12.148Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485523898073110",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:42:05.796Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "➕ Crear Sala",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485524871422013",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:41:08.395Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537486181577662585",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:38:32.127Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "➕ Crear Sala",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485524871422013",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:38:31.686Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "4",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485523898073110",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:38:26.010Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485093030068284",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:38:20.012Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "➕ Crear Sala",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485094405677136",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:36:49.325Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "➕ Crear Sala",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485094405677136",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:36:48.926Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "4",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537485093030068284",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:36:42.908Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1500932365818531980",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:36:39.848Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Crear sala",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1500932369300066476",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:36:34.397Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🧮-interface",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1500932367823540538",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1526277831200473330",
+    "type": "MEMBER_LEAVE",
+    "message": "📤 Usuario Salido",
+    "timestamp": "2026-08-13T15:34:46.407Z",
+    "embed": {
+      "title": "📤 Usuario Salido",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Usuario",
+          "value": "𝐂𝐨𝐝𝐞𝐂𝐨𝐫𝐝#4839 (1510197054406656141)",
+          "inline": true
+        },
+        {
+          "name": "Unido el",
+          "value": "<t:1783981799:R>",
+          "inline": true
+        }
+      ],
+      "thumbnail": {
+        "url": "https://cdn.discordapp.com/avatars/1510197054406656141/440abfb675d7fd6e32c66dcb9f982c8b.webp"
+      },
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1526277831200473330",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:34:46.049Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "➕ Crear Sala",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537484575641440388",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1526277831200473330",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:34:45.653Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🍺 Salas privadas",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "4",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537484574467162355",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1526277831200473330",
+    "type": "guildBanAdd",
+    "message": "🔨 Usuario Baneado",
+    "timestamp": "2026-08-13T15:34:45.530Z",
+    "embed": {
+      "title": "🔨 Usuario Baneado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Usuario",
+          "value": "𝐂𝐨𝐝𝐞𝐂𝐨𝐫𝐝#4839 (1510197054406656141)",
+          "inline": true
+        },
+        {
+          "name": "Razón",
+          "value": "Sin razón especificada",
+          "inline": true
+        }
+      ],
+      "thumbnail": {
+        "url": "https://cdn.discordapp.com/avatars/1510197054406656141/440abfb675d7fd6e32c66dcb9f982c8b.webp"
+      },
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1526277831200473330",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-08-13T15:34:36.647Z",
+    "embed": {
+      "title": "🗑️ Mensaje Eliminado",
+      "description": "**Autor:** Desconocido\n**Canal:** <#1526280310285799547>\n**Eliminado por:** El propio autor (autoborrado)",
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "📝 Contenido",
+          "value": "*Mensaje no disponible (borrado antes de caché)*"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1526277831200473330",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-08-13T15:34:33.104Z",
+    "embed": {
+      "title": "🗑️ Mensaje Eliminado",
+      "description": "**Autor:** aitor2010._47185\n**Canal:** <#1526280310285799547>\n**Eliminado por:** El propio autor (autoborrado)",
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "📝 Contenido",
+          "value": "/createcategory"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-13T15:34:19.975Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537484363577561108",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-13T15:33:55.092Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537484363577561108",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "MEMBER_LEAVE",
+    "message": "📤 Usuario Salido",
+    "timestamp": "2026-08-12T22:35:51.709Z",
+    "embed": {
+      "title": "📤 Usuario Salido",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Usuario",
+          "value": "ssapena999 (1413661991624642591)",
+          "inline": true
+        },
+        {
+          "name": "Unido el",
+          "value": "<t:1786573915:R>",
+          "inline": true
+        }
+      ],
+      "thumbnail": {
+        "url": "https://cdn.discordapp.com/avatars/1413661991624642591/43653e2ed628f6adb7aa667a33e934b3.webp"
+      },
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-08-12T22:14:01.846Z",
+    "embed": {
+      "title": "🗑️ Mensaje Eliminado",
+      "description": "**Autor:** aitor2010._47185\n**Canal:** <#1512799023587655863>\n**Eliminado por:** El propio autor (autoborrado)",
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "📝 Contenido",
+          "value": "**RecordamosQue <@1131731183512854648> ES PUTERO Y NO TRABAJA** @everyone"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageUpdate",
+    "message": "✏️ Mensaje Editado",
+    "timestamp": "2026-08-12T22:13:19.579Z",
+    "embed": {
+      "title": "✏️ Mensaje Editado",
+      "description": "**Autor:** aitor2010._47185\n**Canal:** <#1512799023587655863>\n[Ir al mensaje](https://discord.com/channels/1480225322627764284/1512799023587655863/1537222365941997679)",
+      "color": 16753920,
+      "fields": [
+        {
+          "name": "Ante del cambio",
+          "value": "##RecordamosQue <@1131731183512854648> ES PUTERO Y NO TRABAJA @everyone"
+        },
+        {
+          "name": "Después del cambio",
+          "value": "**Recordamos   Que <@1131731183512854648> ES PUTERO Y NO TRABAJA **@everyone"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageUpdate",
+    "message": "✏️ Mensaje Editado",
+    "timestamp": "2026-08-12T22:12:59.452Z",
+    "embed": {
+      "title": "✏️ Mensaje Editado",
+      "description": "**Autor:** aitor2010._47185\n**Canal:** <#1512799023587655863>\n[Ir al mensaje](https://discord.com/channels/1480225322627764284/1512799023587655863/1537222365941997679)",
+      "color": 16753920,
+      "fields": [
+        {
+          "name": "Ante del cambio",
+          "value": "#RecordamosQue <@1131731183512854648> ES PUTERO Y NO TRABAJA @everyone"
+        },
+        {
+          "name": "Después del cambio",
+          "value": "##RecordamosQue <@1131731183512854648> ES PUTERO Y NO TRABAJA @everyone"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-08-12T21:59:33.145Z",
+    "embed": {
+      "title": "🗑️ Mensaje Eliminado",
+      "description": "**Autor:** eltio6562\n**Canal:** <#1480234824210841782>\n**Eliminado por:** El propio autor (autoborrado)",
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "📝 Contenido",
+          "value": "/ban 1499708933860888667"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-12T21:31:54.690Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537212027066519582",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-12T21:31:44.473Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1537212027066519582",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-09T13:25:12.365Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1536002408533196870",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "messageDelete",
+    "message": "🗑️ Mensaje Eliminado",
+    "timestamp": "2026-08-09T13:17:00.050Z",
+    "embed": {
+      "title": "🗑️ Mensaje Eliminado",
+      "description": "**Autor:** aitor2010._47185\n**Canal:** <#1500506327510810674>\n**Eliminado por:** El propio autor (autoborrado)",
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "📝 Contenido",
+          "value": "/playS"
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-09T13:14:09.745Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1535999494624120843",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-09T13:14:05.325Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de eltio6562",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1535999611443880087",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelDelete",
+    "message": "🗑️ Canal Eliminado",
+    "timestamp": "2026-08-09T13:13:52.998Z",
+    "embed": {
+      "title": "🗑️ Canal Eliminado",
+      "description": null,
+      "color": 16711680,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1535991955660738632",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "channelCreate",
+    "message": "📁 Canal Creado",
+    "timestamp": "2026-08-09T13:13:37.623Z",
+    "embed": {
+      "title": "📁 Canal Creado",
+      "description": null,
+      "color": 65280,
+      "fields": [
+        {
+          "name": "Nombre",
+          "value": "🔊 Sala de aitor2010._47185",
+          "inline": true
+        },
+        {
+          "name": "Tipo",
+          "value": "2",
+          "inline": true
+        },
+        {
+          "name": "ID",
+          "value": "1535999494624120843",
+          "inline": true
+        }
+      ],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-07-28T16:04:52.311Z",
+    "embed": {
+      "title": "➕ Rol Añadido",
+      "description": "**Usuario:** randomizer7088\n**Roles añadidos:** 〘 🌟〙𝐔𝐒𝐔𝐀𝐑𝐈𝐎𝐒 𝐍𝐔𝐄𝐕𝐎𝐒, 🍪13-17 Años",
+      "color": 65280,
+      "fields": [],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-07-28T15:40:55.257Z",
+    "embed": {
+      "title": "➕ Rol Añadido",
+      "description": "**Usuario:** xx_yessplit\n**Roles añadidos:** 〘 🌟〙𝐔𝐒𝐔𝐀𝐑𝐈𝐎𝐒 𝐍𝐔𝐄𝐕𝐎𝐒, 🎓18-22 Años",
+      "color": 65280,
+      "fields": [],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1481704651471720510",
+    "type": "roleAdd",
+    "message": "➕ Rol Añadido",
+    "timestamp": "2026-07-28T15:37:26.866Z",
+    "embed": {
+      "title": "➕ Rol Añadido",
+      "description": "**Usuario:** xx_yessplit\n**Roles añadidos:** 〘 🌟〙𝐔𝐒𝐔𝐀𝐑𝐈𝐎𝐒 𝐍𝐔𝐄𝐕𝐎𝐒, 🎓18-22 Años",
+      "color": 65280,
+      "fields": [],
+      "thumbnail": null,
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "guildBanRemove",
+    "message": "🔓 Miembro desbaneado",
+    "timestamp": "2026-07-23T13:24:57.316Z",
+    "embed": {
+      "title": "🔓 Miembro desbaneado",
+      "description": "**Usuario:** angelexe0117 (1525106309362356224)\n**Mención:** <@1525106309362356224>\n**Desbaneado por:** 𝐂𝐨𝐝𝐞𝐂𝐨𝐫𝐝#4839\n**Mención ejecutor:** <@1510197054406656141>\n**Razón:** gay",
+      "color": 65280,
+      "fields": [],
+      "thumbnail": {
+        "url": "https://cdn.discordapp.com/avatars/1525106309362356224/473c5709cf675c0896eb59af25308786.webp"
+      },
+      "image": null,
+      "author": null,
+      "footer": null
+    }
+  },
+  {
+    "guildId": "1480225322627764284",
+    "type": "guildBanAdd",
+    "message": "🔨 Usuario Baneado",
+    "timestamp": "2026-07-23T13:24:46.934Z",
+    "embed": {
+      "title": "🔨 Usuario Baneado",
+      "description": "**Usuario:** angelexe0117 (1525106309362356224)\n**Mención:** <@1525106309362356224>\n**Baneado por:** aitor2010._47185\n**Mención ejecutor:** <@1262395234596290603>\n**Razón:** Sin razón",
+      "color": 9109504,
+      "fields": [],
+      "thumbnail": {
+        "url": "https://cdn.discordapp.com/avatars/1525106309362356224/473c5709cf675c0896eb59af25308786.webp"
+      },
+      "image": null,
+      "author": null,
+      "footer": {
+        "text": "Baneado el 23/7/2026 a las 15:24:46"
+      }
+    }
+  }
+]

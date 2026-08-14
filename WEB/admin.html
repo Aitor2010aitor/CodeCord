@@ -4206,22 +4206,92 @@
     }
 
     // Inyecta imágenes numeradas en el HTML de texto ya renderizado
+    // Reglas:
+    //  - Varios {n} en la misma línea → flex row (side-by-side)
+    //  - Un solo {n} small/medium en su línea → si la línea anterior/siguiente tiene una imagen grande,
+    //    se coloca en inline para que quede al lado del hueco
     function injectNumberedImages(htmlText, images) {
       if (!images || images.length === 0) return htmlText;
-      let result = htmlText; images.forEach(img => {
-        const tag = `{${img.num}}`; if (result.includes(tag)) {
-          const imgHtml = buildPreviewImgHtml(img);
-          // Escape for replacement (regex safe)
-          result = result.split(tag).join(imgHtml);
+      const imgMap = {};
+      images.forEach(img => { imgMap[img.num] = img; });
+
+      // Split on <br> to process line by line
+      const parts = htmlText.split('<br>');
+      const processed = [];
+
+      for (let lineIdx = 0; lineIdx < parts.length; lineIdx++) {
+        const line = parts[lineIdx];
+        // Find all {n} tags in this line
+        const tagPattern = /\{(\d+)\}/g;
+        const matches = [];
+        let m;
+        while ((m = tagPattern.exec(line)) !== null) {
+          const num = parseInt(m[1]);
+          if (imgMap[num]) matches.push({ num, index: m.index, fullMatch: m[0] });
         }
-      }); return result;
+
+        if (matches.length === 0) {
+          processed.push(line);
+          continue;
+        }
+
+        if (matches.length > 1) {
+          // CASO: múltiples imágenes en la misma línea → flex row
+          let textOnly = line;
+          const imgElements = [];
+          matches.forEach(match => {
+            textOnly = textOnly.split(match.fullMatch).join('');
+            imgElements.push(buildPreviewImgHtml(imgMap[match.num], true));
+          });
+          textOnly = textOnly.replace(/\s+/g, ' ').trim();
+          const flexRow = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin:4px 0; align-items:flex-start;">${imgElements.join('')}</div>`;
+          processed.push((textOnly ? textOnly + '<br>' : '') + flexRow);
+        } else {
+          // CASO: una sola imagen en esta línea
+          const img = imgMap[matches[0].num];
+          const isSmallOrMedium = (img.size === 'small' || img.size === 'medium');
+
+          // Busca si hay imagen grande en la línea anterior o siguiente
+          const prevLine = lineIdx > 0 ? parts[lineIdx - 1] : '';
+          const nextLine = lineIdx < parts.length - 1 ? parts[lineIdx + 1] : '';
+          const neighborHasLarge = /(\{\d+\})/.test(prevLine) || /(\{\d+\})/.test(nextLine);
+          const prevTagMatch = prevLine.match(/\{(\d+)\}/);
+          const prevImg = prevTagMatch ? imgMap[parseInt(prevTagMatch[1])] : null;
+          const adjacentToLarge = prevImg && (prevImg.size === 'large' || prevImg.size === 'banner');
+
+          if (isSmallOrMedium && adjacentToLarge) {
+            // Imágen pequeña después de una grande → ponerla a la derecha (float) en el preview
+            let textOnly = line.split(matches[0].fullMatch).join('').trim();
+            const floatImg = buildPreviewImgHtml(img, true);
+            const floatWrap = `<div style="display:flex; align-items:flex-start; gap:8px; margin:4px 0;">${floatImg}${textOnly ? `<span>${textOnly}</span>` : ''}</div>`;
+            processed.push(floatWrap);
+          } else {
+            // Imagen sola en su línea, comportamiento normal
+            processed.push(line.split(matches[0].fullMatch).join(buildPreviewImgHtml(img, false)));
+          }
+        }
+      }
+      return processed.join('<br>');
     }
 
-    function buildPreviewImgHtml(img) {
-      let style = 'display:block; border-radius:4px; margin:6px 0; object-fit:contain;';
-      if (img.size === 'small') style += ' max-width:150px; max-height:100px;'; else if (img.size === 'medium') style += ' max-width:280px; max-height:200px;';
-      else if (img.size === 'banner') style += ' width:100%; max-height:120px; object-fit:cover; border-radius:8px;'; else style += ' max-width:100%; max-height:350px;';
-      return `<img src="${img.url}" style="${style}" onerror="this.style.display='none'">`;
+    // inline=true → tamaño compacto para cuando va junto a otras imágenes
+    function buildPreviewImgHtml(img, inline = false) {
+      if (img.size === 'banner') {
+        return `<img src="${img.url}" style="display:block; width:100%; max-height:120px; object-fit:cover; border-radius:8px; margin:6px 0;" onerror="this.style.display='none'">`;
+      }
+      if (inline) {
+        let maxW, maxH;
+        if (img.size === 'small') { maxW = '130px'; maxH = '95px'; }
+        else if (img.size === 'medium') { maxW = '200px'; maxH = '150px'; }
+        else { maxW = '250px'; maxH = '180px'; } // large en inline
+        return `<img src="${img.url}" style="max-width:${maxW}; max-height:${maxH}; border-radius:4px; object-fit:contain; flex-shrink:0; display:block;" onerror="this.style.display='none'">`;
+      } else {
+        let style = 'display:block; border-radius:4px; margin:6px 0; object-fit:contain;';
+        if (img.size === 'small') style += ' max-width:150px; max-height:110px;';
+        else if (img.size === 'medium') style += ' max-width:260px; max-height:190px;';
+        else style += ' max-width:100%; max-height:350px;';
+        return `<img src="${img.url}" style="${style}" onerror="this.style.display='none'">`;
+      }
     }
 
     function updateAllPreviews(prefix) {
