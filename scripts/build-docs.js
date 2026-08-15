@@ -82,6 +82,35 @@ function renderInline(text) {
     return out.replace(/\u0000(\d+)\u0000/g, (m, i) => codeSpans[Number(i)]);
 }
 
+/** Detecta un item de lista y captura su indentación y su marcador. */
+const LIST_ITEM = /^(\s*)([*-]|\d+\.)\s+/;
+
+/**
+ * Construye las listas (anidadas) a partir de los items con su indentación.
+ * @param {Array<{indent: number, ordered: boolean, text: string}>} items
+ * @param {number} start - Índice del primer item del nivel actual.
+ * @returns {{html: string, next: number}}
+ */
+function renderList(items, start) {
+    const level = items[start].indent;
+    const tag = items[start].ordered ? 'ol' : 'ul';
+    const parts = [];
+
+    let i = start;
+    while (i < items.length && items[i].indent >= level) {
+        if (items[i].indent > level) {
+            const nested = renderList(items, i);
+            parts[parts.length - 1] = parts[parts.length - 1].replace(/<\/li>$/, `${nested.html}</li>`);
+            i = nested.next;
+            continue;
+        }
+        parts.push(`<li>${renderInline(items[i].text)}</li>`);
+        i++;
+    }
+
+    return { html: `<${tag}>${parts.join('')}</${tag}>`, next: i };
+}
+
 function renderTable(rows) {
     const cells = row => row.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
     const head = cells(rows[0]);
@@ -150,21 +179,24 @@ function renderMarkdown(markdown) {
             continue;
         }
 
-        // Listas
-        if (/^\s*([*-]|\d+\.)\s+/.test(line)) {
-            const ordered = /^\s*\d+\.\s+/.test(line);
+        // Listas (con anidamiento por indentación)
+        if (LIST_ITEM.test(line)) {
             const items = [];
-            while (i < lines.length && /^\s*([*-]|\d+\.)\s+/.test(lines[i])) {
-                items.push(lines[i].replace(/^\s*([*-]|\d+\.)\s+/, ''));
+            while (i < lines.length && LIST_ITEM.test(lines[i])) {
+                const [, indent, marker] = lines[i].match(LIST_ITEM);
+                items.push({
+                    indent: indent.replace(/\t/g, '    ').length,
+                    ordered: /\d/.test(marker),
+                    text: lines[i].replace(LIST_ITEM, '')
+                });
                 i++;
                 // Continuación de un item en varias líneas
-                while (i < lines.length && lines[i].trim() && !/^\s*([*-]|\d+\.)\s+/.test(lines[i]) && !/^(#{1,4}\s|```|>|---)/.test(lines[i])) {
-                    items[items.length - 1] += ' ' + lines[i].trim();
+                while (i < lines.length && lines[i].trim() && !LIST_ITEM.test(lines[i]) && !/^(#{1,4}\s|```|>|---)/.test(lines[i])) {
+                    items[items.length - 1].text += ' ' + lines[i].trim();
                     i++;
                 }
             }
-            const tag = ordered ? 'ol' : 'ul';
-            html.push(`<${tag}>${items.map(it => `<li>${renderInline(it)}</li>`).join('')}</${tag}>`);
+            html.push(renderList(items, 0).html);
             continue;
         }
 
