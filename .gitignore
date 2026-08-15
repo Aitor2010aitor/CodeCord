@@ -24,6 +24,7 @@ yarn-error.log*
 # Archivos de tickets (contienen información sensible)
 tickets/
 *.html
+!docs/*.html
 *.pdf
 *.ico
 

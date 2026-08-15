@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🤖 Wiki de CodeCord · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html" class="active">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="wiki-de-codecord">🤖 Wiki de CodeCord</h1>
+<p><strong>CodeCord</strong> es un bot multifuncional de Discord escrito en <strong>Node.js + discord.js v14</strong> que incluye un <strong>panel web administrativo</strong> (Express) para configurar todo el bot desde el navegador, sin tocar archivos JSON ni memorizar comandos.</p>
+<ul><li>Repositorio: <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">https://github.com/aitor1234567899/CodeCord</a></li><li>Rama principal: <code>VERSION-9.0</code></li><li>Servidor de soporte: <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">https://discord.gg/PzSNTqFCuW</a></li><li>Licencia: ver <a href="https://github.com/aitor1234567899/CodeCord/blob/VERSION-9.0/LICENSE" target="_blank" rel="noopener"><code>LICENSE</code></a></li></ul>
+<hr>
+<h2 id="empezar-en-5-minutos">🚀 Empezar en 5 minutos</h2>
+<pre class="lang-bash"><code>git clone https://github.com/aitor1234567899/CodeCord.git
+cd CodeCord
+npm install
+cp .env.example .env      # rellena BOT_TOKEN, CLIENT_ID, CLIENT_SECRET...
+npm run deploy            # registra los slash commands
+npm start                 # arranca el bot + panel web</code></pre>
+<p>Panel web: <a href="http://localhost:22550" target="_blank" rel="noopener">http://localhost:22550</a> (puerto configurable con <code>PORT</code>).</p>
+<p>Guía detallada: <strong><a href="Instalacion.html">Instalacion</a></strong>.</p>
+<hr>
+<h2 id="indice-de-la-wiki">📚 Índice de la wiki</h2>
+<div class="table-wrap"><table><thead><tr><th>Página</th><th>Contenido</th></tr></thead><tbody><tr><td><strong><a href="Instalacion.html">Instalacion</a></strong></td><td>Requisitos, instalación, despliegue de comandos, arranque</td></tr><tr><td><strong><a href="Configuracion.html">Configuracion</a></strong></td><td>Variables de <code>.env</code>, <code>panel-config.json</code>, OAuth2 de Discord, opción <code>LOGIN</code></td></tr><tr><td><strong><a href="Comandos.html">Comandos</a></strong></td><td>Los 57 slash commands (usuario y administración)</td></tr><tr><td><strong><a href="Panel-Web.html">Panel Web</a></strong></td><td>Secciones del panel, login con Discord, uso diario</td></tr><tr><td><strong><a href="Sistemas.html">Sistemas</a></strong></td><td>Anti-Raid, tickets, voz temporal, logs, bienvenidas, auto-respuestas, sanciones, verificación, colores</td></tr><tr><td><strong><a href="API-del-Panel.html">API del Panel</a></strong></td><td>Referencia de todos los endpoints HTTP del panel</td></tr><tr><td><strong><a href="Arquitectura.html">Arquitectura</a></strong></td><td>Estructura de carpetas, handlers, flujo de arranque</td></tr><tr><td><strong><a href="Almacenamiento-de-Datos.html">Almacenamiento de Datos</a></strong></td><td>Carpeta <code>servidores/</code>, ficheros JSON por servidor</td></tr><tr><td><strong><a href="Solucion-de-Problemas.html">Solucion de Problemas</a></strong></td><td>Errores frecuentes y cómo resolverlos</td></tr><tr><td><strong><a href="Contribuir.html">Contribuir</a></strong></td><td>Convenciones de código, cómo añadir comandos, eventos y sistemas</td></tr></tbody></table></div>
+<hr>
+<h2 id="funcionalidades-principales">✨ Funcionalidades principales</h2>
+<ul><li><strong>Moderación</strong>: ban, kick, timeout, warn, historial de sanciones, clear, slowmode, automod.</li><li><strong>Anti-Raid</strong>: 12 módulos de vigilancia (canales, roles, emojis, bans, webhooks) con ventana deslizante de 60 s, aislamiento automático y lista blanca.</li><li><strong>Tickets</strong>: paneles con hasta 5 botones, formularios, roles de soporte, transcripciones HTML.</li><li><strong>Salas de voz temporales</strong>: creación automática al entrar en «Crear sala» + panel privado de control (nombre, límite, privacidad, invitar, expulsar, ban, transferir…).</li><li><strong>Soporte de voz por cola</strong>: sala de espera, comando de siguiente turno y roles sancionados.</li><li><strong>Bienvenidas</strong>: mensaje personalizado + tarjeta gráfica generada con Jimp.</li><li><strong>Logs</strong>: canal y color configurables por evento, más «Actividad Reciente» en el panel.</li><li><strong>Sorteos, sugerencias, auto-respuestas, censura, embeds, verificación OAuth2 o por reacción.</strong></li></ul>
+<hr>
+<blockquote><p>ℹ️ Esta wiki documenta el estado del código en la rama <code>VERSION-9.0</code>. Las versiones anteriores viven en las ramas <code>VERSION-1.5</code> … <code>VERSION-7.0</code>.</p></blockquote>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#empezar-en-5-minutos">🚀 Empezar en 5 minutos</a></li><li><a href="#indice-de-la-wiki">📚 Índice de la wiki</a></li><li><a href="#funcionalidades-principales">✨ Funcionalidades principales</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

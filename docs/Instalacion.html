@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>⚙️ Instalación y puesta en marcha · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html" class="active">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="instalacion-y-puesta-en-marcha">⚙️ Instalación y puesta en marcha</h1>
+<h2 id="1-requisitos">1. Requisitos</h2>
+<div class="table-wrap"><table><thead><tr><th>Requisito</th><th>Versión recomendada</th></tr></thead><tbody><tr><td>Node.js</td><td>18 LTS o superior (el proyecto se desarrolla con Node 24)</td></tr><tr><td>npm</td><td>Incluido con Node</td></tr><tr><td>Aplicación de Discord</td><td>Bot creado en el <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Portal de desarrolladores</a></td></tr><tr><td>Sistema operativo</td><td>Windows, Linux o macOS (los <code>.bat</code> incluidos son solo para Windows)</td></tr></tbody></table></div>
+<p>En el portal de Discord, dentro de <strong>Bot</strong>, activa los tres <em>Privileged Gateway Intents</em>:</p>
+<ul><li><code>PRESENCE INTENT</code></li><li><code>SERVER MEMBERS INTENT</code></li><li><code>MESSAGE CONTENT INTENT</code></li></ul>
+<p>El bot los solicita todos en <code>src/index.js</code>; si faltan, el login fallará con <code>Used disallowed intents</code>.</p>
+<h2 id="2-clonado-e-instalacion">2. Clonado e instalación</h2>
+<pre class="lang-bash"><code>git clone https://github.com/aitor1234567899/CodeCord.git
+cd CodeCord
+npm install</code></pre>
+<blockquote><p><code>requirements.txt</code> es solo una lista informativa de dependencias. La fuente real es <code>package.json</code>.</p></blockquote>
+<h2 id="3-variables-de-entorno">3. Variables de entorno</h2>
+<pre class="lang-bash"><code>cp .env.example .env</code></pre>
+<p>Rellena como mínimo <code>BOT_TOKEN</code> y <code>CLIENT_ID</code>. Detalle completo en <strong><a href="Configuracion.html">Configuracion</a></strong>.</p>
+<h2 id="4-registrar-los-slash-commands">4. Registrar los slash commands</h2>
+<pre class="lang-bash"><code>npm run deploy      # equivale a: node scripts/deploy-commands.js</code></pre>
+<p>El script registra los comandos en:</p>
+<ul><li>los IDs de <code>GUILD_ID</code>, <code>GUILD_ID_1</code>, <code>GUILD_ID_2</code>, <code>GUILD_ID_3</code> del <code>.env</code>, y</li><li>los IDs detectados automáticamente en los nombres de las carpetas de <code>servidores/</code> (formato <code>NombreServidor_1234567890</code>).</li></ul>
+<p>Registrar por servidor es instantáneo; el registro global de Discord puede tardar hasta 1 hora.</p>
+<p>Scripts auxiliares en <code>scripts/</code>:</p>
+<div class="table-wrap"><table><thead><tr><th>Script</th><th>Uso</th></tr></thead><tbody><tr><td><code>deploy-commands.js</code></td><td>Despliegue estándar (el de <code>npm run deploy</code>)</td></tr><tr><td><code>deploy-commands-simple.js</code> / <code>-fixed.js</code></td><td>Variantes simplificadas de despliegue</td></tr><tr><td><code>clear-commands.js</code></td><td>Borra los comandos registrados (útil si hay duplicados)</td></tr></tbody></table></div>
+<h2 id="5-invitar-el-bot-al-servidor">5. Invitar el bot al servidor</h2>
+<p>Genera la URL OAuth2 con scopes <code>bot</code> + <code>applications.commands</code> y permisos de <strong>Administrador</strong> (o, como mínimo: gestionar roles, canales, mensajes, banear, expulsar, aislar y gestionar webhooks).</p>
+<h2 id="6-arrancar">6. Arrancar</h2>
+<pre class="lang-bash"><code>npm start           # node index.js</code></pre>
+<p>En Windows también puedes hacer doble clic en <code>INICIAR-BOT.bat</code>.</p>
+<p>Al arrancar verás:</p>
+<pre class="lang-text"><code>🚀 [CodeCord] Iniciando bot de Discord...
+✅ CodeCord conectado con éxito como: TuBot#0001
+📊 Servidores detectados (N): ...
+🛡️ Sistema Anti-Raid activado
+🌐 [CodeCord Backend] Arrancando servidor web desde /WEB...</code></pre>
+<p>El panel web queda disponible en <code>http://localhost:22550</code> (o el <code>PORT</code> que hayas definido).</p>
+<h2 id="7-bloqueo-de-instancia-unica">7. Bloqueo de instancia única</h2>
+<p><code>src/index.js</code> crea un fichero <code>bot.lock</code> con el PID del proceso. Si intentas arrancar una segunda instancia mientras la primera sigue viva, el arranque se aborta con:</p>
+<pre class="lang-text"><code>❌ [CodeCord] Ya hay OTRA instancia del bot ejecutándose (PID xxxx).</code></pre>
+<p>Esto evita mensajes duplicados y conflictos de puerto. Si el bot se cerró de forma abrupta y el fichero quedó huérfano, se detecta que el PID ya no existe y se sobrescribe automáticamente.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#1-requisitos">1. Requisitos</a></li><li><a href="#2-clonado-e-instalacion">2. Clonado e instalación</a></li><li><a href="#3-variables-de-entorno">3. Variables de entorno</a></li><li><a href="#4-registrar-los-slash-commands">4. Registrar los slash commands</a></li><li><a href="#5-invitar-el-bot-al-servidor">5. Invitar el bot al servidor</a></li><li><a href="#6-arrancar">6. Arrancar</a></li><li><a href="#7-bloqueo-de-instancia-unica">7. Bloqueo de instancia única</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>💬 Comandos · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html" class="active">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="comandos">💬 Comandos</h1>
+<p>CodeCord registra <strong>57 slash commands</strong>, organizados en dos carpetas: <code>src/commands/usuario/</code> y <code>src/commands/administradores/</code>.</p>
+<p>Dentro de Discord tienes dos menús de ayuda:</p>
+<ul><li><code>/comandos</code> — lista completa de comandos.</li><li><code>/helpadmin</code> — menú interactivo con botones (solo administradores).</li></ul>
+<hr>
+<h2 id="comandos-de-usuario">👤 Comandos de usuario</h2>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/8ball</code></td><td>Hazle una pregunta a la Bola 8 Mágica</td></tr><tr><td><code>/avatar</code></td><td>Muestra el avatar de un usuario</td></tr><tr><td><code>/channelinfo</code></td><td>Información detallada de un canal</td></tr><tr><td><code>/coinflip</code></td><td>Lanza una moneda (cara o cruz)</td></tr><tr><td><code>/comandos</code></td><td>Lista de comandos disponibles</td></tr><tr><td><code>/dado</code></td><td>Tira un dado de 6 caras</td></tr><tr><td><code>/juegos</code></td><td>Menú interactivo de mini-juegos</td></tr><tr><td><code>/membercount</code></td><td>Contador de miembros (total, humanos, bots)</td></tr><tr><td><code>/nick</code></td><td>Cambia el apodo de un usuario</td></tr><tr><td><code>/ping</code></td><td>Latencia del bot y de la API de Discord</td></tr><tr><td><code>/rename</code></td><td>Renombra tu sala de voz temporal</td></tr><tr><td><code>/rps</code></td><td>Piedra, papel o tijera</td></tr><tr><td><code>/serverinfo</code></td><td>Información del servidor</td></tr><tr><td><code>/serverrole</code></td><td>Información detallada de un rol</td></tr><tr><td><code>/ship</code></td><td>Calcula la compatibilidad entre dos personas</td></tr><tr><td><code>/sugerencia</code></td><td>Envía una sugerencia al canal configurado</td></tr><tr><td><code>/trivia</code></td><td>Ronda de trivia con preguntas aleatorias</td></tr><tr><td><code>/userinfo</code></td><td>Información detallada de un usuario</td></tr><tr><td><code>/voiceinterface</code></td><td>Panel privado (efímero) de gestión de tu sala de voz</td></tr></tbody></table></div>
+<h3 id="voiceinterface-en-detalle"><code>/voiceinterface</code> en detalle</h3>
+<p>Publica un panel <strong>efímero</strong> (solo lo ve quien lo ejecuta) con botones para tu sala temporal:</p>
+<p><code>NOMBRE</code> · <code>LÍMITE</code> · <code>PRIVACIDAD</code> · <code>INVITAR</code> · <code>EXPULSAR</code> · <code>BAN</code> · <code>UNBAN</code> · <code>REIVINDICAR</code> · <code>TRANSFERIR</code> · <code>ELIMINAR</code> · <code>INFO</code></p>
+<hr>
+<h2 id="comandos-de-administracion">🛡️ Comandos de administración</h2>
+<h3 id="moderacion">Moderación</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/ban</code></td><td>Banea a un usuario del servidor</td></tr><tr><td><code>/unban</code></td><td>Desbanea a un usuario</td></tr><tr><td><code>/kick</code></td><td>Expulsa a un usuario</td></tr><tr><td><code>/timeout</code></td><td>Aísla temporalmente a un usuario (minutos)</td></tr><tr><td><code>/warn</code></td><td>Aplica una advertencia formal</td></tr><tr><td><code>/warnings</code></td><td>Muestra las advertencias de un usuario</td></tr><tr><td><code>/sanctionhistory</code></td><td>Historial de sanciones y advertencias del servidor</td></tr><tr><td><code>/baninfo</code></td><td>Consulta si un usuario fue baneado o expulsado</td></tr><tr><td><code>/clear</code></td><td>Elimina N mensajes del canal actual</td></tr><tr><td><code>/slowmode</code></td><td>Activa o desactiva el modo lento</td></tr><tr><td><code>/automod</code></td><td>Configura la moderación automática</td></tr></tbody></table></div>
+<h3 id="roles-y-permisos">Roles y permisos</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/rol</code></td><td>Asigna o quita un rol a un usuario</td></tr><tr><td><code>/setroles</code></td><td>Define qué roles pueden usar los comandos del bot</td></tr><tr><td><code>/staffrole</code></td><td>Gestiona los roles de staff mediante menús</td></tr><tr><td><code>/colorrole</code></td><td>Hace que un rol cambie de color automáticamente</td></tr><tr><td><code>/stopcolor</code></td><td>Detiene la rotación automática de color</td></tr></tbody></table></div>
+<h3 id="tickets">Tickets</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/ticketpanel</code></td><td>Publica el panel interactivo para abrir tickets</td></tr><tr><td><code>/ticketclose</code></td><td>Cierra el ticket actual</td></tr><tr><td><code>/ticketstaffrole</code></td><td>Rol de staff que puede ver y atender tickets</td></tr><tr><td><code>/ticketlogchannel</code></td><td>Canal de logs de los tickets</td></tr><tr><td><code>/generatehtml</code></td><td>Genera manualmente la transcripción HTML del canal</td></tr></tbody></table></div>
+<h3 id="voz">Voz</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/setup</code></td><td>Crea la estructura completa de salas privadas</td></tr><tr><td><code>/createcategory</code></td><td>Crea la categoría «🍺 Salas privadas» con sus subcanales</td></tr><tr><td><code>/voiceadmin</code></td><td>Panel de administración de todos los canales de voz</td></tr><tr><td><code>/createsupportchannels</code></td><td>Crea los canales de soporte de voz y configura los roles de staff</td></tr><tr><td><code>/addsupportrole</code></td><td>Añade roles a los canales de soporte existentes</td></tr><tr><td><code>/nex</code></td><td>Pasa al siguiente usuario en la cola de soporte de voz</td></tr><tr><td><code>/voicesupportnextrole</code></td><td>Rol autorizado a usar <code>nex</code></td></tr><tr><td><code>/voicesanctionedrole</code></td><td>Rol de sancionado del soporte de voz</td></tr><tr><td><code>/sanctionsupport</code></td><td>Sanciona a un usuario del soporte de voz</td></tr></tbody></table></div>
+<h3 id="comunicacion">Comunicación</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/say</code></td><td>El bot envía un mensaje en este u otro canal</td></tr><tr><td><code>/anuncio</code></td><td>Publica un anuncio en formato embed</td></tr><tr><td><code>/enviarmd</code></td><td>Envía un DM en formato embed a un usuario (staff)</td></tr><tr><td><code>/poll</code></td><td>Crea una encuesta con opciones</td></tr></tbody></table></div>
+<h3 id="utilidades">Utilidades</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/logs</code></td><td>Configura el canal de logs del servidor</td></tr><tr><td><code>/helpadmin</code></td><td>Menú interactivo de todos los comandos</td></tr><tr><td><code>/userfolder</code></td><td>Genera un TXT con la lista de usuarios del servidor</td></tr></tbody></table></div>
+<hr>
+<h2 id="permisos">Permisos</h2>
+<p>Cada comando comprueba sus propios permisos con <code>PermissionsBitField</code> (por ejemplo <code>/ban</code> exige <code>BanMembers</code>). Además, <code>/setroles</code> permite autorizar roles concretos para usar los comandos del bot, y <code>/staffrole</code> define los roles de staff que usan los sistemas de tickets y soporte.</p>
+<h2 id="anadir-un-comando-nuevo">Añadir un comando nuevo</h2>
+<p>Ver <strong><a href="Contribuir.html">Contribuir</a></strong>: basta con crear un fichero en <code>src/commands/&lt;categoría&gt;/</code> que exporte <code>{ name, description, execute }</code> y volver a ejecutar <code>npm run deploy</code>.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#comandos-de-usuario">👤 Comandos de usuario</a></li><li><a href="#comandos-de-administracion">🛡️ Comandos de administración</a></li><li><a href="#permisos">Permisos</a></li><li><a href="#anadir-un-comando-nuevo">Añadir un comando nuevo</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

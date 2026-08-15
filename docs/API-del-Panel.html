@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🔌 API del panel · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html" class="active">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="api-del-panel">🔌 API del panel</h1>
+<p>Todas las rutas las sirve <code>WEB/admin-panel.js</code> en el mismo puerto que el panel. Salvo las rutas públicas de login, requieren sesión válida cuando <code>LOGIN = true</code>, y devuelven <strong>403</strong> si el usuario autenticado no tiene <code>Administrador</code> o <code>Gestionar servidor</code> en el <code>:guildId</code> solicitado.</p>
+<p><code>:guildId</code> es siempre el ID numérico del servidor de Discord.</p>
+<h2 id="autenticacion-y-sesion">Autenticación y sesión</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead><tbody><tr><td>GET</td><td><code>/login</code></td><td>Redirige al OAuth2 de Discord</td></tr><tr><td>GET</td><td><code>/callback</code></td><td>Callback OAuth2 del login del panel</td></tr><tr><td>GET</td><td><code>/verify-callback</code></td><td>Callback OAuth2 de la verificación de usuarios</td></tr><tr><td>GET</td><td><code>/logout</code></td><td>Cierra la sesión</td></tr></tbody></table></div>
+<h2 id="estado-general">Estado general</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/status</code></td><td>Estado del bot, uptime y estadísticas</td></tr><tr><td>GET</td><td><code>/api/commands</code></td><td>Lista de comandos cargados</td></tr><tr><td>GET</td><td><code>/api/guilds</code></td><td>Servidores visibles para el usuario</td></tr><tr><td>GET</td><td><code>/api/logs</code></td><td>Historial de eventos (Actividad Reciente)</td></tr><tr><td>POST</td><td><code>/api/logs/clear</code></td><td>Vacía el historial de logs</td></tr><tr><td>GET</td><td><code>/api/list-uploads</code></td><td>Imágenes disponibles en <code>uploads/</code></td></tr><tr><td>POST</td><td><code>/api/upload</code></td><td>Sube una imagen (multipart, vía multer)</td></tr></tbody></table></div>
+<h2 id="informacion-del-servidor">Información del servidor</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/guilds/:guildId/info</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/channels</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/roles</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/roles/:roleId</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/emojis</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/members</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/members/:memberId</code></td></tr></tbody></table></div>
+<h2 id="mensajes-y-embeds">Mensajes y embeds</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/guilds/:guildId/send</code></td><td>Envía un mensaje como el bot</td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/send-as-server</code></td><td>Envía un mensaje por webhook con identidad del servidor</td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/embed</code></td><td>Publica un embed</td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/embed/:channelId/:messageId</code></td><td>Carga un embed existente</td></tr><tr><td>PUT</td><td><code>/api/guilds/:guildId/embed/:channelId/:messageId</code></td><td>Edita un embed existente</td></tr></tbody></table></div>
+<h2 id="moderacion-anti-raid-y-logs">Moderación, anti-raid y logs</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/moderation-config</code></td></tr><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/antiraid-config</code></td></tr><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/logs-config</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/autorol</code></td></tr></tbody></table></div>
+<h2 id="tickets">Tickets</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / PUT</td><td><code>/api/guilds/:guildId/ticket-config</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/ticket-panels</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/send-ticket-panel</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/update-ticket-panel/:messageId</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/active-tickets</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/close-ticket</code></td></tr><tr><td>GET</td><td><code>/api/tickets</code></td></tr><tr><td>GET</td><td><code>/api/tickets/:filename</code> (transcripción HTML)</td></tr></tbody></table></div>
+<h2 id="sorteos">Sorteos</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/giveaways</code></td></tr><tr><td>PUT</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/join</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/end</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/cancel</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/reroll</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/recheck</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways-permissions</code></td></tr></tbody></table></div>
+<h2 id="auto-respuestas">Auto-respuestas</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/auto-responses</code></td></tr><tr><td>PUT / DELETE</td><td><code>/api/guilds/:guildId/auto-responses/:responseId</code></td></tr></tbody></table></div>
+<h2 id="sugerencias">Sugerencias</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/guilds/:guildId/suggestions</code></td></tr><tr><td>PUT / DELETE</td><td><code>/api/guilds/:guildId/suggestions/:suggestionId</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/suggestions/:suggestionId/comment</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/suggestions-channel</code></td></tr></tbody></table></div>
+<h2 id="verificacion">Verificación</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/verification</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/verification/settings</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/verification/send-reaction</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/verification/send-oauth</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/verification/users</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/verification/users/:userId/rejoin</code></td></tr><tr><td>DELETE</td><td><code>/api/guilds/:guildId/verification/users/:userId</code></td></tr></tbody></table></div>
+<h2 id="bienvenidas">Bienvenidas</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/welcome-config</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/welcome-test</code></td></tr></tbody></table></div>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#autenticacion-y-sesion">Autenticación y sesión</a></li><li><a href="#estado-general">Estado general</a></li><li><a href="#informacion-del-servidor">Información del servidor</a></li><li><a href="#mensajes-y-embeds">Mensajes y embeds</a></li><li><a href="#moderacion-anti-raid-y-logs">Moderación, anti-raid y logs</a></li><li><a href="#tickets">Tickets</a></li><li><a href="#sorteos">Sorteos</a></li><li><a href="#auto-respuestas">Auto-respuestas</a></li><li><a href="#sugerencias">Sugerencias</a></li><li><a href="#verificacion">Verificación</a></li><li><a href="#bienvenidas">Bienvenidas</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

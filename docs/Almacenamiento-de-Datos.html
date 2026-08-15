@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>💾 Almacenamiento de datos · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html" class="active">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="almacenamiento-de-datos">💾 Almacenamiento de datos</h1>
+<p>CodeCord no usa base de datos: todo se guarda en <strong>ficheros JSON</strong>, con una carpeta por servidor de Discord.</p>
+<h2 id="carpeta-servidores">Carpeta <code>servidores/</code></h2>
+<pre class="lang-text"><code>servidores/
+└── &lt;NombreDelServidor&gt;_&lt;GuildID&gt;/
+    ├── configuracion/
+    │   ├── giveaways.json      # Sorteos
+    │   ├── logs.json           # Canal y color por evento
+    │   ├── moderation.json     # Automod, censura, autorol, limpieza
+    │   ├── staffroles.json     # Roles de staff
+    │   └── verification.json   # Configuración de verificación
+    ├── verification.json       # Estado de la verificación
+    └── verified-users.json     # Usuarios verificados</code></pre>
+<p>Se añaden otros ficheros (tickets, bienvenidas, auto-respuestas, colores, sanciones…) a medida que configuras cada sistema desde el panel o los comandos.</p>
+<h2 id="scriptsconfig-managerjs"><code>scripts/config-manager.js</code></h2>
+<p>Es la capa de acceso a esos ficheros:</p>
+<ul><li><code>setClient(client)</code> — le da acceso al cliente de Discord para resolver nombres de servidor.</li><li><code>getGuildFolder(guildId)</code> — busca la carpeta que termine en <code>_&lt;guildId&gt;</code>; si el servidor se ha renombrado en Discord, <strong>renombra la carpeta</strong> automáticamente; si no existe, la crea junto a <code>configuracion/</code>.</li><li><code>loadGuildConfig(guildId, tipo, valorPorDefecto)</code> / <code>saveGuildConfig(...)</code> — leen y escriben cada fichero de configuración.</li><li><code>migrateExistingConfigs()</code> — migra la configuración global antigua (<code>config/*.json</code>) al formato por servidor; se ejecuta en el arranque.</li></ul>
+<p>Los caracteres no válidos para rutas (<code>\ / : * ? " &lt; &gt; |</code>) se eliminan del nombre del servidor, por lo que emojis y símbolos sí se conservan en el nombre de la carpeta.</p>
+<h2 id="otras-carpetas">Otras carpetas</h2>
+<div class="table-wrap"><table><thead><tr><th>Ruta</th><th>Contenido</th></tr></thead><tbody><tr><td><code>config/panel-config.json</code></td><td>URL, puerto y autenticación del panel</td></tr><tr><td><code>config/*.json.bak</code></td><td>Copias de la configuración global heredada (pre-migración)</td></tr><tr><td><code>data/bot-activity.json</code></td><td>Historial de actividad mostrado en el panel</td></tr><tr><td><code>data/sessions.json</code></td><td>Sesiones del panel web</td></tr><tr><td><code>uploads/</code></td><td>Imágenes subidas desde el panel (se crea sola)</td></tr><tr><td><code>bot.lock</code></td><td>PID de la instancia en ejecución</td></tr><tr><td><code>debug-ready.txt</code></td><td>Marca de la última vez que el bot quedó listo</td></tr></tbody></table></div>
+<h2 id="copias-de-seguridad">Copias de seguridad</h2>
+<p>Para respaldar toda la configuración basta con copiar <code>servidores/</code>, <code>config/</code>, <code>data/</code> y <code>uploads/</code>. Para migrar el bot a otra máquina: copia esas carpetas más tu <code>.env</code>.</p>
+<blockquote><p>⚠️ No edites los JSON con el bot en ejecución: el proceso mantiene parte del estado en memoria y podría sobrescribir tus cambios. Detén el bot, edita y vuelve a arrancar.</p></blockquote>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#carpeta-servidores">Carpeta servidores/</a></li><li><a href="#scriptsconfig-managerjs">scripts/config-manager.js</a></li><li><a href="#otras-carpetas">Otras carpetas</a></li><li><a href="#copias-de-seguridad">Copias de seguridad</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🏗️ Arquitectura y estructura del proyecto · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html" class="active">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="arquitectura-y-estructura-del-proyecto">🏗️ Arquitectura y estructura del proyecto</h1>
+<h2 id="estructura-de-carpetas">Estructura de carpetas</h2>
+<pre class="lang-text"><code>CodeCord/
+├── index.js                  # Punto de entrada: carga dotenv y require('./src/index.js')
+├── package.json              # Dependencias y scripts (start, deploy)
+├── .env / .env.example       # Credenciales y configuración
+├── src/
+│   ├── index.js              # Cliente de discord.js: intents, colecciones, lock, login
+│   ├── server.js             # Puente hacia el panel web (initWebServer)
+│   ├── handlers/
+│   │   ├── commandHandler.js # Carga recursiva de comandos
+│   │   └── eventHandler.js   # Carga automática de eventos
+│   ├── commands/
+│   │   ├── usuario/          # 19 comandos de usuario
+│   │   └── administradores/  # 38 comandos de administración
+│   ├── events/               # ready, messageCreate, interactionCreate, logEvents...
+│   └── systems/              # Anti-raid, tickets, voz, logs, bienvenidas...
+├── WEB/
+│   ├── admin-panel.js        # Servidor Express + API del panel
+│   └── admin.html            # Interfaz (SPA de un solo fichero)
+├── scripts/
+│   ├── deploy-commands*.js   # Registro de slash commands
+│   ├── clear-commands.js     # Borrado de comandos
+│   ├── config-manager.js     # Persistencia por servidor
+│   ├── antiraid.js           # Anti-Raid V2
+│   └── welcome-card.js       # Tarjetas de bienvenida (Jimp)
+├── servidores/               # Configuración y datos por servidor
+├── config/                   # Configuración global del panel y backups heredados
+└── data/                     # Actividad del bot y sesiones</code></pre>
+<h2 id="flujo-de-arranque">Flujo de arranque</h2>
+<ol><li><code>index.js</code> carga <code>dotenv</code> y requiere <code>src/index.js</code>.</li><li><code>src/index.js</code>:</li><li>registra manejadores globales de <code>uncaughtException</code> / <code>unhandledRejection</code>;</li><li>aplica el <strong>bloqueo de instancia única</strong> con <code>bot.lock</code>;</li><li>crea el <code>Client</code> con todos los intents y partials;</li><li>inicializa las colecciones en memoria (<code>commands</code>, salas temporales, cola de soporte, anti-raid…);</li><li>llama a <code>initAntiRaid(client)</code>, <code>loadCommands(client)</code> y <code>loadEvents(client)</code>;</li><li>hace <code>client.login(BOT_TOKEN)</code>.</li><li>El evento <code>ready</code> (<code>src/events/ready.js</code>):</li><li>inicializa <code>configManager</code> y migra configuraciones antiguas;</li><li>arranca el panel web (<code>initWebServer</code> → <code>startAdminPanel</code>);</li><li>carga la configuración de staff y del canal de logs;</li><li>restaura la rotación de colores de roles.</li></ol>
+<h2 id="handlers">Handlers</h2>
+<p><strong><code>commandHandler.js</code></strong> recorre <code>src/commands/</code> de forma <strong>recursiva</strong>, limpia la caché de <code>require</code> y registra en <code>client.commands</code> todo módulo que exporte un <code>name</code> (o <code>data.name</code>) y una función <code>execute</code>. Los ficheros que no cumplen se avisan por consola y se ignoran.</p>
+<p><strong><code>eventHandler.js</code></strong> recorre <code>src/events/</code>, acepta tanto un objeto como un <strong>array de eventos</strong> por fichero (así <code>logEvents.js</code> registra muchos listeners de golpe) y usa <code>client.once</code> cuando el evento declara <code>once: true</code>.</p>
+<p>Resultado: para añadir un comando o un evento <strong>no hay que tocar ningún índice</strong>; basta con crear el fichero.</p>
+<h2 id="eventos">Eventos</h2>
+<div class="table-wrap"><table><thead><tr><th>Fichero</th><th>Responsabilidad</th></tr></thead><tbody><tr><td><code>ready.js</code></td><td>Arranque, panel web, restauración de configuración</td></tr><tr><td><code>messageCreate.js</code></td><td>Anti-spam, anti-links, censura, auto-respuestas, comandos por prefijo</td></tr><tr><td><code>interactionCreate.js</code></td><td>Slash commands, botones, menús y modales (tickets, voz, sorteos, verificación)</td></tr><tr><td><code>guildMemberAdd.js</code></td><td>Bienvenida, rol automático, verificación</td></tr><tr><td><code>guildMemberRemove.js</code></td><td>Salidas y limpieza de mensajes</td></tr><tr><td><code>voiceStateUpdate.js</code></td><td>Salas temporales y cola de soporte de voz</td></tr><tr><td><code>reactionEvents.js</code></td><td>Verificación por reacción y roles por reacción</td></tr><tr><td><code>logEvents.js</code></td><td>Registro de todos los eventos del servidor</td></tr></tbody></table></div>
+<h2 id="estado-en-memoria-vs-disco">Estado en memoria vs. disco</h2>
+<p>El bot mantiene mucho estado volátil en el <code>client</code> (colas de voz, intervalos de color, trackers anti-raid) y persiste la configuración en JSON por servidor mediante <code>scripts/config-manager.js</code>. Al reiniciar, el evento <code>ready</code> reconstruye lo que se puede desde disco. Ver <strong><a href="Almacenamiento-de-Datos.html">Almacenamiento de Datos</a></strong>.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#estructura-de-carpetas">Estructura de carpetas</a></li><li><a href="#flujo-de-arranque">Flujo de arranque</a></li><li><a href="#handlers">Handlers</a></li><li><a href="#eventos">Eventos</a></li><li><a href="#estado-en-memoria-vs-disco">Estado en memoria vs. disco</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

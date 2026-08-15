@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🤝 Contribuir · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html" class="active">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="contribuir">🤝 Contribuir</h1>
+<h2 id="ramas">Ramas</h2>
+<p>El repositorio usa una rama por versión: <code>VERSION-1.5</code>, <code>VERSION-2.0</code>, … <code>VERSION-9.0</code> (rama por defecto y más reciente), además de <code>main</code>. Trabaja sobre la rama de la versión en desarrollo y abre el Pull Request contra ella.</p>
+<h2 id="convenciones-de-codigo">Convenciones de código</h2>
+<ul><li>JavaScript (CommonJS, <code>require</code>) con indentación de 4 espacios y comillas simples.</li><li>Cada fichero empieza con una cabecera de comentario:</li></ul>
+<pre class="lang-js"><code>// Archivo: src/commands/usuario/ping.js
+
+/**
+ * @file ping.js
+ * @description Comando /ping para consultar la latencia del bot.
+ */</code></pre>
+<ul><li>Documenta las funciones con JSDoc (<code>@param</code>, <code>@returns</code>).</li><li>Los mensajes al usuario van en <strong>español</strong> y los embeds usan <code>EmbedBuilder</code>.</li><li>Las respuestas privadas usan <code>flags: MessageFlags.Ephemeral</code> (no el antiguo <code>ephemeral: true</code>).</li><li>Los logs de consola llevan prefijo: <code>✅ [CodeCord] ...</code>, <code>❌ [CodeCord] ...</code>.</li></ul>
+<h2 id="anadir-un-comando">Añadir un comando</h2>
+<ol><li>Crea <code>src/commands/usuario/micomando.js</code> (o en <code>administradores/</code>):</li></ol>
+<pre class="lang-js"><code>// Archivo: src/commands/usuario/micomando.js
+
+/**
+ * @file micomando.js
+ * @description Ejemplo de comando.
+ */
+
+const { EmbedBuilder } = require('discord.js');
+
+module.exports = {
+    name: 'micomando',
+    description: 'Descripción que verá el usuario',
+    /**
+     * @param {ChatInputCommandInteraction} interaction
+     * @param {Client} client
+     */
+    async execute(interaction, client) {
+        const embed = new EmbedBuilder()
+            .setTitle('Hola')
+            .setColor(0x00FF00);
+
+        await interaction.reply({ embeds: [embed] });
+    }
+};</code></pre>
+<ol><li>Añade el <code>SlashCommandBuilder</code> correspondiente en <code>scripts/deploy-commands.js</code> (incluidas sus opciones).</li><li>Ejecuta <code>npm run deploy</code> y reinicia el bot.</li></ol>
+<p>El handler carga la carpeta de forma recursiva, así que no hace falta registrar nada más.</p>
+<h2 id="anadir-un-evento">Añadir un evento</h2>
+<p>Crea un fichero en <code>src/events/</code> que exporte <code>{ name, once?, execute }</code> (o un array de esos objetos):</p>
+<pre class="lang-js"><code>module.exports = {
+    name: 'guildCreate',
+    once: false,
+    async execute(guild, client) {
+        console.log(`✅ [CodeCord] Añadido a ${guild.name}`);
+    }
+};</code></pre>
+<h2 id="anadir-un-sistema">Añadir un sistema</h2>
+<p>Coloca la lógica reutilizable en <code>src/systems/</code>, exporta funciones puras y consúmelas desde comandos y eventos. Para persistir configuración usa siempre <code>scripts/config-manager.js</code> (<code>loadGuildConfig</code> / <code>saveGuildConfig</code>) en lugar de escribir ficheros a mano.</p>
+<h2 id="anadir-una-seccion-al-panel">Añadir una sección al panel</h2>
+<ol><li>Endpoints en <code>WEB/admin-panel.js</code> siguiendo el patrón <code>/api/guilds/:guildId/&lt;recurso&gt;</code> y respetando la comprobación de permisos.</li><li>Interfaz en <code>WEB/admin.html</code> (SPA en un único fichero).</li><li>Documenta el endpoint en <strong><a href="API-del-Panel.html">API del Panel</a></strong>.</li></ol>
+<h2 id="antes-de-abrir-el-pr">Antes de abrir el PR</h2>
+<ul><li>Comprueba que el bot arranca (<code>npm start</code>) sin errores en consola.</li><li>Prueba el comando o la sección en un servidor de pruebas.</li><li>No incluyas <code>.env</code>, <code>bot.lock</code>, <code>uploads/</code> ni datos reales de <code>servidores/</code>.</li><li>Describe en el PR qué cambia y cómo probarlo.</li></ul>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#ramas">Ramas</a></li><li><a href="#convenciones-de-codigo">Convenciones de código</a></li><li><a href="#anadir-un-comando">Añadir un comando</a></li><li><a href="#anadir-un-evento">Añadir un evento</a></li><li><a href="#anadir-un-sistema">Añadir un sistema</a></li><li><a href="#anadir-una-seccion-al-panel">Añadir una sección al panel</a></li><li><a href="#antes-de-abrir-el-pr">Antes de abrir el PR</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

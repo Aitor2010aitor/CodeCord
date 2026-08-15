@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🧩 Sistemas internos · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html" class="active">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="sistemas-internos">🧩 Sistemas internos</h1>
+<p>Cada sistema vive en <code>src/systems/</code> y es consumido por los eventos (<code>src/events/</code>), los comandos y la API del panel.</p>
+<div class="table-wrap"><table><thead><tr><th>Fichero</th><th>Sistema</th></tr></thead><tbody><tr><td><code>antiRaidSystem.js</code></td><td>Anti-Raid y automoderación</td></tr><tr><td><code>ticketSystem.js</code></td><td>Tickets y transcripciones</td></tr><tr><td><code>voiceSystem.js</code></td><td>Salas de voz temporales y cola de soporte</td></tr><tr><td><code>loggerSystem.js</code></td><td>Registro de eventos</td></tr><tr><td><code>welcomeSystem.js</code></td><td>Bienvenidas y tarjetas</td></tr><tr><td><code>autoResponseSystem.js</code></td><td>Auto-respuestas</td></tr><tr><td><code>sanctionSystem.js</code></td><td>Sanciones y advertencias</td></tr><tr><td><code>colorSystem.js</code></td><td>Rotación automática de color de un rol</td></tr></tbody></table></div>
+<p>Además, <code>scripts/antiraid.js</code> inicializa la versión 2 del anti-raid (<code>initAntiRaid(client)</code>) y <code>scripts/welcome-card.js</code> genera la imagen de bienvenida con <strong>Jimp</strong>.</p>
+<hr>
+<h2 id="anti-raid-y-automoderacion">🛡️ Anti-Raid y automoderación</h2>
+<p>Estado en memoria bajo <code>client.antiRaid</code> (<code>messageTracker</code>, <code>channelActions</code>, <code>whitelist</code>, <code>logChannel</code>, <code>settings</code>, <code>adminRole</code>, <code>infractions</code>).</p>
+<p>Valores por defecto de <code>getAntiRaidSettings()</code>:</p>
+<pre class="lang-js"><code>{
+  antiSpam: true,          maxMessages: 5,        timeWindow: 5000,
+  antiChannelSpam: true,   maxChannelActions: 3,  channelTimeWindow: 60000,
+  antiLinks: true,         antiBots: true
+}</code></pre>
+<ul><li><strong>12 módulos vigilados</strong>: crear/borrar/editar canales, crear/borrar/editar roles, crear/borrar emojis, expulsar/banear/desbanear usuarios y editar webhooks.</li><li><strong>Ventana deslizante de 60 s</strong> para detectar abusos masivos.</li><li><strong>Respuesta automática</strong>: aislamiento (retirada de todos los roles) + ban o kick, según configuración.</li><li><strong>Lista blanca</strong> por servidor para excluir administradores y bots de confianza.</li><li>Todo lo detectado se envía al canal de logs configurado.</li></ul>
+<p>Configurable desde <code>/automod</code> y desde la sección <strong>Anti-Raid</strong> del panel.</p>
+<h2 id="tickets">🎫 Tickets</h2>
+<ul><li><code>/ticketpanel</code> publica un panel con hasta <strong>5 botones</strong>, cada uno con su propio formulario (modal).</li><li>Al pulsar, se crea un canal privado visible para el autor y para el rol de staff (<code>/ticketstaffrole</code>).</li><li><code>/ticketclose</code> o el botón de cierre generan una <strong>transcripción HTML</strong> del canal (también manualmente con <code>/generatehtml</code>).</li><li>Los tickets activos se ven en el panel, con botón «Abrir en Discord», y las transcripciones se listan en <code>GET /api/tickets</code>.</li><li>El canal de logs de tickets se define con <code>/ticketlogchannel</code>.</li></ul>
+<h2 id="voz-salas-temporales-y-soporte">🎧 Voz: salas temporales y soporte</h2>
+<p><strong>Salas temporales</strong> — <code>/setup</code> o <code>/createcategory</code> crean la categoría «🍺 Salas privadas» con un canal generador («🔊 Crear sala»). Al entrar en él, el bot crea una sala propia para el usuario y le da el control mediante <code>/voiceinterface</code>: nombre, límite, privacidad, invitar, expulsar, ban/unban, reivindicar, transferir, eliminar e info. La sala se borra al quedarse vacía.</p>
+<p><strong>Soporte de voz por cola</strong> — <code>/createsupportchannels</code> genera la sala de espera, los canales de atención, el canal de logs y los roles de staff. El staff usa <code>/nex</code> para atender al siguiente de la cola; <code>/voicesupportnextrole</code> define quién puede usarlo, <code>/sanctionsupport</code> y <code>/voicesanctionedrole</code> gestionan las sanciones.</p>
+<p>El estado se mantiene en memoria: <code>client.tempVoiceChannels</code>, <code>client.tempVoiceChannelOwners</code>, <code>client.voiceSupportQueue</code>, <code>client.voiceSupportWaitingTime</code>, etc.</p>
+<h2 id="logs">📝 Logs</h2>
+<p><code>sendLogEmbed()</code> (en <code>loggerSystem.js</code>) es el punto único de registro que usan comandos y sistemas. <code>src/events/logEvents.js</code> escucha los eventos de Discord y envía el embed correspondiente.</p>
+<p>Eventos cubiertos: mensajes eliminados (<strong>incluyendo el contenido del mensaje borrado</strong>, quién lo borró y en qué canal), mensajes editados y fijados, entradas y salidas de usuarios, bots añadidos/eliminados, bans y unbans, roles y canales creados/editados/eliminados, invitaciones, webhooks, cambios del servidor, eventos de voz y acciones de moderación/anti-raid.</p>
+<p>En el panel, cada evento puede tener <strong>su propio canal y su propio color</strong>, y la sección <em>Actividad Reciente</em> muestra los embeds completos filtrados por servidor.</p>
+<h2 id="bienvenidas">👋 Bienvenidas</h2>
+<p><code>processWelcomeMember(member)</code> lee la configuración <code>welcome</code> del servidor y, si está habilitada, envía al canal configurado el mensaje personalizado y una tarjeta gráfica generada por <code>scripts/welcome-card.js</code> (fondo e imágenes configurables desde el panel; botón de prueba en <code>POST /api/guilds/:guildId/welcome-test</code>).</p>
+<p>Relacionado: <strong>rol automático al entrar</strong> (<code>POST /api/guilds/:guildId/autorol</code>).</p>
+<h2 id="auto-respuestas">🤖 Auto-respuestas</h2>
+<p>Responde automáticamente cuando un mensaje coincide con una palabra clave. Cada regla admite respuesta en texto o embed, y filtros por canales y roles. Gestión completa vía CRUD en <code>/api/guilds/:guildId/auto-responses</code>.</p>
+<h2 id="sanciones">⚖️ Sanciones</h2>
+<p><code>sanctionSystem.js</code> guarda advertencias y sanciones por servidor y usuario; se consultan con <code>/warnings</code> y <code>/sanctionhistory</code> y desde la sección de miembros del panel.</p>
+<h2 id="rotacion-de-color">🎨 Rotación de color</h2>
+<p><code>/colorrole</code> inicia un intervalo que cambia el color del rol indicado periódicamente; <code>/stopcolor</code> lo detiene. La rotación se <strong>restaura automáticamente al arrancar</strong> el bot leyendo la configuración <code>colorroles</code> de cada servidor.</p>
+<h2 id="verificacion">✅ Verificación</h2>
+<p>Dos modalidades, configurables desde la sección <strong>Verificación</strong> del panel:</p>
+<ul><li><strong>Por reacción</strong>: el usuario reacciona a un mensaje publicado por el bot.</li><li><strong>Por OAuth2</strong>: el usuario pulsa un enlace, autoriza en Discord y vuelve a <code>/verify-callback</code>.</li></ul>
+<p>Opciones adicionales: rol otorgado al verificarse y <strong>rol a retirar</strong> (típicamente el de «no verificado»). Los usuarios verificados quedan registrados en <code>verified-users.json</code> dentro de la carpeta del servidor.</p>
+<h2 id="sorteos">🎉 Sorteos</h2>
+<p>Gestionados desde el panel (<code>/api/guilds/:guildId/giveaways</code>): creación, edición, participación, finalización, cancelación, re-roll y re-verificación de sorteos pendientes. Las interacciones de botón se procesan con <code>handleGiveawayInteraction</code>.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#anti-raid-y-automoderacion">🛡️ Anti-Raid y automoderación</a></li><li><a href="#tickets">🎫 Tickets</a></li><li><a href="#voz-salas-temporales-y-soporte">🎧 Voz: salas temporales y soporte</a></li><li><a href="#logs">📝 Logs</a></li><li><a href="#bienvenidas">👋 Bienvenidas</a></li><li><a href="#auto-respuestas">🤖 Auto-respuestas</a></li><li><a href="#sanciones">⚖️ Sanciones</a></li><li><a href="#rotacion-de-color">🎨 Rotación de color</a></li><li><a href="#verificacion">✅ Verificación</a></li><li><a href="#sorteos">🎉 Sorteos</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

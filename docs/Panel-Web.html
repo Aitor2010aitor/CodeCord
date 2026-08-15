@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🖥️ Panel web de administración · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html" class="active">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="panel-web-de-administracion">🖥️ Panel web de administración</h1>
+<p>El panel es un servidor <strong>Express</strong> (<code>WEB/admin-panel.js</code>, ~3.300 líneas) que sirve una SPA de una sola página (<code>WEB/admin.html</code>). Se arranca automáticamente desde el evento <code>ready</code> del bot a través de <code>src/server.js</code> → <code>startAdminPanel(client)</code>.</p>
+<ul><li>URL por defecto: <code>http://localhost:22550</code></li><li>Puerto: <code>PORT</code> del <code>.env</code> o el puerto incluido en <code>PANEL_URL</code> / <code>config/panel-config.json</code></li></ul>
+<h2 id="inicio-de-sesion">🔐 Inicio de sesión</h2>
+<p>Controlado por la constante <code>LOGIN</code> de <code>WEB/admin-panel.js</code> (ver <strong><a href="Configuracion.html">Configuracion</a></strong>).</p>
+<p>Con <code>LOGIN = true</code>:</p>
+<ol><li>Cualquier ruta no pública redirige a <code>/login</code>.</li><li><code>/login</code> lleva al OAuth2 de Discord; Discord vuelve a <code>/callback</code>.</li><li>Se listan <strong>solo</strong> los servidores donde tu cuenta tiene <code>Administrador</code> o <code>Gestionar servidor</code>, y donde el bot está presente.</li><li>Las llamadas a la API sobre servidores ajenos responden <strong>403 No autorizado</strong>.</li><li><code>/logout</code> cierra la sesión.</li></ol>
+<p>Rutas públicas: <code>/login</code>, <code>/login/password</code>, <code>/callback</code>, <code>/verify-callback</code>, <code>/logout</code>.</p>
+<h2 id="navegacion-por-url">🧭 Navegación por URL</h2>
+<p>El panel soporta rutas directas en el navegador, por ejemplo <code>/embed</code>, <code>/enbet</code> y <code>/say-server</code>, y actualiza la URL con <code>history.pushState</code> al cambiar de pestaña. El servidor seleccionado en el desplegable se guarda en <code>localStorage</code> y se restaura al recargar.</p>
+<h2 id="secciones">📋 Secciones</h2>
+<div class="table-wrap"><table><thead><tr><th>Sección</th><th>Qué permite</th></tr></thead><tbody><tr><td><strong>Dashboard</strong></td><td>Estado del bot, uptime, número de servidores/usuarios/canales y <em>Actividad Reciente</em> con los embeds de los últimos eventos</td></tr><tr><td><strong>Enviar Mensaje como Bot</strong></td><td>Enviar texto o embeds a cualquier canal, con barra de formato (negrita, cursiva, subrayado, tachado, código, títulos, citas, listas, enlaces) y vista previa en tiempo real</td></tr><tr><td><strong>Enviar como Servidor</strong></td><td>Igual que el anterior pero mediante webhook, con el icono y el nombre del servidor y badge <code>SERVIDOR</code></td></tr><tr><td><strong>Constructor de Embeds</strong></td><td>Crear embeds visualmente, enviarlos y también <strong>cargar y editar</strong> un embed existente por ID de mensaje</td></tr><tr><td><strong>Moderación y AutoMod</strong></td><td>Anti-spam, anti-links, anti-bots, censura de palabras/frases, rol automático al entrar, limpieza de mensajes de usuarios expulsados/baneados</td></tr><tr><td><strong>Anti-Raid</strong></td><td>Activar/desactivar cada uno de los 12 módulos, umbrales, lista blanca y acción de castigo</td></tr><tr><td><strong>Tickets</strong></td><td>Crear paneles (hasta 5 botones + formularios), roles de soporte, canal de logs, tickets activos con botón «Abrir en Discord», historial y transcripciones HTML</td></tr><tr><td><strong>Sorteos</strong></td><td>Crear sorteos, premio y duración, ver participantes, finalizar, cancelar y re-rollear ganadores</td></tr><tr><td><strong>Auto-respuestas</strong></td><td>Respuestas por palabra clave (texto o embed), filtros por canal y rol, vista previa</td></tr><tr><td><strong>Sugerencias</strong></td><td>Canal de sugerencias, listado, comentarios y gestión de estado</td></tr><tr><td><strong>Verificación</strong></td><td>Verificación por reacción o por OAuth2, rol a otorgar, rol a retirar al verificarse, listado de usuarios verificados</td></tr><tr><td><strong>Bienvenidas</strong></td><td>Canal, mensaje personalizado, tarjeta gráfica, fondo e imagen, y botón de prueba</td></tr><tr><td><strong>Logs</strong></td><td>Canal y color <strong>por evento</strong>, historial y botón de limpiar</td></tr><tr><td><strong>Miembros</strong></td><td>Lista de usuarios, ficha detallada, advertencias e historial de acciones</td></tr></tbody></table></div>
+<h2 id="subida-de-archivos">🖼️ Subida de archivos</h2>
+<p>El panel guarda las imágenes subidas (fondos de bienvenida, imágenes de embed) en la carpeta <code>uploads/</code>, que se crea automáticamente y se sirve estáticamente en <code>/uploads</code>. Endpoints: <code>POST /api/upload</code> y <code>GET /api/list-uploads</code>.</p>
+<h2 id="exponer-el-panel-en-internet">🌐 Exponer el panel en Internet</h2>
+<p>Si publicas el panel fuera de <code>localhost</code>:</p>
+<ol><li>Pon <code>LOGIN = true</code>.</li><li>Define <code>PANEL_URL</code> con tu dominio público y añade <code>&lt;PANEL_URL&gt;/callback</code> y <code>&lt;PANEL_URL&gt;/verify-callback</code> en el portal de Discord.</li><li>Sirve el panel detrás de HTTPS (proxy inverso tipo Nginx/Caddy o un túnel).</li><li>Usa un <code>SESSION_SECRET</code> largo y aleatorio.</li></ol>
+<p>Referencia completa de endpoints: <strong><a href="API-del-Panel.html">API del Panel</a></strong>.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#inicio-de-sesion">🔐 Inicio de sesión</a></li><li><a href="#navegacion-por-url">🧭 Navegación por URL</a></li><li><a href="#secciones">📋 Secciones</a></li><li><a href="#subida-de-archivos">🖼️ Subida de archivos</a></li><li><a href="#exponer-el-panel-en-internet">🌐 Exponer el panel en Internet</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

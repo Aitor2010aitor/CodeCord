@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🔧 Configuración · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html" class="active">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="configuracion">🔧 Configuración</h1>
+<h2 id="variables-de-entorno-env">Variables de entorno (<code>.env</code>)</h2>
+<p>Plantilla oficial: <code>.env.example</code>.</p>
+<div class="table-wrap"><table><thead><tr><th>Variable</th><th>Obligatoria</th><th>Descripción</th></tr></thead><tbody><tr><td><code>BOT_TOKEN</code></td><td>✅</td><td>Token del bot de Discord. Sin él, el proceso termina con <code>❌ Error: BOT_TOKEN no definido</code></td></tr><tr><td><code>CLIENT_ID</code></td><td>✅</td><td>ID de la aplicación; necesario para desplegar los slash commands</td></tr><tr><td><code>CLIENT_SECRET</code></td><td>Para OAuth2</td><td>Secret de la aplicación; necesario para el login del panel y la verificación OAuth2</td></tr><tr><td><code>GUILD_ID</code></td><td>Recomendada</td><td>Servidor principal donde registrar los comandos al instante</td></tr><tr><td><code>GUILD_ID_1</code> … <code>GUILD_ID_3</code></td><td>Opcional</td><td>Servidores adicionales para el despliegue de comandos</td></tr><tr><td><code>SESSION_SECRET</code></td><td>Recomendada</td><td>Clave de firma de las sesiones Express del panel</td></tr><tr><td><code>PORT</code></td><td>Opcional</td><td>Puerto del panel web (por defecto <code>22550</code>)</td></tr><tr><td><code>PANEL_URL</code></td><td>Para OAuth2</td><td>URL pública del panel, usada en las redirecciones OAuth2</td></tr><tr><td><code>REQUIRE_DISCORD_AUTH</code></td><td>Opcional</td><td><code>true</code> fuerza autenticación de Discord en el panel</td></tr></tbody></table></div>
+<blockquote><p>⚠️ El fichero <code>.env</code> contiene credenciales: nunca lo subas a un repositorio público. Si se te ha escapado un token, regenéralo en el portal de desarrolladores de Discord.</p></blockquote>
+<h2 id="opcion-login-del-panel">Opción <code>LOGIN</code> del panel</h2>
+<p>En <code>WEB/admin-panel.js</code> (parte superior del archivo) existe la constante:</p>
+<pre class="lang-js"><code>const LOGIN = false;   // true = pide login con Discord | false = abre directo
+const loginRequired = LOGIN === true;   // calculado, no tocar</code></pre>
+<ul><li><code>LOGIN = true</code> (<strong>recomendado</strong>): el panel exige iniciar sesión con Discord (OAuth2). Solo se muestran los servidores donde tienes <strong>Administrador</strong> o <strong>Gestionar servidor</strong>, y la API responde <code>403</code> si intentas tocar otro servidor.</li><li><code>LOGIN = false</code>: el panel se abre directamente, sin login. Úsalo solo en <code>localhost</code> o detrás de un cortafuegos.</li></ul>
+<h2 id="oauth2-de-discord">OAuth2 de Discord</h2>
+<p>En el portal de desarrolladores → <strong>OAuth2 → Redirects</strong>, añade las URLs de redirección:</p>
+<pre class="lang-text"><code>&lt;PANEL_URL&gt;/callback           → login del panel
+&lt;PANEL_URL&gt;/verify-callback    → verificación de usuarios por OAuth2</code></pre>
+<p>Por ejemplo, con <code>PANEL_URL=http://localhost:22550</code>:</p>
+<pre class="lang-text"><code>http://localhost:22550/callback
+http://localhost:22550/verify-callback</code></pre>
+<p>En Windows, el script <code>VER-URLS-DISCORD.bat</code> genera estas URLs automáticamente a partir de tu <code>.env</code>.</p>
+<h2 id="configpanel-configjson"><code>config/panel-config.json</code></h2>
+<p>El panel también lee <code>config/panel-config.json</code>, que puede fijar <code>url</code>, <code>port</code> y <code>requireDiscordAuth</code>. Si <code>url</code> incluye un puerto (por ejemplo <code>http://mi-dominio.com:22550</code>), ese puerto tiene prioridad sobre <code>PORT</code>.</p>
+<h2 id="configuracion-por-servidor">Configuración por servidor</h2>
+<p>Todo lo demás (logs, tickets, bienvenidas, anti-raid, verificación, sorteos, auto-respuestas…) <strong>no</strong> se configura por fichero global, sino por servidor, desde el panel web o los comandos de administración. Se guarda en <code>servidores/&lt;NombreServidor&gt;_&lt;GuildID&gt;/configuracion/*.json</code>. Ver <strong><a href="Almacenamiento-de-Datos.html">Almacenamiento de Datos</a></strong>.</p>
+<p>Los ficheros <code>config/*.json.bak</code> son copias heredadas de la configuración antigua global; <code>configManager.migrateExistingConfigs()</code> se encarga de migrarlas al formato por servidor durante el arranque.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#variables-de-entorno-env">Variables de entorno (.env)</a></li><li><a href="#opcion-login-del-panel">Opción LOGIN del panel</a></li><li><a href="#oauth2-de-discord">OAuth2 de Discord</a></li><li><a href="#configpanel-configjson">config/panel-config.json</a></li><li><a href="#configuracion-por-servidor">Configuración por servidor</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>

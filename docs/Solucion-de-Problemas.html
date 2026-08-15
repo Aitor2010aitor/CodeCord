@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🩺 Solución de problemas · CodeCord</title>
+<meta name="description" content="Documentación de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="index.html">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="Instalacion.html">⚙️ Instalación</a></li>
+                    <li><a href="Configuracion.html">🔧 Configuración</a></li>
+                    <li><a href="Comandos.html">💬 Comandos</a></li>
+                    <li><a href="Panel-Web.html">🖥️ Panel web</a></li>
+                    <li><a href="Sistemas.html">🧩 Sistemas</a></li>
+                    <li><a href="API-del-Panel.html">🔌 API del panel</a></li>
+                    <li><a href="Arquitectura.html">🏗️ Arquitectura</a></li>
+                    <li><a href="Almacenamiento-de-Datos.html">💾 Datos</a></li>
+                    <li><a href="Solucion-de-Problemas.html" class="active">🩺 Problemas</a></li>
+                    <li><a href="Contribuir.html">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+<h1 id="solucion-de-problemas">🩺 Solución de problemas</h1>
+<h2 id="el-bot-no-arranca">El bot no arranca</h2>
+<p><strong><code>❌ Error: BOT_TOKEN no definido en el archivo .env</code></strong> No existe el <code>.env</code> o falta la variable. Copia <code>.env.example</code> a <code>.env</code> y pega tu token.</p>
+<p><strong><code>Used disallowed intents</code></strong> Faltan los <em>Privileged Gateway Intents</em> en el portal de desarrolladores: activa <code>PRESENCE</code>, <code>SERVER MEMBERS</code> y <code>MESSAGE CONTENT</code>.</p>
+<p><strong><code>❌ [CodeCord] Ya hay OTRA instancia del bot ejecutándose (PID xxxx)</code></strong> Hay otro proceso vivo. Ciérralo (<code>Administrador de tareas</code> en Windows, <code>kill &lt;PID&gt;</code> en Linux). Si estás seguro de que no hay ninguno, borra <code>bot.lock</code> y reinicia.</p>
+<p><strong><code>EADDRINUSE</code> al arrancar el panel</strong> El puerto del panel está ocupado. Cambia <code>PORT</code> en el <code>.env</code> (o el puerto de <code>PANEL_URL</code> / <code>config/panel-config.json</code>).</p>
+<h2 id="los-comandos-no-aparecen-en-discord">Los comandos no aparecen en Discord</h2>
+<ol><li>Ejecuta <code>npm run deploy</code>.</li><li>Comprueba que <code>CLIENT_ID</code> es correcto y que el bot se invitó con el scope <code>applications.commands</code>.</li><li>Los comandos por servidor aparecen al instante; los globales pueden tardar hasta 1 hora.</li><li>Si ves comandos duplicados o antiguos, ejecuta <code>node scripts/clear-commands.js</code> y vuelve a desplegar.</li></ol>
+<h2 id="el-panel-no-carga-o-me-redirige-al-login-en-bucle">El panel no carga o me redirige al login en bucle</h2>
+<ul><li>Verifica que las URLs de redirección <code>&lt;PANEL_URL&gt;/callback</code> y <code>&lt;PANEL_URL&gt;/verify-callback</code> están registradas <strong>exactamente igual</strong> (protocolo, dominio y puerto) en el portal de Discord.</li><li><code>PANEL_URL</code> debe coincidir con la URL con la que accedes al panel.</li><li>Define un <code>SESSION_SECRET</code> estable: si cambia, todas las sesiones se invalidan.</li><li>Para depurar en local, puedes poner temporalmente <code>LOGIN = false</code> en <code>WEB/admin-panel.js</code>.</li></ul>
+<h2 id="no-autorizado-403-en-el-panel">«No autorizado / 403» en el panel</h2>
+<p>Con <code>LOGIN = true</code> solo ves y gestionas los servidores donde tienes <strong>Administrador</strong> o <strong>Gestionar servidor</strong> y donde el bot está presente. Comprueba tus permisos en Discord y que el bot sigue en el servidor.</p>
+<h2 id="el-bot-no-borra-mensajes-no-banea-no-crea-canales">El bot no borra mensajes / no banea / no crea canales</h2>
+<p>Es un problema de permisos o de <strong>jerarquía de roles</strong>: el rol del bot debe estar por <strong>encima</strong> del rol del usuario o del rol que quiere modificar, y necesita el permiso correspondiente (<code>Gestionar mensajes</code>, <code>Banear</code>, <code>Gestionar canales</code>, <code>Gestionar roles</code>, <code>Gestionar webhooks</code>).</p>
+<p>Además, Discord no permite borrar en bloque mensajes de más de <strong>14 días</strong> (afecta a <code>/clear</code>).</p>
+<h2 id="los-logs-no-se-envian">Los logs no se envían</h2>
+<p>Configura el canal con <code>/logs</code> o desde la sección <strong>Logs</strong> del panel, y asegúrate de que el bot puede escribir y <strong>insertar enlaces/embeds</strong> en ese canal.</p>
+<h2 id="no-se-crean-las-salas-de-voz-temporales">No se crean las salas de voz temporales</h2>
+<ul><li>Ejecuta <code>/setup</code> o <code>/createcategory</code> para crear la estructura.</li><li>El canal generador debe llamarse de forma reconocible (por ejemplo «🔊 Crear sala»); las salas de espera se detectan por nombre (<code>espera</code>, <code>waiting</code>, <code>sala-de-espera</code>).</li><li>El bot necesita <code>Gestionar canales</code> y <code>Mover miembros</code>.</li></ul>
+<h2 id="la-tarjeta-de-bienvenida-no-se-genera">La tarjeta de bienvenida no se genera</h2>
+<p>Revisa que el sistema esté activado y con canal asignado, y que la imagen de fondo subida exista en <code>uploads/</code>. Usa el botón de prueba de la sección <strong>Bienvenidas</strong> para reproducir el fallo y mira la consola: los errores de Jimp se registran ahí.</p>
+<h2 id="se-ha-filtrado-mi-token">Se ha filtrado mi token</h2>
+<p>Regenera el token en el portal de desarrolladores <strong>inmediatamente</strong>, actualiza el <code>.env</code> y no vuelvas a subirlo al repositorio (<code>.env</code> está en <code>.gitignore</code>).</p>
+<h2 id="sigues-atascado">¿Sigues atascado?</h2>
+<p>Abre una incidencia en <a href="https://github.com/aitor1234567899/CodeCord/issues" target="_blank" rel="noopener">https://github.com/aitor1234567899/CodeCord/issues</a> o pregunta en el <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">servidor de Discord</a>, indicando la versión, el sistema operativo, la versión de Node y el error completo de la consola.</p>
+        </article>
+        <aside class="toc"><p class="toc-title">En esta página</p><ul><li><a href="#el-bot-no-arranca">El bot no arranca</a></li><li><a href="#los-comandos-no-aparecen-en-discord">Los comandos no aparecen en Discord</a></li><li><a href="#el-panel-no-carga-o-me-redirige-al-login-en-bucle">El panel no carga o me redirige al login en bucle</a></li><li><a href="#no-autorizado-403-en-el-panel">«No autorizado / 403» en el panel</a></li><li><a href="#el-bot-no-borra-mensajes-no-banea-no-crea-canales">El bot no borra mensajes / no banea / no crea canales</a></li><li><a href="#los-logs-no-se-envian">Los logs no se envían</a></li><li><a href="#no-se-crean-las-salas-de-voz-temporales">No se crean las salas de voz temporales</a></li><li><a href="#la-tarjeta-de-bienvenida-no-se-genera">La tarjeta de bienvenida no se genera</a></li><li><a href="#se-ha-filtrado-mi-token">Se ha filtrado mi token</a></li><li><a href="#sigues-atascado">¿Sigues atascado?</a></li></ul></aside>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">Generado automáticamente desde <code>/wiki</code> con <code>npm run docs</code>.</p>
+</footer>
+<script>
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>
