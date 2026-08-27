@@ -1,7 +1,13 @@
 
 # 🤖 Bot de Discord + Panel Web Administrativo (CodeCord)
 
+
 ---
+
+<h1 align="center">Hola 👋 soy Aitor ✨</h1>
+
+<p align="center"> <a href="https://www.tiktok.com/@aitor2010aitor"> <img src="https://img.shields.io/badge/TikTok-%40aitor2010aitor-black?style=for-the-badge&logo=tiktok&logoColor=white" /> </a> <a href="https://github.com/aitor1234567899?tab=repositories"> <img src="https://img.shields.io/badge/GitHub-Mis%20repositorios-181717?style=for-the-badge&logo=github&logoColor=white" /> </a> </p>
+
 
 > [!IMPORTANT]
 >
