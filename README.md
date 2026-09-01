@@ -25,6 +25,9 @@
 > * **Página Web de Verificación OAuth2 Renovada**: La pantalla web que ven los usuarios al verificarse (`/verify-callback`) fue rediseñada al estilo ProBot/Nekotina con tarjeta glassmorphism, avatar de usuario y servidor con anillo neón, insignia de check esmeralda animada, tarjeta de rol asignado y botón de retorno a Discord.
 > * **Formularios y Controles Modernizados**: Switches estilo iOS/Discord con resplandor neón verde, selectores con foco luminoso y previsualizaciones fidedignas al chat de Discord.
 >
+<img width="1591" height="761" alt="E87BDA78-3C67-48BD-99FC-DB8E2790F47B" src="https://github.com/user-attachments/assets/9142d3cb-a34f-4719-b7aa-5de562065851" />
+
+
 > ### ⚠️ Cambios en comandos y moderación
 > * Los comandos de juegos usan ahora el prefijo `!` para no saturar la lista de Discord. El único comando de juegos disponible con `/` es `/juegos`.
 > * Los comandos de AutoMod se eliminaron de Discord. AutoMod se configura desde el panel web, en **Moderación / AutoMod** y **Anti-Raid**.
