@@ -65,6 +65,7 @@ Guía detallada: **[[Instalacion]]**.
 * **Botón de Menú de 3 Palitos Animado (Hamburguesa)**: Ubicado en la cabecera lateral junto a CodeCord Online y en el header principal. Cuenta con micro-animación fluida de 3 barras para plegar/desplegar la barra con transición suave (`cubic-bezier`), soporte para pantalla completa en desktop y menú flotante (*drawer*) con fondo oscuro desenfocado en móviles.
 * **Buscador Rápido Global (`Ctrl + K` / Quick Jump)**: Barra de búsqueda instantánea interactiva que permite filtrar y saltar a cualquier módulo o ajuste de inmediato.
 * **Dashboard con Hero Banner y Module Cards**: Banner visual con resumen de salud del bot e indicadores en vivo, junto a una cuadrícula de tarjetas de módulos (*Module Cards*) con accesos directos de configuración.
+* **Página Web de Verificación OAuth2 para Miembros**: La pantalla que ven los miembros al verificarse (`/verify-callback`) fue rediseñada al estilo ProBot/Nekotina con tarjeta glassmorphism, avatar con resplandor neón, insignia esmeralda animada y botón de regreso a Discord.
 * **Formularios y Controles Modernizados**: Switches estilo iOS/Discord con resplandor neón verde, selectores con foco luminoso y previsualizaciones fidedignas al chat de Discord.
 
 ### ⚠️ Notificación automática por Mensaje Directo (MD) en `/warn`

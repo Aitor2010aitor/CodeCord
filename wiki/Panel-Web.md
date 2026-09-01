@@ -15,6 +15,7 @@ El panel cuenta con un sistema de diseño visual moderno:
 * **Botón de Menú de 3 Palitos (Hamburguesa)**: Ubicado junto al nombre/avatar del bot y en la cabecera principal. Permite plegar y desplegar la barra lateral con una micro-animación fluida de 3 barras horizontales simétricas y soporte para pantalla completa en desktop y overlay móvil.
 * **Buscador Rápido Global (`Ctrl + K` / Quick Jump)**: Paleta de comandos interactiva que permite filtrar y saltar a cualquier módulo al instante con el teclado o el ratón.
 * **Hero Banner & Module Cards**: Dashboard de bienvenida con chips de estado en vivo y tarjetas de acceso directo para configurar cada módulo.
+* **Pantalla de Verificación OAuth2 para Miembros**: La página web que ven los usuarios al verificarse (`/verify-callback`) fue rediseñada con tarjeta glassmorphism, avatar con resplandor neón, insignia esmeralda animada de éxito y botón para regresar a Discord.
 
 ---
 

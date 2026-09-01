@@ -3740,57 +3740,53 @@
       </div>
     </div>
 
-    <!-- Verification Section -->
+        <!-- Verification Section -->
     <div id="verification" class="section">
-      <div class="section-header" style="margin-bottom: 20px;">
-        <span class="section-title">🛡 Sistema de Verificación Dual</span>
-        <div style="display: flex; gap: 10px;">
-          <button onclick="loadVerificationConfig()" class="view-btn"
-            style="background: rgba(255,255,255,0.1); color: white;">
+      <div class="section-header">
+        <div>
+          <span class="section-title"><i class="fas fa-user-check" style="color: var(--accent);"></i> Sistema de Verificación Dual</span>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Protege tu servidor exigiendo verificación por reacción de emoji o por aplicación autorizada (OAuth2).</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button onclick="loadVerificationConfig()" class="view-btn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border-subtle);">
             <i class="fas fa-sync-alt"></i> Recargar
           </button>
-          <button onclick="saveVerificationConfig()" class="view-btn"
-            style="background: var(--success); color: #181825; font-weight: 700;">
+          <button onclick="saveVerificationConfig()" class="view-btn" style="background: var(--success); color: #0a0d14; font-weight: 700; box-shadow: 0 0 15px var(--success-glow);">
             <i class="fas fa-save"></i> Guardar Ajustes
           </button>
         </div>
       </div>
 
-      <!-- Subtabs navigation -->
-      <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-        <button class="view-btn active-tab" onclick="switchVerificationSubTab('emoji')" id="verify-sub-emoji"
-          style="background: var(--accent); color: white;">
+      <!-- Subtabs navigation estilo ProBot / Dyno -->
+      <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); width: fit-content;">
+        <button class="view-btn active-tab" onclick="switchVerificationSubTab('emoji')" id="verify-sub-emoji" style="background: var(--accent); color: white; padding: 7px 14px; font-size: 0.84rem;">
           <i class="fas fa-smile"></i> Verificación con Emoji
         </button>
-        <button class="view-btn" onclick="switchVerificationSubTab('oauth')" id="verify-sub-oauth"
-          style="background: rgba(255,255,255,0.1); color: white;">
-          <i class="fas fa-shield-alt"></i> Verificación por App Autorizada
+        <button class="view-btn" onclick="switchVerificationSubTab('oauth')" id="verify-sub-oauth" style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
+          <i class="fas fa-shield-alt"></i> Verificación por App (OAuth2)
         </button>
-        <button class="view-btn" onclick="switchVerificationSubTab('users')" id="verify-sub-users"
-          style="background: rgba(255,255,255,0.1); color: white;">
+        <button class="view-btn" onclick="switchVerificationSubTab('users')" id="verify-sub-users" style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
           <i class="fas fa-users-cog"></i> Usuarios Verificados
         </button>
-        <button class="view-btn" onclick="switchVerificationSubTab('settings')" id="verify-sub-settings"
-          style="background: rgba(255,255,255,0.1); color: white;">
-          <i class="fas fa-cog"></i> Ajustes
+        <button class="view-btn" onclick="switchVerificationSubTab('settings')" id="verify-sub-settings" style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
+          <i class="fas fa-cog"></i> Ajustes Avanzados
         </button>
       </div>
 
       <!-- TAB 1: EMOJI VERIFICATION -->
       <div id="verify-tab-emoji" style="display: block;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1200px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
           <!-- LEFT: Form -->
-          <div
-            style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px;">
-            <div
-              style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
-              <div>
-                <h3
-                  style="color: var(--accent); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; margin: 0;">
-                  <i class="fas fa-smile"></i> Verificación con Emoji
-                </h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; margin-bottom: 0;">
-                  Los usuarios reaccionan a un mensaje para obtener su rol.</p>
+          <div class="log-config-card" style="padding: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(88, 101, 242, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.2rem;">
+                  <i class="fas fa-smile"></i>
+                </div>
+                <div>
+                  <h3 style="color: white; font-size: 1.05rem; font-weight: 700; margin: 0;">Verificación por Reacción</h3>
+                  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; margin-bottom: 0;">Reaccionar a un mensaje para ganar acceso inmediato.</p>
+                </div>
               </div>
               <label class="switch">
                 <input type="checkbox" id="verify-reaction-enabled">
@@ -3800,156 +3796,109 @@
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">CANAL
-                  DEL MENSAJE</label>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANAL DEL MENSAJE</label>
                 <select id="verify-reaction-channel" class="log-select" style="margin: 0;"></select>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px;">
+              <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px;">
                 <div>
-                  <label
-                    style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">EMOJI</label>
-                  <input type="text" id="verify-reaction-emoji" class="log-select" placeholder="Ej: ✅"
-                    style="margin: 0;" oninput="updateVerifyPreview()">
+                  <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">EMOJI</label>
+                  <input type="text" id="verify-reaction-emoji" class="log-select" placeholder="Ej: ✅" style="margin: 0;" oninput="updateVerifyPreview()">
                 </div>
                 <div>
-                  <label
-                    style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ROL
-                    A ASIGNAR</label>
+                  <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ROL A ASIGNAR</label>
                   <select id="verify-reaction-role" class="log-select" style="margin: 0;"></select>
                 </div>
               </div>
 
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">TÍTULO
-                  DEL EMBED</label>
-                <input type="text" id="verify-reaction-title" placeholder="Ej: Verificación Requerida"
-                  class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TÍTULO DEL EMBED</label>
+                <input type="text" id="verify-reaction-title" placeholder="Ej: Verificación Requerida" class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
               </div>
 
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">DESCRIPCIÓN
-                  DEL EMBED</label>
-                <div style="display:flex; gap:5px; margin-bottom:8px; flex-wrap:wrap;">
-                  <button onclick="applyFormat('verify-reaction-desc','bold')" title="Negrita"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; font-weight:700; font-size:0.82rem;"><b>B</b></button>
-                  <button onclick="applyFormat('verify-reaction-desc','italic')" title="Cursiva"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; font-style:italic; font-size:0.82rem;"><i>I</i></button>
-                  <button onclick="applyFormat('verify-reaction-desc','underline')" title="Subrayado"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; text-decoration:underline; font-size:0.82rem;">U</button>
-                  <button onclick="applyFormat('verify-reaction-desc','strikethrough')" title="Tachado"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; text-decoration:line-through; font-size:0.82rem;">S</button>
-                  <button onclick="applyFormat('verify-reaction-desc','code')" title="Código"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:#57f287; cursor:pointer; font-family:monospace; font-size:0.82rem;">`c`</button>
-                  <button onclick="applyFormat('verify-reaction-desc','link')" title="Insertar enlace"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:#00b0f4; cursor:pointer; font-size:0.82rem;">🔍—
-                    Link</button>
-                  <button onclick="applyFormat('verify-reaction-desc','quote')" title="Cita"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:var(--text-muted); cursor:pointer; font-size:0.82rem;">&#x275D;
-                    Cita</button>
-                  <button onclick="applyFormat('verify-reaction-desc','list')" title="Lista"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; font-size:0.82rem;">&bull;
-                    Lista</button>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DESCRIPCIÓN DEL EMBED</label>
+                <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
+                  <button onclick="applyFormat('verify-reaction-desc','bold')" title="Negrita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><b>B</b></button>
+                  <button onclick="applyFormat('verify-reaction-desc','italic')" title="Cursiva" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i>I</i></button>
+                  <button onclick="applyFormat('verify-reaction-desc','underline')" title="Subrayado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:underline;">U</button>
+                  <button onclick="applyFormat('verify-reaction-desc','strikethrough')" title="Tachado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:line-through;">S</button>
+                  <button onclick="applyFormat('verify-reaction-desc','code')" title="Código" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--success); font-family:monospace;">&grave;c&grave;</button>
+                  <button onclick="applyFormat('verify-reaction-desc','link')" title="Insertar enlace" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--accent-cyan);"><i class="fas fa-link"></i> Link</button>
+                  <button onclick="applyFormat('verify-reaction-desc','quote')" title="Cita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted);"><i class="fas fa-quote-left"></i> Cita</button>
+                  <button onclick="applyFormat('verify-reaction-desc','list')" title="Lista" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i class="fas fa-list-ul"></i> Lista</button>
                 </div>
-                <textarea id="verify-reaction-desc"
-                  placeholder="Ej: Reacciona al emoji de abajo para acceder al servidor." class="log-select"
-                  style="margin: 0; min-height: 80px; resize: vertical;" oninput="updateVerifyPreview()"></textarea>
+                <textarea id="verify-reaction-desc" placeholder="Ej: Reacciona al emoji de abajo para acceder al servidor." class="log-select" style="margin: 0; min-height: 85px;" oninput="updateVerifyPreview()"></textarea>
               </div>
 
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">COLOR
-                  DEL EMBED</label>
-                <input type="color" id="verify-reaction-color" value="#5865f2"
-                  style="width: 100%; height: 40px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer;"
-                  oninput="updateVerifyPreview()">
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLOR DEL EMBED</label>
+                <input type="color" id="verify-reaction-color" value="#5865f2" class="color-input" style="width: 100%; height: 42px;" oninput="updateVerifyPreview()">
               </div>
 
               <!-- Imagenes Adicionales para Reaccion -->
-              <div class="image-manager-container"
-                style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; margin-top: 10px;">
-                <label
-                  style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">
-                  🖼 Imágenes Adicionales (Sin límite)
+              <div class="image-manager-container" style="border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 14px; background: rgba(0,0,0,0.2);">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
+                  🖼️ Imágenes Adicionales (Sin límite)
                 </label>
-                <div id="verif-emoji-image-list"
-                  style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
-                <button type="button" onclick="addImageRow('verif-emoji')" class="view-btn"
-                  style="padding: 6px 12px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.2); color: white; border: 1px solid rgba(88, 101, 242, 0.4); width: auto; align-self: flex-start; margin: 0;">
+                <div id="verif-emoji-image-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
+                <button type="button" onclick="addImageRow('verif-emoji')" class="view-btn" style="padding: 6px 14px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.15); color: var(--accent-light); border: 1px solid rgba(88, 101, 242, 0.3);">
                   <i class="fas fa-plus"></i> Añadir Imagen
                 </button>
               </div>
 
-              <button onclick="sendVerificationReaction()" class="view-btn"
-                style="background: var(--accent); color: white; padding: 14px; font-weight: 700; border-radius: 10px; margin-top: 10px; width: 100%;">
+              <button onclick="sendVerificationReaction()" class="view-btn" style="background: var(--accent); color: white; padding: 14px; font-weight: 700; border-radius: var(--radius-md); margin-top: 6px; width: 100%; justify-content: center;">
                 <i class="fas fa-paper-plane"></i> Enviar Mensaje de Verificación
               </button>
-              <span id="verify-reaction-msg-status"
-                style="font-size: 0.75rem; color: var(--text-muted); text-align: center; display: block; margin-top: -5px;"></span>
+              <span id="verify-reaction-msg-status" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; display: block; margin-top: 4px;"></span>
             </div>
           </div>
 
           <!-- RIGHT: Preview -->
           <div>
             <div style="position: sticky; top: 20px;">
-              <label
-                style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">VISTA
-                PREVIA EN DISCORD</label>
-              <div
-                style="background: #313338; border-radius: 12px; padding: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.2);">
-                <div style="display: flex; gap: 12px;">
-                  <img src="https://cdn.discordapp.com/embed/avatars/0.png"
-                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.05);"
-                    id="verify-emoji-preview-avatar" />
-                  <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                      <span style="color: #f2f3f5; font-weight: 600; font-size: 0.95rem;"
-                        id="verify-emoji-preview-botname">RTXSERVERBOT</span>
-                      <span
-                        style="background: #5865F2; color: white; font-size: 0.625rem; padding: 2px 5px; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">BOT</span>
-                      <span style="color: #949ba4; font-size: 0.75rem;">Hoy a las 16:00</span>
-                    </div>
-
-                    <div id="verify-emoji-preview-embed"
-                      style="border-left: 4px solid #5865f2; background: #2b2d31; border-radius: 4px; padding: 12px 16px; margin-top: 8px; max-width: 520px;">
-                      <div id="verify-emoji-preview-title"
-                        style="color: #ffffff; font-weight: 600; font-size: 1rem; margin-bottom: 6px; word-break: break-word;">
-                        Verificación Requerida</div>
-                      <div id="verify-emoji-preview-desc"
-                        style="color: #dbdee1; font-size: 0.875rem; white-space: pre-wrap; word-break: break-word;">
-                        Reacciona al emoji de abajo para acceder al servidor.</div>
-                    </div>
-
-                    <div
-                      style="margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; background: #2b2d31; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
-                      <span id="verify-emoji-preview-emoji">✅</span>
-                      <span style="color: #dbdee1; font-size: 0.8rem; font-weight: 600;">1</span>
+              <label style="display: block; margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">VISTA PREVIA EN DISCORD</label>
+              <div class="discord-preview-container">
+                <div class="discord-msg-header">
+                  <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="discord-bot-avatar" id="verify-emoji-preview-avatar" />
+                  <div>
+                    <div class="discord-bot-author">
+                      <span id="verify-emoji-preview-botname">CodeCord</span>
+                      <span class="discord-bot-badge">BOT</span>
+                      <span class="discord-timestamp">Hoy a las 16:00</span>
                     </div>
                   </div>
+                </div>
+
+                <div class="discord-preview" id="verify-emoji-preview-embed">
+                  <div class="preview-title" id="verify-emoji-preview-title">Verificación Requerida</div>
+                  <div class="preview-content" id="verify-emoji-preview-desc">Reacciona al emoji de abajo para acceder al servidor.</div>
+                </div>
+
+                <div style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: #2b2d31; padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08);">
+                  <span id="verify-emoji-preview-emoji" style="font-size: 1.1rem;">✅</span>
+                  <span style="color: #dbdee1; font-size: 0.85rem; font-weight: 700;">1</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <!-- TAB 2: OAUTH VERIFICATION -->
       <div id="verify-tab-oauth" style="display: none;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1200px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
           <!-- LEFT: Form -->
-          <div
-            style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px;">
-            <div
-              style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
-              <div>
-                <h3
-                  style="color: var(--success); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; margin: 0;">
-                  <i class="fas fa-shield-alt"></i> Verificación por App Autorizada
-                </h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; margin-bottom: 0;">
-                  Más seguro. Los usuarios autorizan al bot en la web para obtener su rol.</p>
+          <div class="log-config-card" style="padding: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 1.2rem;">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                  <h3 style="color: var(--success); font-size: 1.05rem; font-weight: 700; margin: 0;">Verificación por App Autorizada</h3>
+                  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; margin-bottom: 0;">Máxima seguridad anti-bots mediante OAuth2 de Discord.</p>
+                </div>
               </div>
               <label class="switch">
                 <input type="checkbox" id="verify-oauth-enabled">
@@ -3959,141 +3908,88 @@
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">CANAL
-                  DEL PANEL</label>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANAL DEL PANEL</label>
                 <select id="verify-oauth-channel" class="log-select" style="margin: 0;"></select>
               </div>
 
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ROL
-                  A ASIGNAR AL VERIFICAR</label>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ROL A ASIGNAR AL VERIFICAR</label>
                 <select id="verify-oauth-role" class="log-select" style="margin: 0;"></select>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
-                <div>
-                  <label
-                    style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">TEXTO
-                    DEL BOTÓN</label>
-                  <input type="text" id="verify-oauth-btntext" placeholder="Ej: Verificarse" class="log-select"
-                    style="margin: 0;" oninput="updateVerifyPreview()">
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TEXTO DEL BOTÓN</label>
+                <input type="text" id="verify-oauth-btntext" placeholder="Ej: Verificarse" class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
+              </div>
+
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TÍTULO DEL EMBED</label>
+                <input type="text" id="verify-oauth-title" placeholder="Ej: Verificación Necesaria" class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
+              </div>
+
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DESCRIPCIÓN DEL EMBED</label>
+                <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
+                  <button onclick="applyFormat('verify-oauth-desc','bold')" title="Negrita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><b>B</b></button>
+                  <button onclick="applyFormat('verify-oauth-desc','italic')" title="Cursiva" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i>I</i></button>
+                  <button onclick="applyFormat('verify-oauth-desc','underline')" title="Subrayado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:underline;">U</button>
+                  <button onclick="applyFormat('verify-oauth-desc','strikethrough')" title="Tachado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:line-through;">S</button>
+                  <button onclick="applyFormat('verify-oauth-desc','code')" title="Código" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--success); font-family:monospace;">&grave;c&grave;</button>
+                  <button onclick="applyFormat('verify-oauth-desc','link')" title="Insertar enlace" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--accent-cyan);"><i class="fas fa-link"></i> Link</button>
+                  <button onclick="applyFormat('verify-oauth-desc','quote')" title="Cita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted);"><i class="fas fa-quote-left"></i> Cita</button>
+                  <button onclick="applyFormat('verify-oauth-desc','list')" title="Lista" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i class="fas fa-list-ul"></i> Lista</button>
                 </div>
+                <textarea id="verify-oauth-desc" placeholder="Ej: Haz clic en el botón inferior para autorizar la aplicación de verificación y obtener acceso." class="log-select" style="margin: 0; min-height: 85px;" oninput="updateVerifyPreview()"></textarea>
               </div>
 
               <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">TÍTULO
-                  DEL EMBED</label>
-                <input type="text" id="verify-oauth-title" placeholder="Ej: Verificación Necesaria" class="log-select"
-                  style="margin: 0;" oninput="updateVerifyPreview()">
-              </div>
-
-              <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">DESCRIPCIÓN
-                  DEL EMBED</label>
-                <div style="display:flex; gap:5px; margin-bottom:8px; flex-wrap:wrap;">
-                  <button onclick="applyFormat('verify-oauth-desc','bold')" title="Negrita"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; font-weight:700; font-size:0.82rem;"><b>B</b></button>
-                  <button onclick="applyFormat('verify-oauth-desc','italic')" title="Cursiva"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; font-style:italic; font-size:0.82rem;"><i>I</i></button>
-                  <button onclick="applyFormat('verify-oauth-desc','underline')" title="Subrayado"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; text-decoration:underline; font-size:0.82rem;">U</button>
-                  <button onclick="applyFormat('verify-oauth-desc','strikethrough')" title="Tachado"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; text-decoration:line-through; font-size:0.82rem;">S</button>
-                  <button onclick="applyFormat('verify-oauth-desc','code')" title="Código"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:#57f287; cursor:pointer; font-family:monospace; font-size:0.82rem;">`c`</button>
-                  <button onclick="applyFormat('verify-oauth-desc','link')" title="Insertar enlace"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:#00b0f4; cursor:pointer; font-size:0.82rem;">🔍—
-                    Link</button>
-                  <button onclick="applyFormat('verify-oauth-desc','quote')" title="Cita"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:var(--text-muted); cursor:pointer; font-size:0.82rem;">&#x275D;
-                    Cita</button>
-                  <button onclick="applyFormat('verify-oauth-desc','list')" title="Lista"
-                    style="padding:4px 9px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.07); color:white; cursor:pointer; font-size:0.82rem;">&bull;
-                    Lista</button>
-                </div>
-                <textarea id="verify-oauth-desc"
-                  placeholder="Ej: Haz clic en el botón inferior para autorizar la aplicación de verificación y obtener acceso."
-                  class="log-select" style="margin: 0; min-height: 80px; resize: vertical;"
-                  oninput="updateVerifyPreview()"></textarea>
-              </div>
-
-              <div>
-                <label
-                  style="display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">COLOR
-                  DEL EMBED</label>
-                <input type="color" id="verify-oauth-color" value="#5865f2"
-                  style="width: 100%; height: 40px; background: #181825; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer;"
-                  oninput="updateVerifyPreview()">
+                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLOR DEL EMBED</label>
+                <input type="color" id="verify-oauth-color" value="#5865f2" class="color-input" style="width: 100%; height: 42px;" oninput="updateVerifyPreview()">
               </div>
 
               <!-- Imagenes Adicionales para OAuth -->
-              <div class="image-manager-container"
-                style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; margin-top: 10px;">
-                <label
-                  style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">
-                  🖼 Imágenes Adicionales (Sin límite)
+              <div class="image-manager-container" style="border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 14px; background: rgba(0,0,0,0.2);">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
+                  🖼️ Imágenes Adicionales (Sin límite)
                 </label>
-                <div id="verif-oauth-image-list"
-                  style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
-                <button type="button" onclick="addImageRow('verif-oauth')" class="view-btn"
-                  style="padding: 6px 12px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.2); color: white; border: 1px solid rgba(88, 101, 242, 0.4); width: auto; align-self: flex-start; margin: 0;">
+                <div id="verif-oauth-image-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
+                <button type="button" onclick="addImageRow('verif-oauth')" class="view-btn" style="padding: 6px 14px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.15); color: var(--accent-light); border: 1px solid rgba(88, 101, 242, 0.3);">
                   <i class="fas fa-plus"></i> Añadir Imagen
                 </button>
               </div>
 
-              <button onclick="sendVerificationOAuth()" class="view-btn"
-                style="background: var(--success); color: #181825; padding: 14px; font-weight: 700; border-radius: 10px; margin-top: 10px; width: 100%;">
+              <button onclick="sendVerificationOAuth()" class="view-btn" style="background: var(--success); color: #0a0d14; padding: 14px; font-weight: 700; border-radius: var(--radius-md); margin-top: 6px; width: 100%; justify-content: center; box-shadow: 0 0 15px var(--success-glow);">
                 <i class="fas fa-paper-plane"></i> Enviar Panel de App Autorizada
               </button>
-              <span id="verify-oauth-msg-status"
-                style="font-size: 0.75rem; color: var(--text-muted); text-align: center; display: block; margin-top: -5px;"></span>
+              <span id="verify-oauth-msg-status" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; display: block; margin-top: 4px;"></span>
             </div>
           </div>
 
           <!-- RIGHT: Preview -->
           <div>
             <div style="position: sticky; top: 20px;">
-              <label
-                style="display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">VISTA
-                PREVIA EN DISCORD</label>
-              <div
-                style="background: #313338; border-radius: 12px; padding: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.2);">
-                <div style="display: flex; gap: 12px;">
-                  <img src="https://cdn.discordapp.com/embed/avatars/0.png"
-                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.05);"
-                    id="verify-oauth-preview-avatar" />
-                  <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                      <span style="color: #f2f3f5; font-weight: 600; font-size: 0.95rem;"
-                        id="verify-oauth-preview-botname">RTXSERVERBOT</span>
-                      <span
-                        style="background: #5865F2; color: white; font-size: 0.625rem; padding: 2px 5px; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">BOT</span>
-                      <span style="color: #949ba4; font-size: 0.75rem;">Hoy a las 16:00</span>
-                    </div>
-
-                    <div id="verify-oauth-preview-embed"
-                      style="border-left: 4px solid #5865f2; background: #2b2d31; border-radius: 4px; padding: 12px 16px; margin-top: 8px; max-width: 520px;">
-                      <div id="verify-oauth-preview-title"
-                        style="color: #ffffff; font-weight: 600; font-size: 1rem; margin-bottom: 6px; word-break: break-word;">
-                        Verificación Requerida</div>
-                      <div id="verify-oauth-preview-desc"
-                        style="color: #dbdee1; font-size: 0.875rem; white-space: pre-wrap; word-break: break-word;">
-                        Haz clic en el botón inferior para autorizar la aplicación de
-                        verificación y obtener acceso.</div>
-                    </div>
-
-                    <div style="margin-top: 8px;">
-                      <button
-                        style="background: #4e5058; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-external-link-alt"></i> <span
-                          id="verify-oauth-preview-btntext">Verificarse</span>
-                      </button>
+              <label style="display: block; margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">VISTA PREVIA EN DISCORD</label>
+              <div class="discord-preview-container">
+                <div class="discord-msg-header">
+                  <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="discord-bot-avatar" id="verify-oauth-preview-avatar" />
+                  <div>
+                    <div class="discord-bot-author">
+                      <span id="verify-oauth-preview-botname">CodeCord</span>
+                      <span class="discord-bot-badge">BOT</span>
+                      <span class="discord-timestamp">Hoy a las 16:00</span>
                     </div>
                   </div>
+                </div>
+
+                <div class="discord-preview" id="verify-oauth-preview-embed">
+                  <div class="preview-title" id="verify-oauth-preview-title">Verificación Requerida</div>
+                  <div class="preview-content" id="verify-oauth-preview-desc">Haz clic en el botón inferior para autorizar la aplicación de verificación y obtener acceso.</div>
+                </div>
+
+                <div style="margin-top: 12px;">
+                  <button style="background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 12px var(--accent-glow);">
+                    <i class="fas fa-external-link-alt"></i> <span id="verify-oauth-preview-btntext">Verificarse</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -4103,41 +3999,32 @@
 
       <!-- TAB 3: USUARIOS VERIFICADOS -->
       <div id="verify-tab-users" style="display: none;">
-        <div
-          style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px;">
-          <div
-            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+        <div class="log-config-card" style="padding: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px; flex-wrap: wrap; gap: 12px;">
             <div>
-              <h3 style="color: white; font-size: 1.1rem; margin: 0;">👥 Usuarios Verificados
-              </h3>
-              <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; margin-bottom: 0;">Estos
-                usuarios han autorizado al bot. Puedes restaurar su membresía si se salen o si el servidor
-                sufre algún problema.</p>
+              <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin: 0;">👥 Usuarios Verificados</h3>
+              <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; margin-bottom: 0;">Usuarios que han completado la verificación OAuth2. Puedes restaurar su membresía si se salen.</p>
             </div>
-            <button onclick="loadVerifiedUsers()" class="view-btn"
-              style="background: rgba(255,255,255,0.1); color: white;">
+            <button onclick="loadVerifiedUsers()" class="view-btn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border-subtle);">
               <i class="fas fa-sync"></i> Actualizar Lista
             </button>
           </div>
 
           <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <table>
               <thead>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                  <th style="padding: 12px 8px; color: var(--text-muted); font-size: 0.85rem;">Usuario
-                  </th>
-                  <th style="padding: 12px 8px; color: var(--text-muted); font-size: 0.85rem;">ID de
-                    Discord</th>
-                  <th style="padding: 12px 8px; color: var(--text-muted); font-size: 0.85rem;">Fecha
-                    Verificado</th>
-                  <th style="padding: 12px 8px; color: var(--text-muted); text-align: right; font-size: 0.85rem;">
-                    Acciones</th>
+                <tr>
+                  <th>Usuario</th>
+                  <th>ID de Discord</th>
+                  <th>Fecha Verificado</th>
+                  <th style="text-align: right;">Acciones</th>
                 </tr>
               </thead>
               <tbody id="verify-users-body">
                 <tr>
                   <td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">
-                    Cargando usuarios...</td>
+                    <div class="spinner" style="width: 24px; height: 24px; margin-bottom: 8px;"></div> Cargando usuarios...
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -4147,85 +4034,61 @@
 
       <!-- TAB 4: AJUSTES DE VERIFICACIÓN -->
       <div id="verify-tab-settings" style="display: none;">
-        <div
-          style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px; max-width: 700px;">
-          <div
-            style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
-            <div
-              style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #f9e2af, #fab387); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-              ⚙️</div>
+        <div class="log-config-card" style="padding: 26px; max-width: 780px;">
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--warning);">
+              <i class="fas fa-sliders-h"></i>
+            </div>
             <div>
-              <h3 style="color: white; font-size: 1.05rem; margin: 0;">Ajustes Avanzados de
-                Verificación</h3>
-              <p style="color: var(--text-muted); font-size: 0.8rem; margin: 2px 0 0;">Configuración
-                del rol no verificado y acceso automático a canales</p>
+              <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin: 0;">Ajustes Avanzados de Verificación</h3>
+              <p style="color: var(--text-muted); font-size: 0.82rem; margin: 2px 0 0;">Configuración de aislamiento de canales y roles automáticos.</p>
             </div>
           </div>
 
           <!-- Rol sin verificar -->
-          <div style="margin-bottom: 28px;">
-            <div
-              style="display: flex; align-items: flex-start; gap: 14px; background: rgba(249,226,175,0.07); border: 1px solid rgba(249,226,175,0.15); border-radius: 12px; padding: 18px; margin-bottom: 18px;">
-              <div style="font-size: 1.4rem; margin-top: 2px;">🔍</div>
+          <div style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: flex-start; gap: 14px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
+              <div style="font-size: 1.3rem; color: var(--warning);"><i class="fas fa-shield-alt"></i></div>
               <div>
-                <h4 style="color: #f9e2af; margin: 0 0 6px; font-size: 0.95rem;">Rol de No Verificados</h4>
+                <h4 style="color: var(--warning); margin: 0 0 4px; font-size: 0.92rem; font-weight: 700;">Aislamiento para No Verificados</h4>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0; line-height: 1.5;">
-                  Selecciona el rol que tienen los usuarios <strong style="color: white;">no verificados</strong>.
-                  Cuando se cree un canal nuevo en el servidor, el bot automáticamente configurará ese
-                  canal para que ese rol <strong style="color: #f38ba8;">no pueda verlo</strong>, protegiéndolo
-                  hasta que
-                  el usuario se verifique.
+                  Al crear un canal nuevo en el servidor, el bot configurará automáticamente ese canal para que el rol no verificado <strong style="color: var(--danger);">no pueda verlo</strong>, protegiéndolo hasta completar la verificación.
                 </p>
               </div>
             </div>
 
-            <label
-              style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
-              <i class="fas fa-user-slash" style="color: #f9e2af; margin-right: 6px;"></i>
+            <label style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-user-slash" style="color: var(--warning); margin-right: 6px;"></i>
               Rol sin verificar (ocultar canales nuevos automáticamente)
             </label>
             <select id="verify-settings-unverified-role" class="log-select" style="margin: 0; width: 100%;">
               <option value="">— Sin rol configurado (desactivado) —</option>
             </select>
-            <p style="color: var(--text-muted); font-size: 0.78rem; margin-top: 8px;">
-              <i class="fas fa-info-circle" style="color: var(--accent);"></i>
-              El bot necesita tener el permiso <strong style="color: white;">Gestionar Canales</strong> para aplicar esta
-              configuración automáticamente.
-            </p>
           </div>
 
           <!-- Rol a retirar al verificar -->
-          <div style="margin-bottom: 28px;">
-            <label
-              style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
-              <i class="fas fa-user-minus" style="color: #f38ba8; margin-right: 6px;"></i>
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fas fa-user-minus" style="color: var(--danger); margin-right: 6px;"></i>
               Rol a retirar al verificarse
             </label>
             <select id="verify-settings-remove-role" class="log-select" style="margin: 0; width: 100%;">
               <option value="">— Sin rol configurado (desactivado) —</option>
             </select>
-            <p style="color: var(--text-muted); font-size: 0.78rem; margin-top: 8px;">
-              <i class="fas fa-info-circle" style="color: var(--accent);"></i>
-              Este rol se quitará del usuario tan pronto como complete la verificación (reacción o OAuth2).
-            </p>
           </div>
 
           <!-- Estado actual -->
-          <div id="verify-settings-status"
-            style="display: none; background: rgba(166,227,161,0.08); border: 1px solid rgba(166,227,161,0.2); border-radius: 10px; padding: 14px; margin-bottom: 20px;">
+          <div id="verify-settings-status" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.1rem;"></i>
+              <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.2rem;"></i>
               <div>
-                <div style="color: var(--success); font-weight: 600; font-size: 0.9rem;">Protección
-                  automática activa</div>
-                <div id="verify-settings-status-text"
-                  style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;"></div>
+                <div style="color: var(--success); font-weight: 700; font-size: 0.9rem;">Protección automática activa</div>
+                <div id="verify-settings-status-text" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;"></div>
               </div>
             </div>
           </div>
 
-          <button onclick="saveVerificationSettings()" class="view-btn"
-            style="background: linear-gradient(135deg, #f9e2af, #fab387); color: #181825; font-weight: 700; width: 100%; padding: 12px; font-size: 0.95rem;">
+          <button onclick="saveVerificationSettings()" class="view-btn" style="background: linear-gradient(135deg, var(--accent) 0%, #7950F2 100%); color: white; font-weight: 700; width: 100%; padding: 13px; font-size: 0.95rem; justify-content: center; box-shadow: 0 0 15px var(--accent-glow);">
             <i class="fas fa-save"></i> Guardar Ajustes de Verificación
           </button>
         </div>

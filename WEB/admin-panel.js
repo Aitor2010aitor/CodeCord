@@ -3382,148 +3382,225 @@ app.get('/verify-callback', async (req, res) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Verificación Completada - ${guild.name}</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
                 <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+                    }
                     body {
-                        background: #0f0f13;
+                        background-color: #0a0d14;
+                        background-image: 
+                            radial-gradient(circle at 15% 20%, rgba(88, 101, 242, 0.12) 0%, transparent 45%),
+                            radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 45%),
+                            radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.04) 0%, transparent 60%);
+                        background-attachment: fixed;
                         color: #ffffff;
-                        font-family: 'Inter', system-ui, -apple-system, sans-serif;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         min-height: 100vh;
-                        margin: 0;
-                        padding: 20px;
-                        box-sizing: border-box;
+                        padding: 24px;
                     }
-                    .card {
-                        background: #181825;
+                    .verify-card {
+                        background: rgba(18, 24, 38, 0.85);
+                        backdrop-filter: blur(16px);
                         border: 1px solid rgba(255, 255, 255, 0.08);
-                        border-radius: 24px;
-                        padding: 40px 30px;
+                        border-radius: 28px;
+                        padding: 44px 36px;
                         text-align: center;
-                        box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+                        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(88, 101, 242, 0.15);
                         width: 100%;
-                        max-width: 440px;
-                        animation: fadeInUp 0.5s ease-out;
+                        max-width: 480px;
+                        position: relative;
+                        overflow: hidden;
+                        animation: cardEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                     }
-                    .avatar-container {
+                    .verify-card::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        height: 3px;
+                        background: linear-gradient(90deg, #5865F2, #10B981, #00D2FF);
+                    }
+                    .avatar-group {
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        gap: 15px;
-                        margin-bottom: 25px;
+                        gap: 16px;
+                        margin-bottom: 28px;
+                        position: relative;
+                    }
+                    .avatar-wrap {
                         position: relative;
                     }
                     .avatar {
-                        width: 72px;
-                        height: 72px;
+                        width: 76px;
+                        height: 76px;
                         border-radius: 50%;
-                        border: 3px solid #5865f2;
-                        box-shadow: 0 0 20px rgba(88, 101, 242, 0.4);
+                        border: 3px solid #5865F2;
+                        box-shadow: 0 0 25px rgba(88, 101, 242, 0.45);
                         object-fit: cover;
+                        background: #111726;
                     }
                     .guild-avatar {
-                        width: 72px;
-                        height: 72px;
+                        width: 76px;
+                        height: 76px;
                         border-radius: 50%;
-                        border: 3px solid #57f287;
-                        box-shadow: 0 0 20px rgba(87, 242, 135, 0.3);
+                        border: 3px solid #10B981;
+                        box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
                         object-fit: cover;
+                        background: #111726;
                     }
-                    .verify-badge {
-                        width: 42px;
-                        height: 42px;
-                        background: #57f287;
-                        color: #0f0f13;
+                    .verify-check-badge {
+                        width: 44px;
+                        height: 44px;
                         border-radius: 50%;
+                        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+                        color: #0a0d14;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         font-size: 1.4rem;
                         font-weight: 900;
-                        box-shadow: 0 0 15px rgba(87, 242, 135, 0.5);
+                        box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+                        z-index: 2;
+                        animation: pulseBadge 2.5s infinite;
                     }
-                    h2 {
-                        margin: 0 0 10px;
-                        font-size: 1.6rem;
-                        font-weight: 800;
-                        color: #ffffff;
+                    @keyframes pulseBadge {
+                        0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+                        50% { transform: scale(1.08); box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
                     }
-                    .status-pill {
+                    .status-chip {
                         display: inline-flex;
                         align-items: center;
-                        gap: 6px;
-                        background: rgba(87, 242, 135, 0.12);
-                        color: #57f287;
-                        padding: 6px 16px;
-                        border-radius: 20px;
-                        font-size: 0.85rem;
+                        gap: 8px;
+                        background: rgba(16, 185, 129, 0.12);
+                        color: #10B981;
+                        padding: 6px 18px;
+                        border-radius: 9999px;
+                        font-size: 0.82rem;
                         font-weight: 700;
-                        margin-bottom: 20px;
-                        border: 1px solid rgba(87, 242, 135, 0.3);
+                        letter-spacing: 0.3px;
+                        margin-bottom: 18px;
+                        border: 1px solid rgba(16, 185, 129, 0.3);
+                        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
                     }
-                    p {
-                        color: #a9a9b3;
+                    .status-chip .dot {
+                        width: 7px;
+                        height: 7px;
+                        border-radius: 50%;
+                        background: #10B981;
+                        box-shadow: 0 0 8px #10B981;
+                    }
+                    h2 {
+                        font-size: 1.7rem;
+                        font-weight: 800;
+                        letter-spacing: -0.5px;
+                        margin-bottom: 10px;
+                        background: linear-gradient(135deg, #ffffff 0%, #d1d5db 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+                    .user-msg {
+                        color: #9ca3af;
                         font-size: 0.95rem;
                         line-height: 1.6;
-                        margin: 0 0 30px;
+                        margin-bottom: 26px;
                     }
-                    .role-info {
-                        background: rgba(255,255,255,0.04);
-                        border-radius: 12px;
-                        padding: 12px 16px;
-                        margin-bottom: 25px;
+                    .user-msg strong {
+                        color: #ffffff;
+                    }
+                    .role-card {
+                        background: rgba(88, 101, 242, 0.08);
+                        border: 1px solid rgba(88, 101, 242, 0.25);
+                        border-radius: 14px;
+                        padding: 12px 18px;
+                        margin-bottom: 26px;
                         font-size: 0.9rem;
-                        color: #dcddde;
+                        color: #d1d5db;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
                     }
-                    .role-tag {
-                        color: #5865f2;
+                    .role-badge {
+                        background: rgba(88, 101, 242, 0.25);
+                        color: #7983f5;
                         font-weight: 700;
+                        padding: 3px 10px;
+                        border-radius: 6px;
+                        border: 1px solid rgba(88, 101, 242, 0.4);
+                        font-size: 0.85rem;
                     }
-                    .close-btn {
-                        background: #5865f2;
-                        color: white;
+                    .return-btn {
+                        background: linear-gradient(135deg, #5865F2 0%, #7950F2 100%);
+                        color: #ffffff;
                         padding: 14px 28px;
                         border: none;
                         border-radius: 14px;
                         font-weight: 700;
                         font-size: 1rem;
                         cursor: pointer;
-                        transition: all 0.2s ease;
+                        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                         width: 100%;
-                        box-sizing: border-box;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        box-shadow: 0 10px 25px rgba(88, 101, 242, 0.35);
                     }
-                    .close-btn:hover {
-                        background: #4752c4;
+                    .return-btn:hover {
                         transform: translateY(-2px);
-                        box-shadow: 0 8px 20px rgba(88,101,242,0.4);
+                        box-shadow: 0 14px 32px rgba(88, 101, 242, 0.5), 0 0 20px rgba(88, 101, 242, 0.4);
                     }
-                    @keyframes fadeInUp {
-                        from { opacity: 0; transform: translateY(20px); }
-                        to { opacity: 1; transform: translateY(0); }
+                    .return-btn:active {
+                        transform: translateY(1px);
+                    }
+                    @keyframes cardEnter {
+                        from { opacity: 0; transform: translateY(24px) scale(0.97); }
+                        to { opacity: 1; transform: translateY(0) scale(1); }
                     }
                 </style>
             </head>
             <body>
-                <div class="card">
-                    <div class="avatar-container">
-                        <img src="${userAvatar}" class="avatar" title="${userData.username}">
-                        <div class="verify-badge"><i class="fas fa-check"></i></div>
-                        <img src="${guildIcon}" class="guild-avatar" title="${guild.name}">
+                <div class="verify-card">
+                    <div class="avatar-group">
+                        <div class="avatar-wrap">
+                            <img src="${userAvatar}" class="avatar" alt="${userData.username}" title="${userData.username}">
+                        </div>
+                        <div class="verify-check-badge">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="avatar-wrap">
+                            <img src="${guildIcon}" class="guild-avatar" alt="${guild.name}" title="${guild.name}">
+                        </div>
                     </div>
                     
-                    <div class="status-pill">
-                        <i class="fas fa-shield-alt"></i> ${alreadyVerified ? 'Cuenta Ya Verificada' : 'Verificación Exitosa'}
+                    <div class="status-chip">
+                        <span class="dot"></span>
+                        <span>${alreadyVerified ? 'Cuenta Ya Verificada' : 'Verificación Exitosa'}</span>
                     </div>
 
                     <h2>${alreadyVerified ? '¡Ya tenías acceso!' : '¡Acceso Concedido!'}</h2>
                     
-                    <p>Hola, <strong>${userData.global_name || userData.username}</strong>.<br>
-                    ${alreadyVerified ? 'Tu cuenta ya estaba verificada en' : 'Has verificado tu cuenta correctamente en'} <strong>${guild.name}</strong>.</p>
+                    <p class="user-msg">Hola, <strong>${userData.global_name || userData.username}</strong>.<br>
+                    ${alreadyVerified ? 'Tu cuenta ya estaba verificada en' : 'Has completado la verificación de seguridad en'} <strong>${guild.name}</strong>.</p>
                     
-                    ${roleNameAssigned ? `<div class="role-info"><i class="fas fa-user-tag"></i> Rol asignado: <span class="role-tag">@${roleNameAssigned}</span></div>` : ''}
+                    ${roleNameAssigned ? `
+                    <div class="role-card">
+                        <i class="fas fa-shield-alt" style="color: #5865f2;"></i>
+                        <span>Rol asignado:</span>
+                        <span class="role-badge">@${roleNameAssigned}</span>
+                    </div>` : ''}
                     
-                    <button class="close-btn" onclick="window.close()">Volver a Discord</button>
+                    <button class="return-btn" onclick="window.close()">
+                        <i class="fab fa-discord"></i> Volver a Discord
+                    </button>
                 </div>
             </body>
             </html>
@@ -3536,67 +3613,84 @@ app.get('/verify-callback', async (req, res) => {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Error de Verificación</title>
+                <title>Error de Verificación - CodeCord</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
                 <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
                     body {
-                        background: #0f0f13;
+                        background-color: #0a0d14;
+                        background-image: 
+                            radial-gradient(circle at 20% 20%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 80%, rgba(88, 101, 242, 0.06) 0%, transparent 50%);
                         color: #ffffff;
-                        font-family: 'Inter', system-ui, sans-serif;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         min-height: 100vh;
-                        margin: 0;
-                        padding: 20px;
-                        box-sizing: border-box;
+                        padding: 24px;
                     }
                     .card {
-                        background: #181825;
-                        border: 1px solid rgba(243, 139, 168, 0.2);
-                        border-radius: 24px;
-                        padding: 40px 30px;
+                        background: rgba(18, 24, 38, 0.85);
+                        backdrop-filter: blur(16px);
+                        border: 1px solid rgba(239, 68, 68, 0.25);
+                        border-radius: 28px;
+                        padding: 44px 34px;
                         text-align: center;
-                        max-width: 440px;
+                        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.18);
                         width: 100%;
+                        max-width: 460px;
+                        animation: fadeInUp 0.4s ease-out;
                     }
-                    .icon {
-                        font-size: 3rem;
-                        color: #f38ba8;
-                        margin-bottom: 15px;
+                    .icon-wrap {
+                        width: 76px;
+                        height: 76px;
+                        border-radius: 50%;
+                        background: rgba(239, 68, 68, 0.12);
+                        border: 2px solid rgba(239, 68, 68, 0.35);
+                        color: #ef4444;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2.2rem;
+                        margin: 0 auto 24px;
+                        box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
                     }
-                    h2 {
-                        color: #f38ba8;
-                        margin: 0 0 10px;
-                        font-size: 1.5rem;
-                    }
-                    p {
-                        color: #a9a9b3;
-                        font-size: 0.95rem;
-                        line-height: 1.6;
-                        margin-bottom: 25px;
-                    }
-                    button {
-                        background: #2b2b3b;
-                        color: white;
-                        border: 1px solid rgba(255,255,255,0.1);
-                        padding: 12px 24px;
+                    h2 { font-size: 1.5rem; font-weight: 800; color: #ffffff; margin-bottom: 10px; }
+                    p { color: #9ca3af; font-size: 0.92rem; line-height: 1.6; margin-bottom: 26px; }
+                    .error-box {
+                        background: rgba(239, 68, 68, 0.08);
+                        border: 1px solid rgba(239, 68, 68, 0.2);
                         border-radius: 12px;
-                        cursor: pointer;
+                        padding: 12px 16px;
+                        color: #fca5a5;
+                        font-size: 0.85rem;
+                        margin-bottom: 26px;
+                        text-align: left;
+                    }
+                    .btn {
+                        background: rgba(255, 255, 255, 0.08);
+                        color: #ffffff;
+                        border: 1px solid rgba(255, 255, 255, 0.14);
+                        padding: 13px 24px;
+                        border-radius: 14px;
                         font-weight: 700;
+                        font-size: 0.95rem;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
                         width: 100%;
                     }
-                    button:hover {
-                        background: #36364a;
-                    }
+                    .btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+                    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
                 </style>
             </head>
             <body>
                 <div class="card">
-                    <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="icon-wrap"><i class="fas fa-shield-virus"></i></div>
                     <h2>No se pudo completar la verificación</h2>
-                    <p>${e.message}</p>
-                    <button onclick="window.close()">Cerrar ventana</button>
+                    <p>Ocurrió un inconveniente durante el proceso de verificación con Discord:</p>
+                    <div class="error-box">${e.message}</div>
+                    <button class="btn" onclick="window.close()">Cerrar Ventana</button>
                 </div>
             </body>
             </html>
