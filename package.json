@@ -1,0 +1,22 @@
+{
+  "name": "bot-codecord",
+  "version": "1.0.0",
+  "description": "CodeCord - Bot Multifuncional Avanzado para Discord",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node scripts/deploy-commands.js"
+  },
+  "dependencies": {
+    "@discordjs/ws": "^2.0.4",
+    "discord.js": "^14.23.2",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "express-session": "^1.18.0",
+    "is-ci": "^4.1.0",
+    "jimp": "^0.22.10",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^6.3.0",
+    "pdfkit": "^0.17.2"
+  }
+}

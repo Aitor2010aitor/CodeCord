@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🤖 CodeCord - Documentación Completa</title>
+<meta name="description" content="Documentación completa de CodeCord: bot multifuncional de Discord con panel web administrativo.">
+<style>
+/* Archivo: scripts/docs-style.css */
+
+:root {
+    --bg: #0f1117;
+    --bg-alt: #161923;
+    --bg-code: #1b1f2b;
+    --border: #262b39;
+    --text: #d5d9e3;
+    --text-dim: #98a0b3;
+    --accent: #5865f2;
+    --accent-soft: rgba(88, 101, 242, 0.15);
+    --green: #57f287;
+    --sidebar-width: 260px;
+    --topbar-height: 56px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--topbar-height) + 16px); }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+a { color: #8b95ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Barra superior */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 20px;
+    background: rgba(15, 17, 23, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+}
+
+.brand { color: var(--text); font-weight: 600; font-size: 18px; }
+.brand em { color: var(--text-dim); font-style: normal; font-weight: 400; font-size: 14px; }
+.brand:hover { text-decoration: none; }
+
+.topbar-links { margin-left: auto; display: flex; gap: 18px; font-size: 14px; }
+.topbar-links a { color: var(--text-dim); }
+.topbar-links a:hover { color: var(--text); }
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 16px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+/* Estructura */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+    position: sticky;
+    top: var(--topbar-height);
+    flex: 0 0 var(--sidebar-width);
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--topbar-height));
+    overflow-y: auto;
+    padding: 24px 12px;
+    border-right: 1px solid var(--border);
+    background: var(--bg-alt);
+}
+
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar li { margin: 2px 0; }
+
+.sidebar a {
+    display: block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.sidebar a:hover { background: var(--bg-code); color: var(--text); text-decoration: none; }
+.sidebar a.active { background: var(--accent-soft); color: #fff; font-weight: 600; }
+
+main {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    gap: 32px;
+    padding: 32px 40px 64px;
+}
+
+.content { flex: 1; min-width: 0; max-width: 860px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* Índice lateral derecho */
+
+.toc {
+    position: sticky;
+    top: calc(var(--topbar-height) + 32px);
+    flex: 0 0 210px;
+    font-size: 14px;
+    border-left: 1px solid var(--border);
+    padding-left: 18px;
+}
+
+.toc-title { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; margin: 0 0 8px; }
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 6px 0; }
+.toc a { color: var(--text-dim); cursor: pointer; }
+.toc a:hover { color: var(--text); }
+
+/* Contenido */
+
+.content h1 {
+    font-size: 34px;
+    line-height: 1.25;
+    margin: 0 0 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.content h2 { font-size: 25px; margin: 40px 0 14px; }
+.content h3 { font-size: 20px; margin: 28px 0 10px; }
+.content h4 { font-size: 17px; margin: 22px 0 8px; color: var(--text-dim); }
+
+.content p { margin: 12px 0; }
+.content ul, .content ol { margin: 12px 0; padding-left: 24px; }
+.content li { margin: 6px 0; }
+
+.content hr { border: 0; border-top: 1px solid var(--border); margin: 36px 0; }
+
+code {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+    font-size: 0.88em;
+    color: #e5b8ff;
+}
+
+pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+}
+
+pre code { background: none; border: 0; padding: 0; color: #c8d2e8; font-size: 13.5px; line-height: 1.6; }
+
+blockquote {
+    margin: 18px 0;
+    padding: 2px 18px;
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 8px 8px 0;
+    color: var(--text);
+}
+
+blockquote p { margin: 10px 0; }
+
+.table-wrap { overflow-x: auto; margin: 18px 0; }
+
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+
+th, td { border: 1px solid var(--border); padding: 9px 13px; text-align: left; vertical-align: top; }
+th { background: var(--bg-alt); color: #fff; font-weight: 600; }
+tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+tbody tr:hover { background: var(--accent-soft); }
+
+/* Pie */
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 40px 40px;
+    color: var(--text-dim);
+    font-size: 14px;
+    text-align: center;
+}
+
+.site-footer p { margin: 6px 0; }
+.site-footer .generated { font-size: 12.5px; opacity: 0.75; }
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+    .toc { display: none; }
+}
+
+@media (max-width: 800px) {
+    .menu-toggle { display: block; }
+    main { padding: 24px 18px 48px; }
+
+    .sidebar {
+        position: fixed;
+        top: var(--topbar-height);
+        left: 0;
+        z-index: 15;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+    }
+
+    .sidebar.open { transform: translateX(0); }
+    .content h1 { font-size: 27px; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    <a class="brand" href="#" onclick="return false">🤖 <span>CodeCord</span> <em>docs</em></a>
+    <nav class="topbar-links">
+        <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Discord</a>
+    </nav>
+</header>
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a onclick="showPage('index')" class="nav-link active">🏠 Inicio</a></li>
+            <li><a onclick="showPage('instalacion')" class="nav-link">⚙️ Instalación</a></li>
+            <li><a onclick="showPage('configuracion')" class="nav-link">🔧 Configuración</a></li>
+            <li><a onclick="showPage('comandos')" class="nav-link">💬 Comandos</a></li>
+            <li><a onclick="showPage('panel')" class="nav-link">🖥️ Panel web</a></li>
+            <li><a onclick="showPage('sistemas')" class="nav-link">🧩 Sistemas</a></li>
+            <li><a onclick="showPage('api')" class="nav-link">🔌 API del panel</a></li>
+            <li><a onclick="showPage('arquitectura')" class="nav-link">🏗️ Arquitectura</a></li>
+            <li><a onclick="showPage('datos')" class="nav-link">💾 Datos</a></li>
+            <li><a onclick="showPage('problemas')" class="nav-link">🩺 Problemas</a></li>
+            <li><a onclick="showPage('contribuir')" class="nav-link">🤝 Contribuir</a></li>
+        </ul>
+    </nav>
+    <main>
+        <article class="content">
+
+<!-- PÁGINA: INICIO -->
+<div id="index" class="page active">
+<h1 id="wiki-de-codecord">🤖 Wiki de CodeCord</h1>
+<p><strong>CodeCord</strong> es un bot multifuncional de Discord escrito en <strong>Node.js + discord.js v14</strong> que incluye un <strong>panel web administrativo</strong> (Express) para configurar todo el bot desde el navegador, sin tocar archivos JSON ni memorizar comandos.</p>
+<ul><li>Repositorio: <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">https://github.com/aitor1234567899/CodeCord</a></li><li>Rama principal: <code>VERSION-10.50</code></li><li>Servidor de soporte: <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">https://discord.gg/PzSNTqFCuW</a></li><li>Licencia: ver <a href="https://github.com/aitor1234567899/CodeCord/blob/VERSION-10.50/LICENSE" target="_blank" rel="noopener"><code>LICENSE</code></a></li></ul>
+<hr>
+<h2 id="empezar-en-5-minutos">🚀 Empezar en 5 minutos</h2>
+<pre class="lang-bash"><code>git clone https://github.com/aitor1234567899/CodeCord.git
+cd CodeCord
+npm install
+cp .env.example .env      # rellena BOT_TOKEN, CLIENT_ID, CLIENT_SECRET...
+npm run deploy            # registra los slash commands
+npm start                 # arranca el bot + panel web</code></pre>
+<p>Panel web: <a href="http://localhost:22550" target="_blank" rel="noopener">http://localhost:22550</a> (puerto configurable con <code>PORT</code>).</p>
+<p>Guía detallada: <strong>Instalacion</strong>.</p>
+<hr>
+<h2 id="indice-de-la-wiki">📚 Índice de la wiki</h2>
+<div class="table-wrap"><table><thead><tr><th>Página</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>Instalacion</strong></td><td>Requisitos, instalación, despliegue de comandos, arranque</td></tr><tr><td><strong>Configuracion</strong></td><td>Variables de <code>.env</code>, <code>panel-config.json</code>, OAuth2 de Discord, opción <code>LOGIN</code></td></tr><tr><td><strong>Comandos</strong></td><td>Los 57 slash commands (usuario y administración)</td></tr><tr><td><strong>Panel Web</strong></td><td>Secciones del panel, login con Discord, uso diario</td></tr><tr><td><strong>Sistemas</strong></td><td>Anti-Raid, tickets, voz temporal, logs, bienvenidas, auto-respuestas, sanciones, verificación, colores</td></tr><tr><td><strong>API del Panel</strong></td><td>Referencia de todos los endpoints HTTP del panel</td></tr><tr><td><strong>Arquitectura</strong></td><td>Estructura de carpetas, handlers, flujo de arranque</td></tr><tr><td><strong>Almacenamiento de Datos</strong></td><td>Carpeta <code>servidores/</code>, ficheros JSON por servidor</td></tr><tr><td><strong>Solucion de Problemas</strong></td><td>Errores frecuentes y cómo resolverlos</td></tr><tr><td><strong>Contribuir</strong></td><td>Convenciones de código, cómo añadir comandos, eventos y sistemas</td></tr></tbody></table></div>
+<hr>
+<h2 id="funcionalidades-principales">✨ Funcionalidades principales</h2>
+<ul><li><strong>Moderación</strong>: ban, kick, timeout, warn, historial de sanciones, clear, slowmode, automod.</li><li><strong>Anti-Raid</strong>: 12 módulos de vigilancia (canales, roles, emojis, bans, webhooks) con ventana deslizante de 60 s, aislamiento automático y lista blanca.</li><li><strong>Tickets</strong>: paneles con hasta 5 botones, formularios, roles de soporte, transcripciones HTML.</li><li><strong>Salas de voz temporales</strong>: creación automática al entrar en «Crear sala» + panel privado de control (nombre, límite, privacidad, invitar, expulsar, ban, transferir…).</li><li><strong>Soporte de voz por cola</strong>: sala de espera, comando de siguiente turno y roles sancionados.</li><li><strong>Bienvenidas</strong>: mensaje personalizado + tarjeta gráfica generada con Jimp.</li><li><strong>Logs</strong>: canal y color configurables por evento, más «Actividad Reciente» en el panel.</li><li><strong>Sorteos, sugerencias, auto-respuestas, censura, embeds, verificación OAuth2 o por reacción.</strong></li></ul>
+<hr>
+<h2 id="novedades-v1050">🚀 Versión 10.50 - Novedades</h2>
+<h3 id="notificacion-md-warn">⚠️ Notificación automática por Mensaje Directo (MD) en /warn</h3>
+<ul><li>El comando <code>/warn</code> ahora envía automáticamente un <strong>mensaje directo (MD)</strong> privado y detallado al usuario advertido con la razón, el servidor y el moderador que aplicó la sanción.</li><li>Cuenta con control de excepciones y reporte en el canal indicando si la notificación privada fue entregada con éxito o si el usuario tenía los MD bloqueados/cerrados.</li><li>Registro automático de auditoría en el sistema de logs del servidor (<code>sendLogEmbed</code>) y almacenamiento aislado en el directorio de sanciones del servidor.</li></ul>
+<h3 id="cargar-y-editar-mensajes-servidor">🏠 Cargar y editar mensajes en "Enviar Mensaje como Servidor"</h3>
+<ul><li>Ahora puedes <strong>cargar cualquier mensaje existente</strong> (enviado como servidor con webhook o como bot) ingresando su ID de mensaje o pegando directamente el enlace de Discord (<code>https://discord.com/channels/...</code>).</li><li>El panel detecta automáticamente el canal y si el mensaje es de texto normal o contiene un Embed, cargando todos sus campos (título, descripción, color, imágenes, pie de página y texto adicional).</li><li>Permite modificar el contenido con vista previa en vivo y cuenta con botones para <strong>Guardar Cambios en Discord</strong> en tiempo real o cancelar la edición.</li></ul>
+<h3 id="formularios-de-tickets-corregidos">🎫 Formularios de tickets corregidos (Panel Web)</h3>
+<ul><li>Los botones del panel de tickets publicados desde el <strong>Panel Web</strong> ahora muestran correctamente el formulario (modal) con la pregunta configurada antes de abrir el ticket.</li><li>Compatibilidad con los botones <code>create_ticket_q{1-5}</code> / <code>create_ticket_{1-5}</code> del panel web y <code>create_ticket_btn_{1-5}</code> del comando <code>/ticketpanel</code>.</li><li>Las preguntas se leen desde <code>panelConfigs</code> de la configuración de tickets de cada servidor.</li></ul>
+<h3 id="sanciones-aisladas-por-servidor">📁 Sanciones aisladas por servidor</h3>
+<ul><li>El archivo de sanciones de cada servidor ya no se guarda en una carpeta global compartida.</li><li>Cada servidor almacena sus sanciones en su propia carpeta: <code>servidores/&lt;NombreDelServidor&gt;_&lt;GuildID&gt;/sanciones/sanciones_&lt;GuildID&gt;.txt</code>.</li><li>Los datos quedan totalmente aislados: cada servidor tiene su propia carpeta dentro de <code>servidores/</code>, sin mezclarse con los demás.</li></ul>
+<h3 id="autorol-mejorado">🎭 Auto-Rol mejorado (Panel Web)</h3>
+<ul><li><strong>Selector visual de emojis</strong> con búsqueda en tiempo real: muestra los emojis personalizados del servidor (con su imagen real) y los emojis unicode más populares.</li><li>Los emojis del servidor se cargan directamente desde Discord (<code>guild.emojis.fetch()</code>) y se muestran con su imagen animada o estática.</li><li><strong>Selector de color de embed</strong> con paleta de colores rápida (Blurple, Verde, Amarillo, Rosa, Rojo, Cyan, Blanco, Oscuro) y soporte para color hex personalizado con previsualización en tiempo real.</li><li>Las tarjetas de Auto-Rol activas ahora muestran la imagen real del emoji si es personalizado del servidor.</li></ul>
+<h3 id="bug-verificacion">🐛 Bug: Ajustes Avanzados de Verificación persistente (Arreglado)</h3>
+<ul><li>Corregido un bug de anidamiento HTML en el que el bloque <code>#verify-tab-settings</code> quedaba fuera del <code>&lt;div id="verification"&gt;</code>, haciendo que los «Ajustes Avanzados de Verificación» aparecieran visibles en cualquier otra sección del panel.</li><li>Ahora el contenido de verificación se oculta correctamente al navegar a otras secciones.</li></ul>
+<h3 id="lista-miembros-paginacion">👥 Lista de Miembros — Paginación corregida (Panel Web)</h3>
+<ul><li><strong>Arreglado</strong>: al pasar de página en la «Lista de Miembros», se mostraban siempre los mismos miembros porque Discord.js ignora el parámetro <code>after</code> en <code>guild.members.fetch({ limit, after })</code>.</li><li>Ahora el backend obtiene todos los miembros, los ordena por ID (snowflake cronológico) y aplica el cursor <code>after</code> manualmente, garantizando que cada página muestre un conjunto distinto de miembros.</li><li>La lógica del <code>afterStack</code> en el frontend también fue corregida para que «Página anterior» vuelva al grupo correcto sin desincronizarse.</li></ul>
+<hr>
+<blockquote><p>ℹ️ Esta wiki documenta el estado del código en la rama <code>VERSION-10.50</code>. Las versiones anteriores viven en las ramas <code>VERSION-1.5</code> … <code>VERSION-9.0</code>.</p></blockquote>
+</div>
+
+<!-- PÁGINA: INSTALACIÓN -->
+<div id="instalacion" class="page">
+<h1 id="instalacion-y-puesta-en-marcha">⚙️ Instalación y puesta en marcha</h1>
+<h2 id="1-requisitos">1. Requisitos</h2>
+<div class="table-wrap"><table><thead><tr><th>Requisito</th><th>Versión recomendada</th></tr></thead><tbody><tr><td>Node.js</td><td>18 LTS o superior (el proyecto se desarrolla con Node 24)</td></tr><tr><td>npm</td><td>Incluido con Node</td></tr><tr><td>Aplicación de Discord</td><td>Bot creado en el <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Portal de desarrolladores</a></td></tr><tr><td>Sistema operativo</td><td>Windows, Linux o macOS (los <code>.bat</code> incluidos son solo para Windows)</td></tr></tbody></table></div>
+<p>En el portal de Discord, dentro de <strong>Bot</strong>, activa los tres <em>Privileged Gateway Intents</em>:</p>
+<ul><li><code>PRESENCE INTENT</code></li><li><code>SERVER MEMBERS INTENT</code></li><li><code>MESSAGE CONTENT INTENT</code></li></ul>
+<p>El bot los solicita todos en <code>src/index.js</code>; si faltan, el login fallará con <code>Used disallowed intents</code>.</p>
+<h2 id="2-clonado-e-instalacion">2. Clonado e instalación</h2>
+<pre class="lang-bash"><code>git clone https://github.com/aitor1234567899/CodeCord.git
+cd CodeCord
+npm install</code></pre>
+<blockquote><p><code>requirements.txt</code> es solo una lista informativa de dependencias. La fuente real es <code>package.json</code>.</p></blockquote>
+<h2 id="3-variables-de-entorno">3. Variables de entorno</h2>
+<pre class="lang-bash"><code>cp .env.example .env</code></pre>
+<p>Rellena como mínimo <code>BOT_TOKEN</code> y <code>CLIENT_ID</code>. Detalle completo en <strong>Configuracion</strong>.</p>
+<h2 id="4-registrar-los-slash-commands">4. Registrar los slash commands</h2>
+<pre class="lang-bash"><code>npm run deploy      # equivale a: node scripts/deploy-commands.js</code></pre>
+<p>El script registra los comandos globalmente para todos los servidores donde esté instalado el bot. También elimina los comandos antiguos de los IDs definidos en <code>GUILD_ID</code>, <code>GUILD_ID_1</code>, <code>GUILD_ID_2</code> y <code>GUILD_ID_3</code> para evitar duplicados.</p>
+<p>El registro global de Discord puede tardar hasta 1 hora en aparecer.</p>
+<p>Scripts auxiliares en <code>scripts/</code>:</p>
+<div class="table-wrap"><table><thead><tr><th>Script</th><th>Uso</th></tr></thead><tbody><tr><td><code>deploy-commands.js</code></td><td>Despliegue global (el de <code>npm run deploy</code>)</td></tr><tr><td><code>deploy-commands-simple.js</code> / <code>-fixed.js</code></td><td>Variantes simplificadas de despliegue</td></tr><tr><td><code>clear-commands.js</code></td><td>Borra los comandos registrados (útil si hay duplicados)</td></tr></tbody></table></div>
+<h2 id="5-invitar-el-bot-al-servidor">5. Invitar el bot al servidor</h2>
+<p>Genera la URL OAuth2 con scopes <code>bot</code> + <code>applications.commands</code> y permisos de <strong>Administrador</strong> (o, como mínimo: gestionar roles, canales, mensajes, banear, expulsar, aislar y gestionar webhooks).</p>
+<h2 id="6-arrancar">6. Arrancar</h2>
+<pre class="lang-bash"><code>npm start           # node index.js</code></pre>
+<p>En Windows también puedes hacer doble clic en <code>INICIAR-BOT.bat</code>.</p>
+<p>Al arrancar verás:</p>
+<pre class="lang-text"><code>🚀 [CodeCord] Iniciando bot de Discord...
+✅ CodeCord conectado con éxito como: TuBot#0001
+📊 Servidores detectados (N): ...
+🛡️ Sistema Anti-Raid activado
+🌐 [CodeCord Backend] Arrancando servidor web desde /WEB...</code></pre>
+<p>El panel web queda disponible en <code>http://localhost:22550</code> (o el <code>PORT</code> que hayas definido).</p>
+<h2 id="7-bloqueo-de-instancia-unica">7. Bloqueo de instancia única</h2>
+<p><code>src/index.js</code> crea un fichero <code>bot.lock</code> con el PID del proceso. Si intentas arrancar una segunda instancia mientras la primera sigue viva, el arranque se aborta con:</p>
+<pre class="lang-text"><code>❌ [CodeCord] Ya hay OTRA instancia del bot ejecutándose (PID xxxx).</code></pre>
+<p>Esto evita mensajes duplicados y conflictos de puerto. Si el bot se cerró de forma abrupta y el fichero quedó huérfano, se detecta que el PID ya no existe y se sobrescribe automáticamente.</p>
+</div>
+
+<!-- PÁGINA: CONFIGURACIÓN -->
+<div id="configuracion" class="page">
+<h1 id="configuracion">🔧 Configuración</h1>
+<h2 id="variables-de-entorno-env">Variables de entorno (<code>.env</code>)</h2>
+<p>Plantilla oficial: <code>.env.example</code>.</p>
+<div class="table-wrap"><table><thead><tr><th>Variable</th><th>Obligatoria</th><th>Descripción</th></tr></thead><tbody><tr><td><code>BOT_TOKEN</code></td><td>✅</td><td>Token del bot de Discord. Sin él, el proceso termina con <code>❌ Error: BOT_TOKEN no definido</code></td></tr><tr><td><code>CLIENT_ID</code></td><td>✅</td><td>ID de la aplicación; necesario para desplegar los slash commands</td></tr><tr><td><code>CLIENT_SECRET</code></td><td>Para OAuth2</td><td>Secret de la aplicación; necesario para el login del panel y la verificación OAuth2</td></tr><tr><td><code>GUILD_ID</code></td><td>Recomendada</td><td>Servidor principal donde registrar los comandos al instante</td></tr><tr><td><code>GUILD_ID_1</code> … <code>GUILD_ID_3</code></td><td>Opcional</td><td>Servidores adicionales para el despliegue de comandos</td></tr><tr><td><code>SESSION_SECRET</code></td><td>Recomendada</td><td>Clave de firma de las sesiones Express del panel</td></tr><tr><td><code>PORT</code></td><td>Opcional</td><td>Puerto del panel web (por defecto <code>22550</code>)</td></tr><tr><td><code>PANEL_URL</code></td><td>Para OAuth2</td><td>URL pública del panel, usada en las redirecciones OAuth2</td></tr><tr><td><code>REQUIRE_DISCORD_AUTH</code></td><td>Opcional</td><td><code>true</code> fuerza autenticación de Discord en el panel</td></tr></tbody></table></div>
+<blockquote><p>⚠️ El fichero <code>.env</code> contiene credenciales: nunca lo subas a un repositorio público. Si se te ha escapado un token, regenéralo en el portal de desarrolladores de Discord.</p></blockquote>
+<h2 id="opcion-login-del-panel">Opción <code>LOGIN</code> del panel</h2>
+<p>En <code>WEB/admin-panel.js</code> (parte superior del archivo) existe la constante:</p>
+<pre class="lang-js"><code>const LOGIN = false;   // true = pide login con Discord | false = abre directo
+const loginRequired = LOGIN === true;   // calculado, no tocar</code></pre>
+<ul><li><code>LOGIN = true</code> (<strong>recomendado</strong>): el panel exige iniciar sesión con Discord (OAuth2). Solo se muestran los servidores donde tienes <strong>Administrador</strong> o <strong>Gestionar servidor</strong>, y la API responde <code>403</code> si intentas tocar otro servidor.</li><li><code>LOGIN = false</code>: el panel se abre directamente, sin login. Úsalo solo en <code>localhost</code> o detrás de un cortafuegos.</li></ul>
+<h2 id="oauth2-de-discord">OAuth2 de Discord</h2>
+<p>En el portal de desarrolladores → <strong>OAuth2 → Redirects</strong>, añade las URLs de redirección:</p>
+<pre class="lang-text"><code>&lt;PANEL_URL&gt;/callback           → login del panel
+&lt;PANEL_URL&gt;/verify-callback    → verificación de usuarios por OAuth2</code></pre>
+<p>Por ejemplo, con <code>PANEL_URL=http://localhost:22550</code>:</p>
+<pre class="lang-text"><code>http://localhost:22550/callback
+http://localhost:22550/verify-callback</code></pre>
+<p>En Windows, el script <code>VER-URLS-DISCORD.bat</code> genera estas URLs automáticamente a partir de tu <code>.env</code>.</p>
+<h2 id="configpanel-configjson"><code>config/panel-config.json</code></h2>
+<p>El panel también lee <code>config/panel-config.json</code>, que puede fijar <code>url</code>, <code>port</code> y <code>requireDiscordAuth</code>. Si <code>url</code> incluye un puerto (por ejemplo <code>http://mi-dominio.com:22550</code>), ese puerto tiene prioridad sobre <code>PORT</code>.</p>
+<h2 id="configuracion-por-servidor">Configuración por servidor</h2>
+<p>Todo lo demás (logs, tickets, bienvenidas, anti-raid, verificación, sorteos, auto-respuestas…) <strong>no</strong> se configura por fichero global, sino por servidor, desde el panel web o los comandos de administración. Se guarda en <code>servidores/&lt;NombreServidor&gt;_&lt;GuildID&gt;/configuracion/*.json</code>.</p>
+<p>Los ficheros <code>config/*.json.bak</code> son copias heredadas de la configuración antigua global; <code>configManager.migrateExistingConfigs()</code> se encarga de migrarlas al formato por servidor durante el arranque.</p>
+</div>
+
+<!-- PÁGINA: COMANDOS -->
+<div id="comandos" class="page">
+<h1 id="comandos">💬 Comandos</h1>
+<p><strong>Nota:</strong> los juegos se utilizan con el prefijo <code>!</code> (excepto <code>/juegos</code>), AutoMod se configura desde la web y <code>/unwar</code> retira la advertencia más reciente de un usuario.</p>
+<p>CodeCord registra <strong>57 slash commands</strong>, organizados en dos carpetas: <code>src/commands/usuario/</code> y <code>src/commands/administradores/</code>.</p>
+<p>Dentro de Discord tienes dos menús de ayuda:</p>
+<ul><li><code>/comandos</code> — lista completa de comandos.</li><li><code>/helpadmin</code> — menú interactivo con botones (solo administradores).</li></ul>
+<hr>
+<h2 id="comandos-de-usuario">👤 Comandos de usuario</h2>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/8ball</code></td><td>Hazle una pregunta a la Bola 8 Mágica</td></tr><tr><td><code>/avatar</code></td><td>Muestra el avatar de un usuario</td></tr><tr><td><code>/channelinfo</code></td><td>Información detallada de un canal</td></tr><tr><td><code>/coinflip</code></td><td>Lanza una moneda (cara o cruz)</td></tr><tr><td><code>/comandos</code></td><td>Lista de comandos disponibles</td></tr><tr><td><code>/dado</code></td><td>Tira un dado de 6 caras</td></tr><tr><td><code>/juegos</code></td><td>Menú interactivo de mini-juegos</td></tr><tr><td><code>/membercount</code></td><td>Contador de miembros (total, humanos, bots)</td></tr><tr><td><code>/nick</code></td><td>Cambia el apodo de un usuario</td></tr><tr><td><code>/ping</code></td><td>Latencia del bot y de la API de Discord</td></tr><tr><td><code>/rename</code></td><td>Renombra tu sala de voz temporal</td></tr><tr><td><code>/rps</code></td><td>Piedra, papel o tijera</td></tr><tr><td><code>/serverinfo</code></td><td>Información del servidor</td></tr><tr><td><code>/serverrole</code></td><td>Información detallada de un rol</td></tr><tr><td><code>/ship</code></td><td>Calcula la compatibilidad entre dos personas</td></tr><tr><td><code>/sugerencia</code></td><td>Envía una sugerencia al canal configurado</td></tr><tr><td><code>/trivia</code></td><td>Ronda de trivia con preguntas aleatorias</td></tr><tr><td><code>/userinfo</code></td><td>Información detallada de un usuario</td></tr><tr><td><code>/voiceinterface</code></td><td>Panel privado (efímero) de gestión de tu sala de voz</td></tr></tbody></table></div>
+<h3 id="voiceinterface-en-detalle"><code>/voiceinterface</code> en detalle</h3>
+<p>Publica un panel <strong>efímero</strong> (solo lo ve quien lo ejecuta) con botones para tu sala temporal:</p>
+<p><code>NOMBRE</code> · <code>LÍMITE</code> · <code>PRIVACIDAD</code> · <code>INVITAR</code> · <code>EXPULSAR</code> · <code>BAN</code> · <code>UNBAN</code> · <code>REIVINDICAR</code> · <code>TRANSFERIR</code> · <code>ELIMINAR</code> · <code>INFO</code></p>
+<hr>
+<h2 id="comandos-de-administracion">🛡️ Comandos de administración</h2>
+<h3 id="moderacion">Moderación</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/ban</code></td><td>Banea a un usuario del servidor</td></tr><tr><td><code>/unban</code></td><td>Desbanea a un usuario</td></tr><tr><td><code>/kick</code></td><td>Expulsa a un usuario</td></tr><tr><td><code>/timeout</code></td><td>Aísla temporalmente a un usuario (minutos)</td></tr><tr><td><code>/warn</code></td><td>Aplica una advertencia formal y notifica al usuario por MD</td></tr><tr><td><code>/warnings</code></td><td>Muestra las advertencias de un usuario</td></tr><tr><td><code>/sanctionhistory</code></td><td>Historial de sanciones y advertencias del servidor</td></tr><tr><td><code>/baninfo</code></td><td>Consulta si un usuario fue baneado o expulsado</td></tr><tr><td><code>/clear</code></td><td>Elimina N mensajes del canal actual</td></tr><tr><td><code>/slowmode</code></td><td>Activa o desactiva el modo lento</td></tr><tr><td><code>/automod</code></td><td>Configura la moderación automática</td></tr></tbody></table></div>
+<h3 id="roles-y-permisos">Roles y permisos</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/rol</code></td><td>Asigna o quita un rol a un usuario</td></tr><tr><td><code>/setroles</code></td><td>Define qué roles pueden usar los comandos del bot</td></tr><tr><td><code>/staffrole</code></td><td>Gestiona los roles de staff mediante menús</td></tr><tr><td><code>/colorrole</code></td><td>Hace que un rol cambie de color automáticamente</td></tr><tr><td><code>/stopcolor</code></td><td>Detiene la rotación automática de color</td></tr></tbody></table></div>
+<h3 id="tickets">Tickets</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/ticketpanel</code></td><td>Publica el panel interactivo para abrir tickets</td></tr><tr><td><code>/ticketclose</code></td><td>Cierra el ticket actual</td></tr><tr><td><code>/ticketstaffrole</code></td><td>Rol de staff que puede ver y atender tickets</td></tr><tr><td><code>/ticketlogchannel</code></td><td>Canal de logs de los tickets</td></tr><tr><td><code>/generatehtml</code></td><td>Genera manualmente la transcripción HTML del canal</td></tr></tbody></table></div>
+<h3 id="voz">Voz</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/setup</code></td><td>Crea la estructura completa de salas privadas</td></tr><tr><td><code>/createcategory</code></td><td>Crea la categoría «🍺 Salas privadas» con sus subcanales</td></tr><tr><td><code>/voiceadmin</code></td><td>Panel de administración de todos los canales de voz</td></tr><tr><td><code>/createsupportchannels</code></td><td>Crea los canales de soporte de voz y configura los roles de staff</td></tr><tr><td><code>/addsupportrole</code></td><td>Añade roles a los canales de soporte existentes</td></tr><tr><td><code>/nex</code></td><td>Pasa al siguiente usuario en la cola de soporte de voz</td></tr><tr><td><code>/voicesupportnextrole</code></td><td>Rol autorizado a usar <code>nex</code></td></tr><tr><td><code>/voicesanctionedrole</code></td><td>Rol de sancionado del soporte de voz</td></tr><tr><td><code>/sanctionsupport</code></td><td>Sanciona a un usuario del soporte de voz</td></tr></tbody></table></div>
+<h3 id="comunicacion">Comunicación</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/say</code></td><td>El bot envía un mensaje en este u otro canal</td></tr><tr><td><code>/anuncio</code></td><td>Publica un anuncio en formato embed</td></tr><tr><td><code>/enviarmd</code></td><td>Envía un DM en formato embed a un usuario (staff)</td></tr><tr><td><code>/poll</code></td><td>Crea una encuesta con opciones</td></tr></tbody></table></div>
+<h3 id="utilidades">Utilidades</h3>
+<div class="table-wrap"><table><thead><tr><th>Comando</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/logs</code></td><td>Configura el canal de logs del servidor</td></tr><tr><td><code>/helpadmin</code></td><td>Menú interactivo de todos los comandos</td></tr><tr><td><code>/userfolder</code></td><td>Genera un TXT con la lista de usuarios del servidor</td></tr></tbody></table></div>
+<hr>
+<h2 id="permisos">Permisos</h2>
+<p>Cada comando comprueba sus propios permisos con <code>PermissionsBitField</code> (por ejemplo <code>/ban</code> exige <code>BanMembers</code>). Además, <code>/setroles</code> permite autorizar roles concretos para usar los comandos del bot, y <code>/staffrole</code> define los roles de staff que usan los sistemas de tickets y soporte.</p>
+<h2 id="anadir-un-comando-nuevo">Añadir un comando nuevo</h2>
+<p>Ver <strong>Contribuir</strong>: basta con crear un fichero en <code>src/commands/&lt;categoría&gt;/</code> que exporte <code>{ name, description, execute }</code> y volver a ejecutar <code>npm run deploy</code>.</p>
+</div>
+
+<!-- PÁGINA: PANEL WEB -->
+<div id="panel" class="page">
+<h1 id="panel-web-de-administracion">🖥️ Panel web de administración</h1>
+<p>El panel es un servidor <strong>Express</strong> (<code>WEB/admin-panel.js</code>, ~3.300 líneas) que sirve una SPA de una sola página (<code>WEB/admin.html</code>). Se arranca automáticamente desde el evento <code>ready</code> del bot a través de <code>src/server.js</code> → <code>startAdminPanel(client)</code>.</p>
+<ul><li>URL por defecto: <code>http://localhost:22550</code></li><li>Puerto: <code>PORT</code> del <code>.env</code> o el puerto incluido en <code>PANEL_URL</code> / <code>config/panel-config.json</code></li></ul>
+<h2 id="inicio-de-sesion">🔐 Inicio de sesión</h2>
+<p>Controlado por la constante <code>LOGIN</code> de <code>WEB/admin-panel.js</code> (ver <strong>Configuracion</strong>).</p>
+<p>Con <code>LOGIN = true</code>:</p>
+<ol><li>Cualquier ruta no pública redirige a <code>/login</code>.</li><li><code>/login</code> lleva al OAuth2 de Discord; Discord vuelve a <code>/callback</code>.</li><li>Se listan <strong>solo</strong> los servidores donde tu cuenta tiene <code>Administrador</code> o <code>Gestionar servidor</code>, y donde el bot está presente.</li><li>Las llamadas a la API sobre servidores ajenos responden <strong>403 No autorizado</strong>.</li><li><code>/logout</code> cierra la sesión.</li></ol>
+<p>Rutas públicas: <code>/login</code>, <code>/login/password</code>, <code>/callback</code>, <code>/verify-callback</code>, <code>/logout</code>.</p>
+<h2 id="navegacion-por-url">🧭 Navegación por URL</h2>
+<p>El panel soporta rutas directas en el navegador, por ejemplo <code>/embed</code>, <code>/enbet</code> y <code>/say-server</code>, y actualiza la URL con <code>history.pushState</code> al cambiar de pestaña. El servidor seleccionado en el desplegable se guarda en <code>localStorage</code> y se restaura al recargar.</p>
+<h2 id="secciones">📋 Secciones</h2>
+<div class="table-wrap"><table><thead><tr><th>Sección</th><th>Qué permite</th></tr></thead><tbody><tr><td><strong>Dashboard</strong></td><td>Estado del bot, uptime, número de servidores/usuarios/canales y <em>Actividad Reciente</em> con los embeds de los últimos eventos</td></tr><tr><td><strong>Enviar Mensaje como Bot</strong></td><td>Enviar texto o embeds a cualquier canal, con barra de formato (negrita, cursiva, subrayado, tachado, código, títulos, citas, listas, enlaces) y vista previa en tiempo real</td></tr><tr><td><strong>Enviar como Servidor</strong></td><td>Enviar texto o embeds mediante webhook con identidad del servidor, y también <strong>cargar y editar mensajes existentes</strong> por ID o enlace de Discord</td></tr><tr><td><strong>Constructor de Embeds</strong></td><td>Crear embeds visualmente, enviarlos y también <strong>cargar y editar</strong> un embed existente por ID de mensaje</td></tr><tr><td><strong>Moderación y AutoMod</strong></td><td>Anti-spam, anti-links, anti-bots, censura de palabras/frases, <strong>Auto-Rol</strong> (selector visual de emojis del servidor y paleta de color de embed), limpieza de mensajes de usuarios expulsados/baneados</td></tr><tr><td><strong>Anti-Raid</strong></td><td>Activar/desactivar cada uno de los 12 módulos, umbrales, lista blanca y acción de castigo</td></tr><tr><td><strong>Tickets</strong></td><td>Crear paneles (hasta 5 botones + formularios), roles de soporte, canal de logs, tickets activos con botón «Abrir en Discord», historial y transcripciones HTML</td></tr><tr><td><strong>Sorteos</strong></td><td>Crear sorteos, premio y duración, ver participantes, finalizar, cancelar y re-rollear ganadores</td></tr><tr><td><strong>Auto-respuestas</strong></td><td>Respuestas por palabra clave (texto o embed), filtros por canal y rol, vista previa</td></tr><tr><td><strong>Sugerencias</strong></td><td>Canal de sugerencias, listado, comentarios y gestión de estado</td></tr><tr><td><strong>Verificación</strong></td><td>Verificación por reacción o por OAuth2, rol a otorgar, rol a retirar al verificarse, listado de usuarios verificados. <em>Bug arreglado: los ajustes avanzados ya no se muestran en otras secciones.</em></td></tr><tr><td><strong>Miembros</strong></td><td>Lista de usuarios con <strong>paginación corregida</strong> (cada página muestra un conjunto distinto de miembros), ficha detallada, advertencias e historial de acciones</td></tr></tbody></table></div>
+<h2 id="correcciones-recientes">🔧 Correcciones recientes</h2>
+<div class="table-wrap"><table><thead><tr><th>Componente</th><th>Corrección</th></tr></thead><tbody><tr><td><strong>Auto-Rol → Emoji</strong></td><td>Selector visual con emojis del servidor (imagen real) y unicode más populares, con búsqueda en tiempo real</td></tr><tr><td><strong>Auto-Rol → Color</strong></td><td>Paleta de color de embed con presets rápidos + input hex con previsualización</td></tr><tr><td><strong>Verificación</strong></td><td>Bug de anidamiento HTML corregido: los ajustes avanzados ya no aparecen en otras secciones</td></tr><tr><td><strong>Lista de Miembros</strong></td><td>Paginación reescrita: cursor <code>after</code> calculado manualmente sobre lista ordenada por ID; <code>afterStack</code> del frontend corregido</td></tr></tbody></table></div>
+<h2 id="subida-de-archivos">🖼️ Subida de archivos</h2>
+<p>El panel guarda las imágenes subidas (fondos de bienvenida, imágenes de embed) en la carpeta <code>uploads/</code>, que se crea automáticamente y se sirve estáticamente en <code>/uploads</code>. Endpoints: <code>POST /api/upload</code> y <code>GET /api/list-uploads</code>.</p>
+<h2 id="exponer-el-panel-en-internet">🌐 Exponer el panel en Internet</h2>
+<p>Si publicas el panel fuera de <code>localhost</code>:</p>
+<ol><li>Pon <code>LOGIN = true</code>.</li><li>Define <code>PANEL_URL</code> con tu dominio público y añade <code>&lt;PANEL_URL&gt;/callback</code> y <code>&lt;PANEL_URL&gt;/verify-callback</code> en el portal de Discord.</li><li>Sirve el panel detrás de HTTPS (proxy inverso tipo Nginx/Caddy o un túnel).</li><li>Usa un <code>SESSION_SECRET</code> largo y aleatorio.</li></ol>
+</div>
+
+<!-- PÁGINA: SISTEMAS -->
+<div id="sistemas" class="page">
+<h1 id="sistemas-internos">🧩 Sistemas internos</h1>
+<p>Cada sistema vive en <code>src/systems/</code> y es consumido por los eventos (<code>src/events/</code>), los comandos y la API del panel.</p>
+<div class="table-wrap"><table><thead><tr><th>Fichero</th><th>Sistema</th></tr></thead><tbody><tr><td><code>antiRaidSystem.js</code></td><td>Anti-Raid y automoderación</td></tr><tr><td><code>ticketSystem.js</code></td><td>Tickets y transcripciones</td></tr><tr><td><code>voiceSystem.js</code></td><td>Salas de voz temporales y cola de soporte</td></tr><tr><td><code>loggerSystem.js</code></td><td>Registro de eventos</td></tr><tr><td><code>welcomeSystem.js</code></td><td>Bienvenidas y tarjetas</td></tr><tr><td><code>autoResponseSystem.js</code></td><td>Auto-respuestas</td></tr><tr><td><code>sanctionSystem.js</code></td><td>Sanciones y advertencias</td></tr><tr><td><code>colorSystem.js</code></td><td>Rotación automática de color de un rol</td></tr></tbody></table></div>
+<p>Además, <code>scripts/antiraid.js</code> inicializa la versión 2 del anti-raid (<code>initAntiRaid(client)</code>) y <code>scripts/welcome-card.js</code> genera la imagen de bienvenida con <strong>Jimp</strong>.</p>
+<hr>
+<h2 id="anti-raid-y-automoderacion">🛡️ Anti-Raid y automoderación</h2>
+<p>Valores por defecto de <code>getAntiRaidSettings()</code>:</p>
+<pre class="lang-js"><code>{
+  antiSpam: true,          maxMessages: 5,        timeWindow: 5000,
+  antiChannelSpam: true,   maxChannelActions: 3,  channelTimeWindow: 60000,
+  antiLinks: true,         antiBots: true
+}</code></pre>
+<ul><li><strong>12 módulos vigilados</strong>: crear/borrar/editar canales, crear/borrar/editar roles, crear/borrar emojis, expulsar/banear/desbanear usuarios y editar webhooks.</li><li><strong>Ventana deslizante de 60 s</strong> para detectar abusos masivos.</li><li><strong>Respuesta automática</strong>: aislamiento (retirada de todos los roles) + ban o kick, según configuración.</li><li><strong>Lista blanca</strong> por servidor para excluir administradores y bots de confianza.</li><li>Todo lo detectado se envía al canal de logs configurado.</li></ul>
+<h2 id="tickets">🎫 Tickets</h2>
+<ul><li><code>/ticketpanel</code> publica un panel con hasta <strong>5 botones</strong>, cada uno con su propio formulario (modal).</li><li>Al pulsar, se crea un canal privado visible para el autor y para el rol de staff (<code>/ticketstaffrole</code>).</li><li><code>/ticketclose</code> o el botón de cierre generan una <strong>transcripción HTML</strong> del canal (también manualmente con <code>/generatehtml</code>).</li><li>Los tickets activos se ven en el panel, con botón «Abrir en Discord», y las transcripciones se listan en <code>GET /api/tickets</code>.</li><li>El canal de logs de tickets se define con <code>/ticketlogchannel</code>.</li></ul>
+<h2 id="voz-salas-temporales-y-soporte">🎧 Voz: salas temporales y soporte</h2>
+<p><strong>Salas temporales</strong> — <code>/setup</code> o <code>/createcategory</code> crean la categoría «🍺 Salas privadas» con un canal generador («🔊 Crear sala»). Al entrar en él, el bot crea una sala propia para el usuario y le da el control mediante <code>/voiceinterface</code>: nombre, límite, privacidad, invitar, expulsar, ban/unban, reivindicar, transferir, eliminar e info. La sala se borra al quedarse vacía.</p>
+<p><strong>Soporte de voz por cola</strong> — <code>/createsupportchannels</code> genera la sala de espera, los canales de atención, el canal de logs y los roles de staff. El staff usa <code>/nex</code> para atender al siguiente de la cola; <code>/voicesupportnextrole</code> define quién puede usarlo, <code>/sanctionsupport</code> y <code>/voicesanctionedrole</code> gestionan las sanciones.</p>
+<h2 id="logs">📝 Logs</h2>
+<p><code>sendLogEmbed()</code> (en <code>loggerSystem.js</code>) es el punto único de registro que usan comandos y sistemas. <code>src/events/logEvents.js</code> escucha los eventos de Discord y envía el embed correspondiente.</p>
+<p>Eventos cubiertos: mensajes eliminados, editados y fijados, entradas y salidas de usuarios, bots añadidos/eliminados, bans y unbans, roles y canales creados/editados/eliminados, invitaciones, webhooks, cambios del servidor, eventos de voz y acciones de moderación/anti-raid.</p>
+<p>En el panel, cada evento puede tener <strong>su propio canal y su propio color</strong>, y la sección <em>Actividad Reciente</em> muestra los embeds completos filtrados por servidor.</p>
+<h2 id="bienvenidas">👋 Bienvenidas</h2>
+<p><code>processWelcomeMember(member)</code> lee la configuración <code>welcome</code> del servidor y, si está habilitada, envía al canal configurado el mensaje personalizado y una tarjeta gráfica generada por <code>scripts/welcome-card.js</code> (fondo e imágenes configurables desde el panel; botón de prueba en <code>POST /api/guilds/:guildId/welcome-test</code>).</p>
+<h2 id="auto-respuestas">🤖 Auto-respuestas</h2>
+<p>Responde automáticamente cuando un mensaje coincide con una palabra clave. Cada regla admite respuesta en texto o embed, y filtros por canales y roles. Gestión completa vía CRUD en <code>/api/guilds/:guildId/auto-responses</code>.</p>
+<h2 id="sanciones">⚖️ Sanciones</h2>
+<p><code>sanctionSystem.js</code> gestiona el registro persistente e independiente de sanciones y advertencias por servidor. El comando <code>/warn</code> aplica una advertencia formal, la almacena en <code>servidores/&lt;NombreDelServidor&gt;_&lt;GuildID&gt;/sanciones/</code> y notifica automáticamente al usuario mediante <strong>mensaje directo (MD)</strong> con embed detallado. Las sanciones se consultan con <code>/warnings</code>, <code>/sanctionhistory</code> y desde la sección de miembros del panel.</p>
+<h2 id="verificacion">✅ Verificación</h2>
+<p>Dos modalidades, configurables desde la sección <strong>Verificación</strong> del panel:</p>
+<ul><li><strong>Por reacción</strong>: el usuario reacciona a un mensaje publicado por el bot.</li><li><strong>Por OAuth2</strong>: el usuario pulsa un enlace, autoriza en Discord y vuelve a <code>/verify-callback</code>.</li></ul>
+<p>Opciones adicionales: rol otorgado al verificarse y <strong>rol a retirar</strong> (típicamente el de «no verificado»). Los usuarios verificados quedan registrados en <code>verified-users.json</code> dentro de la carpeta del servidor.</p>
+<h2 id="autorol-mejoras">🎭 Auto-Rol — Mejoras (Panel Web)</h2>
+<ul><li><strong>Emojis del servidor</strong>: el endpoint <code>GET /api/guilds/:guildId/emojis</code> usa <code>await guild.emojis.fetch()</code> para obtener emojis en tiempo real (no solo caché). Devuelve <code>{ id, name, animated, url }</code> con la URL de imagen de Discord.</li><li><strong>Selector visual de emojis</strong>: modal con búsqueda en tiempo real que muestra emojis del servidor como imágenes reales y los más usados en unicode.</li><li><strong>Paleta de color de embed</strong>: input <code>type="color"</code> sincronizado con presets rápidos (Blurple <code>#5865F2</code>, Verde, Amarillo, Rosa, Rojo, Cyan, Blanco, Oscuro).</li><li>Las tarjetas activas muestran la imagen real del emoji personalizado en lugar del código de texto.</li></ul>
+<h2 id="bug-verificacion-sistemas">🐛 Verificación — Bug de anidamiento HTML (Arreglado)</h2>
+<p>El bloque <code>#verify-tab-settings</code> tenía un <code>&lt;/div&gt;</code> prematuro que lo dejaba fuera del <code>&lt;div id="verification" class="section"&gt;</code>. Esto hacía que los «Ajustes Avanzados de Verificación» se mostraran en cualquier otra sección del panel. Corregido anidando correctamente el HTML.</p>
+<h2 id="sorteos">🎉 Sorteos</h2>
+<p>Gestionados desde el panel (<code>/api/guilds/:guildId/giveaways</code>): creación, edición, participación, finalización, cancelación, re-roll y re-verificación de sorteos pendientes. Las interacciones de botón se procesan con <code>handleGiveawayInteraction</code>.</p>
+<h2 id="lista-miembros-sistemas">👥 Lista de Miembros — Paginación corregida</h2>
+<p>El endpoint <code>GET /api/guilds/:guildId/members</code> fue reescrito para funcionar correctamente con la paginación por cursor:</p>
+<ul><li>Se llama a <code>guild.members.fetch({ limit: 1000 })</code> para obtener todos los miembros frescos (sin depender del caché).</li><li>Los miembros se ordenan por ID (snowflake = orden cronológico) y el parámetro <code>after</code> se aplica manualmente buscando el índice del miembro con ese ID y tomando el slice siguiente.</li><li>En el frontend, el <code>afterStack</code> fue corregido: <code>goMembersNext()</code> empuja el cursor antes de cargar y hace rollback si falla; <code>goMembersPrev()</code> usa <code>afterStack[afterStack.length - 1]</code> en lugar del índice desincronizado <code>page - 1</code>.</li></ul>
+</div>
+
+<!-- PÁGINA: API -->
+<div id="api" class="page">
+<h1 id="api-del-panel">🔌 API del panel</h1>
+<p>Todas las rutas las sirve <code>WEB/admin-panel.js</code> en el mismo puerto que el panel. Salvo las rutas públicas de login, requieren sesión válida cuando <code>LOGIN = true</code>, y devuelven <strong>403</strong> si el usuario autenticado no tiene <code>Administrador</code> o <code>Gestionar servidor</code> en el <code>:guildId</code> solicitado.</p>
+<p><code>:guildId</code> es siempre el ID numérico del servidor de Discord.</p>
+<h2 id="autenticacion-y-sesion">Autenticación y sesión</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead><tbody><tr><td>GET</td><td><code>/login</code></td><td>Redirige al OAuth2 de Discord</td></tr><tr><td>GET</td><td><code>/callback</code></td><td>Callback OAuth2 del login del panel</td></tr><tr><td>GET</td><td><code>/verify-callback</code></td><td>Callback OAuth2 de la verificación de usuarios</td></tr><tr><td>GET</td><td><code>/logout</code></td><td>Cierra la sesión</td></tr></tbody></table></div>
+<h2 id="estado-general">Estado general</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead><tbody><tr><td>GET</td><td><code>/api/status</code></td><td>Estado del bot, uptime y estadísticas</td></tr><tr><td>GET</td><td><code>/api/commands</code></td><td>Lista de comandos cargados</td></tr><tr><td>GET</td><td><code>/api/guilds</code></td><td>Servidores visibles para el usuario</td></tr><tr><td>GET</td><td><code>/api/logs</code></td><td>Historial de eventos (Actividad Reciente)</td></tr><tr><td>POST</td><td><code>/api/logs/clear</code></td><td>Vacía el historial de logs</td></tr><tr><td>GET</td><td><code>/api/list-uploads</code></td><td>Imágenes disponibles en <code>uploads/</code></td></tr><tr><td>POST</td><td><code>/api/upload</code></td><td>Sube una imagen (multipart, vía multer)</td></tr></tbody></table></div>
+<h2 id="mensajes-y-embeds">Mensajes y embeds</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead><tbody><tr><td>POST</td><td><code>/api/guilds/:guildId/send</code></td><td>Envía un mensaje como el bot</td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/send-as-server</code></td><td>Envía un mensaje por webhook con identidad del servidor</td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/send-as-server/:channelId/:messageId</code></td><td>Carga un mensaje existente (texto o embed, servidor o bot)</td></tr><tr><td>PUT</td><td><code>/api/guilds/:guildId/send-as-server/:channelId/:messageId</code></td><td>Edita un mensaje existente enviado por el servidor (webhook) o bot</td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/message/:channelId/:messageId</code></td><td>Carga cualquier mensaje de Discord</td></tr><tr><td>PUT</td><td><code>/api/guilds/:guildId/message/:channelId/:messageId</code></td><td>Edita un mensaje de Discord (servidor o bot)</td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/embed</code></td><td>Publica un embed</td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/embed/:channelId/:messageId</code></td><td>Carga un embed existente</td></tr><tr><td>PUT</td><td><code>/api/guilds/:guildId/embed/:channelId/:messageId</code></td><td>Edita un embed existente</td></tr></tbody></table></div>
+<h2 id="tickets-api">Tickets</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / PUT</td><td><code>/api/guilds/:guildId/ticket-config</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/ticket-panels</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/send-ticket-panel</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/update-ticket-panel/:messageId</code></td></tr><tr><td>GET</td><td><code>/api/guilds/:guildId/active-tickets</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/close-ticket</code></td></tr><tr><td>GET</td><td><code>/api/tickets</code></td></tr><tr><td>GET</td><td><code>/api/tickets/:filename</code> (transcripción HTML)</td></tr></tbody></table></div>
+<h2 id="sorteos-api">Sorteos</h2>
+<div class="table-wrap"><table><thead><tr><th>Método</th><th>Ruta</th></tr></thead><tbody><tr><td>GET / POST</td><td><code>/api/guilds/:guildId/giveaways</code></td></tr><tr><td>PUT</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/join</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/end</code></td></tr><tr><td>POST</td><td><code>/api/guilds/:guildId/giveaways/:giveawayId/cancel</code></td></tr></tbody></table></div>
+</div>
+
+<!-- PÁGINA: ARQUITECTURA -->
+<div id="arquitectura" class="page">
+<h1 id="arquitectura-y-estructura-del-proyecto">🏗️ Arquitectura y estructura del proyecto</h1>
+<h2 id="estructura-de-carpetas">Estructura de carpetas</h2>
+<pre class="lang-text"><code>CodeCord/
+├── index.js                  # Punto de entrada
+├── package.json              # Dependencias y scripts
+├── .env / .env.example       # Credenciales y configuración
+├── src/
+│   ├── index.js              # Cliente de discord.js
+│   ├── server.js             # Puente hacia el panel web
+│   ├── handlers/
+│   │   ├── commandHandler.js # Carga recursiva de comandos
+│   │   └── eventHandler.js   # Carga automática de eventos
+│   ├── commands/
+│   │   ├── usuario/          # 19 comandos de usuario
+│   │   └── administradores/  # 38 comandos de administración
+│   ├── events/               # ready, messageCreate, interactionCreate, logEvents...
+│   └── systems/              # Anti-raid, tickets, voz, logs, bienvenidas...
+├── WEB/
+│   ├── admin-panel.js        # Servidor Express + API del panel
+│   └── admin.html            # Interfaz (SPA)
+├── scripts/
+│   ├── deploy-commands*.js   # Registro de slash commands
+│   ├── config-manager.js     # Persistencia por servidor
+│   ├── antiraid.js           # Anti-Raid V2
+│   └── welcome-card.js       # Tarjetas de bienvenida (Jimp)
+├── servidores/               # Configuración y datos por servidor
+├── config/                   # Configuración global del panel
+└── data/                     # Actividad del bot y sesiones</code></pre>
+<h2 id="flujo-de-arranque">Flujo de arranque</h2>
+<ol><li><code>index.js</code> carga <code>dotenv</code> y requiere <code>src/index.js</code>.</li><li><code>src/index.js</code> registra manejadores globales, aplica bloqueo de instancia única, crea el Cliente con intents, inicializa colecciones en memoria, llama a handlers y hace <code>client.login(BOT_TOKEN)</code>.</li><li>El evento <code>ready</code> inicializa <code>configManager</code>, arranca el panel web e restaura la configuración del servidor.</li></ol>
+<h2 id="handlers">Handlers</h2>
+<p><strong><code>commandHandler.js</code></strong> recorre <code>src/commands/</code> de forma recursiva y registra en <code>client.commands</code> todo módulo que exporte <code>name</code> y <code>execute</code>.</p>
+<p><strong><code>eventHandler.js</code></strong> recorre <code>src/events/</code>, acepta objetos o arrays de eventos por fichero y usa <code>client.once</code> cuando el evento declara <code>once: true</code>.</p>
+<h2 id="eventos">Eventos</h2>
+<div class="table-wrap"><table><thead><tr><th>Fichero</th><th>Responsabilidad</th></tr></thead><tbody><tr><td><code>ready.js</code></td><td>Arranque, panel web, restauración</td></tr><tr><td><code>messageCreate.js</code></td><td>Anti-spam, anti-links, censura, auto-respuestas</td></tr><tr><td><code>interactionCreate.js</code></td><td>Slash commands, botones, menús, modales</td></tr><tr><td><code>guildMemberAdd.js</code></td><td>Bienvenida, rol automático, verificación</td></tr><tr><td><code>voiceStateUpdate.js</code></td><td>Salas temporales y cola de soporte</td></tr><tr><td><code>logEvents.js</code></td><td>Registro de todos los eventos</td></tr></tbody></table></div>
+</div>
+
+<!-- PÁGINA: DATOS -->
+<div id="datos" class="page">
+<h1 id="almacenamiento-de-datos">💾 Almacenamiento de datos</h1>
+<p>CodeCord no usa base de datos: todo se guarda en <strong>ficheros JSON</strong>, con una carpeta por servidor de Discord.</p>
+<h2 id="carpeta-servidores">Carpeta <code>servidores/</code></h2>
+<pre class="lang-text"><code>servidores/
+└── &lt;NombreDelServidor&gt;_&lt;GuildID&gt;/
+    ├── configuracion/
+    │   ├── giveaways.json      # Sorteos
+    │   ├── logs.json           # Canal y color por evento
+    │   ├── moderation.json     # Automod, censura, autorol, limpieza
+    │   ├── staffroles.json     # Roles de staff
+    │   └── verification.json   # Configuración de verificación
+    ├── verification.json       # Estado de la verificación
+    └── verified-users.json     # Usuarios verificados</code></pre>
+<p>Se añaden otros ficheros (tickets, bienvenidas, auto-respuestas, colores, sanciones…) a medida que configuras cada sistema desde el panel o los comandos.</p>
+<h2 id="scriptsconfig-managerjs"><code>scripts/config-manager.js</code></h2>
+<p>Es la capa de acceso a esos ficheros:</p>
+<ul><li><code>setClient(client)</code> — le da acceso al cliente de Discord para resolver nombres de servidor.</li><li><code>getGuildFolder(guildId)</code> — busca la carpeta que termine en <code>_&lt;guildId&gt;</code>; si no existe, la crea junto a <code>configuracion/</code>.</li><li><code>loadGuildConfig(guildId, tipo, valorPorDefecto)</code> / <code>saveGuildConfig(...)</code> — leen y escriben cada fichero de configuración.</li><li><code>migrateExistingConfigs()</code> — migra la configuración global antigua al formato por servidor.</li></ul>
+<h2 id="otras-carpetas">Otras carpetas</h2>
+<div class="table-wrap"><table><thead><tr><th>Ruta</th><th>Contenido</th></tr></thead><tbody><tr><td><code>config/panel-config.json</code></td><td>URL, puerto y autenticación del panel</td></tr><tr><td><code>data/bot-activity.json</code></td><td>Historial de actividad del panel</td></tr><tr><td><code>uploads/</code></td><td>Imágenes subidas desde el panel</td></tr><tr><td><code>bot.lock</code></td><td>PID de la instancia en ejecución</td></tr></tbody></table></div>
+<h2 id="copias-de-seguridad">Copias de seguridad</h2>
+<p>Para respaldar toda la configuración basta con copiar <code>servidores/</code>, <code>config/</code>, <code>data/</code> y <code>uploads/</code>. Para migrar el bot a otra máquina: copia esas carpetas más tu <code>.env</code>.</p>
+<blockquote><p>⚠️ No edites los JSON con el bot en ejecución: el proceso mantiene parte del estado en memoria y podría sobrescribir tus cambios.</p></blockquote>
+</div>
+
+<!-- PÁGINA: PROBLEMAS -->
+<div id="problemas" class="page">
+<h1 id="solucion-de-problemas">🩺 Solución de problemas</h1>
+<h2 id="el-bot-no-arranca">El bot no arranca</h2>
+<p><strong><code>❌ Error: BOT_TOKEN no definido en el archivo .env</code></strong> No existe el <code>.env</code> o falta la variable. Copia <code>.env.example</code> a <code>.env</code> y pega tu token.</p>
+<p><strong><code>Used disallowed intents</code></strong> Faltan los <em>Privileged Gateway Intents</em> en el portal de desarrolladores: activa <code>PRESENCE</code>, <code>SERVER MEMBERS</code> y <code>MESSAGE CONTENT</code>.</p>
+<p><strong><code>❌ [CodeCord] Ya hay OTRA instancia del bot ejecutándose (PID xxxx)</code></strong> Hay otro proceso vivo. Ciérralo (<code>Administrador de tareas</code> en Windows, <code>kill &lt;PID&gt;</code> en Linux). Si estás seguro de que no hay ninguno, borra <code>bot.lock</code> y reinicia.</p>
+<p><strong><code>EADDRINUSE</code> al arrancar el panel</strong> El puerto del panel está ocupado. Cambia <code>PORT</code> en el <code>.env</code>.</p>
+<h2 id="los-comandos-no-aparecen-en-discord">Los comandos no aparecen en Discord</h2>
+<ol><li>Ejecuta <code>npm run deploy</code>.</li><li>Comprueba que <code>CLIENT_ID</code> es correcto y que el bot se invitó con el scope <code>applications.commands</code>.</li><li>Los comandos por servidor aparecen al instante; los globales pueden tardar hasta 1 hora.</li><li>Si ves comandos duplicados o antiguos, ejecuta <code>node scripts/clear-commands.js</code> y vuelve a desplegar.</li></ol>
+<h2 id="el-panel-no-carga-o-da-error-al-iniciar-sesion-oauth2">El panel no carga o da error al iniciar sesión (OAuth2)</h2>
+<p><strong><code>[OAuth2] Error: invalid_client (401)</code></strong></p>
+<ol><li><strong><code>CLIENT_SECRET</code> incorrecto o no coincide</strong>: Ve al <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a> &rarr; tu Aplicación &rarr; pestaña <strong>OAuth2</strong> &rarr; sección <strong>Client Secret</strong>. Pulsa <em>Reset Secret</em>, cópialo y pégalo en la variable <code>CLIENT_SECRET=</code> de tu archivo <code>.env</code> en el hosting.</li><li><strong>Confusión entre Bot Token y Client Secret</strong>: Nunca pongas el <code>BOT_TOKEN</code> en <code>CLIENT_SECRET</code>. El token va en <code>BOT_TOKEN</code> (pestaña <em>Bot</em>) y el secret va en <code>CLIENT_SECRET</code> (pestaña <em>OAuth2</em>).</li><li><strong><code>CLIENT_ID</code> erróneo</strong>: Asegúrate de que <code>CLIENT_ID</code> en el <code>.env</code> sea el <em>Application ID</em> de tu bot.</li><li><strong>Espacios o comillas accidentales</strong>: Revisa que no haya espacios en blanco ni comillas extra al principio o al final de las claves en el <code>.env</code>.</li></ol>
+<p><strong>Redirección al login en bucle / <code>invalid_grant</code></strong></p>
+<ul><li>Verifica que las URLs de redirección <code>&lt;PANEL_URL&gt;/callback</code> y <code>&lt;PANEL_URL&gt;/verify-callback</code> están registradas <strong>exactamente igual</strong> (protocolo <code>http://</code> o <code>https://</code>, dominio y puerto) en el portal de Discord en <strong>OAuth2 &gt; Redirects</strong>.</li><li><code>PANEL_URL</code> debe coincidir con la URL con la que accedes al panel.</li><li>Define un <code>SESSION_SECRET</code> estable: si cambia, todas las sesiones se invalidan.</li><li>Para depurar en local, puedes poner temporalmente <code>LOGIN = false</code> en <code>WEB/admin-panel.js</code>.</li></ul>
+<h2 id="no-autorizado-403-en-el-panel">«No autorizado / 403» en el panel</h2>
+<p>Con <code>LOGIN = true</code> solo ves y gestionas los servidores donde tienes <strong>Administrador</strong> o <strong>Gestionar servidor</strong> y donde el bot está presente. Comprueba tus permisos en Discord y que el bot sigue en el servidor.</p>
+<h2 id="el-bot-no-borra-mensajes-no-banea-no-crea-canales">El bot no borra mensajes / no banea / no crea canales</h2>
+<p>Es un problema de permisos o de <strong>jerarquía de roles</strong>: el rol del bot debe estar por <strong>encima</strong> del rol del usuario o del rol que quiere modificar, y necesita el permiso correspondiente (<code>Gestionar mensajes</code>, <code>Banear</code>, <code>Gestionar canales</code>, <code>Gestionar roles</code>).</p>
+<p>Además, Discord no permite borrar en bloque mensajes de más de <strong>14 días</strong> (afecta a <code>/clear</code>).</p>
+<h2 id="los-logs-no-se-envian">Los logs no se envían</h2>
+<p>Configura el canal con <code>/logs</code> o desde la sección <strong>Logs</strong> del panel, y asegúrate de que el bot puede escribir e <strong>insertar enlaces/embeds</strong> en ese canal.</p>
+<h2 id="no-se-crean-las-salas-de-voz-temporales">No se crean las salas de voz temporales</h2>
+<ul><li>Ejecuta <code>/setup</code> o <code>/createcategory</code> para crear la estructura.</li><li>El canal generador debe llamarse de forma reconocible (por ejemplo «🔊 Crear sala»); las salas de espera se detectan por nombre (<code>espera</code>, <code>waiting</code>, <code>sala-de-espera</code>).</li><li>El bot necesita <code>Gestionar canales</code> y <code>Mover miembros</code>.</li></ul>
+<h2 id="se-ha-filtrado-mi-token">Se ha filtrado mi token</h2>
+<p>Regenera el token en el portal de desarrolladores <strong>inmediatamente</strong>, actualiza el <code>.env</code> y no vuelvas a subirlo al repositorio.</p>
+<h2 id="sigues-atascado">¿Sigues atascado?</h2>
+<p>Abre una incidencia en <a href="https://github.com/aitor1234567899/CodeCord/issues" target="_blank" rel="noopener">GitHub</a> o pregunta en el <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">servidor de Discord</a>, indicando la versión, el sistema operativo, la versión de Node y el error completo de la consola.</p>
+</div>
+
+<!-- PÁGINA: CONTRIBUIR -->
+<div id="contribuir" class="page">
+<h1 id="contribuir">🤝 Contribuir</h1>
+<h2 id="ramas">Ramas</h2>
+<p>El repositorio usa una rama por versión: <code>VERSION-1.5</code>, <code>VERSION-2.0</code>, … <code>VERSION-10.50</code> (rama por defecto y más reciente), además de <code>main</code>. Trabaja sobre la rama de la versión en desarrollo y abre el Pull Request contra ella.</p>
+<h2 id="convenciones-de-codigo">Convenciones de código</h2>
+<ul><li>JavaScript (CommonJS, <code>require</code>) con indentación de 4 espacios y comillas simples.</li><li>Cada fichero empieza con una cabecera de comentario:</li></ul>
+<pre class="lang-js"><code>// Archivo: src/commands/usuario/ping.js
+
+/**
+ * @file ping.js
+ * @description Comando /ping para consultar la latencia del bot.
+ */</code></pre>
+<ul><li>Documenta las funciones con JSDoc (<code>@param</code>, <code>@returns</code>).</li><li>Los mensajes al usuario van en <strong>español</strong> y los embeds usan <code>EmbedBuilder</code>.</li><li>Las respuestas privadas usan <code>flags: MessageFlags.Ephemeral</code>.</li><li>Los logs de consola llevan prefijo: <code>✅ [CodeCord] ...</code>, <code>❌ [CodeCord] ...</code>.</li></ul>
+<h2 id="anadir-un-comando">Añadir un comando</h2>
+<ol><li>Crea <code>src/commands/usuario/micomando.js</code> (o en <code>administradores/</code>):</li></ol>
+<pre class="lang-js"><code>// Archivo: src/commands/usuario/micomando.js
+
+const { EmbedBuilder } = require('discord.js');
+
+module.exports = {
+    name: 'micomando',
+    description: 'Descripción que verá el usuario',
+    async execute(interaction, client) {
+        const embed = new EmbedBuilder()
+            .setTitle('Hola')
+            .setColor(0x00FF00);
+
+        await interaction.reply({ embeds: [embed] });
+    }
+};</code></pre>
+<ol><li>Añade el <code>SlashCommandBuilder</code> correspondiente en <code>scripts/deploy-commands.js</code>.</li><li>Ejecuta <code>npm run deploy</code> y reinicia el bot.</li></ol>
+<h2 id="anadir-un-evento">Añadir un evento</h2>
+<p>Crea un fichero en <code>src/events/</code> que exporte <code>{ name, once?, execute }</code> (o un array de esos objetos):</p>
+<pre class="lang-js"><code>module.exports = {
+    name: 'guildCreate',
+    once: false,
+    async execute(guild, client) {
+        console.log(`✅ [CodeCord] Añadido a ${guild.name}`);
+    }
+};</code></pre>
+<h2 id="anadir-un-sistema">Añadir un sistema</h2>
+<p>Coloca la lógica reutilizable en <code>src/systems/</code>, exporta funciones puras y consúmelas desde comandos y eventos. Para persistir configuración usa siempre <code>scripts/config-manager.js</code> (<code>loadGuildConfig</code> / <code>saveGuildConfig</code>).</p>
+<h2 id="antes-de-abrir-el-pr">Antes de abrir el PR</h2>
+<ul><li>Comprueba que el bot arranca (<code>npm start</code>) sin errores en consola.</li><li>Prueba el comando o la sección en un servidor de pruebas.</li><li>No incluyas <code>.env</code>, <code>bot.lock</code>, <code>uploads/</code> ni datos reales de <code>servidores/</code>.</li><li>Describe en el PR qué cambia y cómo probarlo.</li></ul>
+</div>
+
+        </article>
+    </main>
+</div>
+<footer class="site-footer">
+    <p>CodeCord — bot de Discord + panel web administrativo · <a href="https://github.com/aitor1234567899/CodeCord" target="_blank" rel="noopener">Repositorio</a> · <a href="https://discord.gg/PzSNTqFCuW" target="_blank" rel="noopener">Servidor de soporte</a></p>
+    <p class="generated">📦 Documentación completa consolidada en un único archivo HTML con estilos CSS incluidos inline.</p>
+</footer>
+
+<script>
+// Manejo de navegación
+function showPage(pageId) {
+    // Ocultar todas las páginas
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.remove('active'));
+    
+    // Mostrar la página seleccionada
+    const selectedPage = document.getElementById(pageId);
+    if (selectedPage) {
+        selectedPage.classList.add('active');
+    }
+    
+    // Actualizar clase activa en el menú
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Cerrar el menú móvil si está abierto
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+    }
+    
+    // Scroll al top
+    window.scrollTo(0, 0);
+}
+
+// Manejo del menú hamburguesa en móvil
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+});
+</script>
+</body>
+</html>
