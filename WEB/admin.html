@@ -1228,6 +1228,152 @@
       }
     }
 
+  
+    
+    
+    /* BOTONES DE MENÚ HAMBURGUESA / PLEGAR LATERAL (PERFECTAMENTE CENTRADOS) */
+    .sidebar-toggle-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+      outline: none;
+      padding: 0;
+      position: relative;
+    }
+    .sidebar-toggle-btn:hover {
+      background: rgba(88, 101, 242, 0.2);
+      border-color: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+      transform: scale(1.06);
+    }
+    .sidebar-toggle-btn:active {
+      transform: scale(0.94);
+    }
+
+    .sidebar-toggle-btn .bar {
+      width: 20px;
+      height: 2px;
+      background-color: var(--text-main);
+      border-radius: 2px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+      display: block;
+    }
+    .sidebar-toggle-btn:hover .bar {
+      background-color: var(--accent-light);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* Cuando el menú está colapsado (en desktop), el botón en el header muestra las 3 barras perfectamente horizontales */
+    body.sidebar-collapsed #sidebar-toggle-btn .bar {
+      transform: none !important;
+      opacity: 1 !important;
+    }
+
+    /* En móvil cuando el menú está abierto, el botón de cierre dentro de la sidebar se convierte en una X perfecta */
+    body.sidebar-mobile-open #sidebar-toggle-btn-sidebar .bar:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    body.sidebar-mobile-open #sidebar-toggle-btn-sidebar .bar:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    body.sidebar-mobile-open #sidebar-toggle-btn-sidebar .bar:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* En desktop, el botón de la sidebar hace un sutil colapso con icono o barras limpias */
+    #sidebar-toggle-btn-sidebar {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    #sidebar-toggle-btn-sidebar:hover {
+      background: rgba(88, 101, 242, 0.25);
+    }
+
+
+    /* Sidebar Backdrop para móviles */
+    .sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.sidebar-mobile-open .sidebar-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Transición suave de Sidebar y Main Content */
+    .sidebar {
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+    }
+    .main-content {
+      transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
+    }
+
+    /* Estado Colapsado en Desktop (Oculta la barra y expande el contenido a pantalla completa) */
+    @media (min-width: 993px) {
+      body.sidebar-collapsed .sidebar {
+        transform: translateX(-280px);
+        box-shadow: none;
+      }
+      body.sidebar-collapsed .main-content {
+        margin-left: 0;
+        max-width: 100%;
+      }
+    }
+
+    /* Estado en Móvil / Tablet (< 992px) */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 280px !important;
+        transform: translateX(-100%);
+        box-shadow: none;
+      }
+      .sidebar .bot-name,
+      .sidebar .bot-badge-status,
+      .sidebar .nav-category,
+      .sidebar .nav-link span,
+      .sidebar .nav-badge {
+        display: inline-block !important;
+      }
+      .sidebar .sidebar-header {
+        justify-content: flex-start !important;
+        padding: 22px 20px !important;
+      }
+      .sidebar .nav-link {
+        justify-content: flex-start !important;
+        padding: 10px 14px !important;
+      }
+      .main-content {
+        margin-left: 0 !important;
+        max-width: 100% !important;
+        padding: 20px;
+      }
+      body.sidebar-mobile-open .sidebar {
+        transform: translateX(0) !important;
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.7) !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -1235,16 +1381,24 @@
   <div id="toast-container"></div>
     <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="bot-logo" id="sidebar-bot-logo">
-        <i class="fas fa-robot"></i>
-      </div>
-      <div class="bot-header-info">
-        <span class="bot-name" id="sidebar-bot-name">CodeCord</span>
-        <div class="bot-badge-status">
-          <span class="status-dot"></span>
-          <span>Online</span>
+      <div class="bot-header-left">
+        <div class="bot-logo" id="sidebar-bot-logo">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="bot-header-info">
+          <span class="bot-name" id="sidebar-bot-name">CodeCord</span>
+          <div class="bot-badge-status">
+            <span class="status-dot"></span>
+            <span>Online</span>
+          </div>
         </div>
       </div>
+      <!-- Botón de los 3 Palitos justo al lado del nombre/logo -->
+      <button class="sidebar-toggle-btn" id="sidebar-toggle-btn-sidebar" onclick="toggleSidebar()" title="Plegar / Desplegar menú lateral">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
     </div>
     <nav class="nav-links">
       <div class="nav-category">Principal</div>
@@ -1313,10 +1467,18 @@
     </nav>
   </aside>
 
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
   <main class="main-content">
-      <main class="main-content">
     <header>
       <div class="header-left">
+        <!-- Botón de 3 Palitos Animado (Hamburguesa) -->
+        <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Plegar / Desplegar menú lateral">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+
         <div class="header-title-wrap">
           <h2 id="section-title-header"><i class="fas fa-th-large" style="color: var(--accent); font-size: 1.3rem;"></i> Panel de Control</h2>
           <span class="breadcrumb-text">Dashboard &bull; Gestión y configuración en tiempo real</span>
@@ -4102,6 +4264,49 @@
   </div>
 
   <script>
+
+  // --- CONTROL DE SIDEBAR DESPLEGABLE / PLEGABLE (BOTÓN 3 PALITOS) ---
+  function toggleSidebar(forceState) {
+    const isMobile = window.innerWidth <= 992;
+    if (isMobile) {
+      if (typeof forceState === 'boolean') {
+        if (forceState) document.body.classList.add('sidebar-mobile-open');
+        else document.body.classList.remove('sidebar-mobile-open');
+      } else {
+        document.body.classList.toggle('sidebar-mobile-open');
+      }
+    } else {
+      if (typeof forceState === 'boolean') {
+        if (forceState) document.body.classList.remove('sidebar-collapsed');
+        else document.body.classList.add('sidebar-collapsed');
+      } else {
+        document.body.classList.toggle('sidebar-collapsed');
+      }
+      // Guardar preferencia en desktop
+      try {
+        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+        localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+      } catch (e) {}
+    }
+  }
+
+  // Restaurar estado de sidebar al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      if (window.innerWidth > 992 && localStorage.getItem('sidebar_collapsed') === 'true') {
+        document.body.classList.add('sidebar-collapsed');
+      }
+    } catch(e) {}
+  });
+
+  // Cerrar sidebar en móvil al hacer clic en cualquier enlace
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 992 && e.target.closest('.nav-link')) {
+      document.body.classList.remove('sidebar-mobile-open');
+    }
+  });
+
+
 
   // --- FUNCIONES HELPER DE INTERFAZ MODERNA (PROBOT / DYNO / NEKOTINA) ---
   function openQuickSearch() {

@@ -16,6 +16,14 @@
 >
 > ## 🚀 Versión 10.50 - Novedades
 >
+> ### 🎨 Nueva Interfaz Web de Alta Gama (Estilo ProBot / Dyno / Nekotina)
+> * **Diseño Futurista & Gamer**: Transformación completa del Panel Web (`WEB/admin.html`) con una estética moderna de temática oscura profunda (`#0A0D14`, `#0F1422`), efectos *Glassmorphism* (`backdrop-filter: blur(12px)`), acentos Discord Blurple (`#5865F2`) y cian neón, además de tipografía moderna (**Plus Jakarta Sans** y **JetBrains Mono**).
+> * **Barra Lateral Categorizada**: Módulos organizados en categorías lógicas (*Principal*, *Seguridad & Moderación*, *Comunicación*, *Comunidad & Engagement*, *Administración & Sistema*) con estado del bot en vivo (punto verde pulsante con animación).
+> * **Botón de Menú de 3 Palitos Animado (Hamburguesa)**: Ubicado en la cabecera lateral junto a CodeCord Online y en el header principal. Cuenta con micro-animación fluida de 3 barras para plegar/desplegar la barra con transición suave (`cubic-bezier`), soporte para pantalla completa en desktop y menú flotante (*drawer*) con fondo oscuro desenfocado en móviles.
+> * **Buscador Rápido Global (`Ctrl + K` / Quick Jump)**: Barra de búsqueda instantánea interactiva que permite filtrar y saltar a cualquier módulo o ajuste de inmediato.
+> * **Dashboard con Hero Banner y Module Cards**: Banner visual con resumen de salud del bot e indicadores en vivo, junto a una cuadrícula de tarjetas de módulos (*Module Cards*) con accesos directos de configuración.
+> * **Formularios y Controles Modernizados**: Switches estilo iOS/Discord con resplandor neón verde, selectores con foco luminoso y previsualizaciones fidedignas al chat de Discord.
+>
 > ### ⚠️ Cambios en comandos y moderación
 > * Los comandos de juegos usan ahora el prefijo `!` para no saturar la lista de Discord. El único comando de juegos disponible con `/` es `/juegos`.
 > * Los comandos de AutoMod se eliminaron de Discord. AutoMod se configura desde el panel web, en **Moderación / AutoMod** y **Anti-Raid**.
@@ -68,7 +76,7 @@
 
 ## 🖥️ ¿Qué es y qué hace el Panel Web de Administración?
 
-El panel web te permite controlar la configuración del bot en tiempo real desde tu navegador, evitando tener que modificar archivos JSON manualmente o utilizar largos comandos dentro de Discord.
+El panel web te permite controlar la configuración del bot en tiempo real desde tu navegador con una interfaz interactiva de alta gama (estilo **ProBot**, **Dyno** y **Nekotina**), evitando tener que modificar archivos JSON manualmente o utilizar largos comandos dentro de Discord.
 
 ### 🔐 Inicio de Sesión (Login)
 

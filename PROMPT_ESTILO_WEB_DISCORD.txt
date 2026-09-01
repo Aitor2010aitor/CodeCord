@@ -1,4 +1,4 @@
-================================================================================
+z================================================================================
 PROMPT MAESTRO PARA REPLICAR ESTE PANEL WEB (ESTILO PROBOT / DYNO / NEKOTINA)
 ================================================================================
 Copia y pega el siguiente texto completo en cualquier IA (ChatGPT, Claude, etc.) 
