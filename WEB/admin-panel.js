@@ -14,8 +14,8 @@ const { MessageFlags } = require('discord.js');
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: process.env.PANEL_URL || 'fi9.bot-hosting.cloud:25816',
-    port: parseInt(process.env.PORT || process.env.PANEL_PORT || '258816', 10),
+    url: process.env.PANEL_URL || 'lik',
+    port: parseInt(process.env.PORT || process.env.PANEL_PORT || 'puerto', 10),
     requireDiscordAuth: process.env.REQUIRE_DISCORD_AUTH === 'true'
 };
 

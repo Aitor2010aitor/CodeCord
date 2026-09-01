@@ -17,7 +17,7 @@
       --bg-card-hover: rgba(26, 35, 56, 0.85);
       --bg-input: #090d16;
       --bg-input-focus: #0f1524;
-      
+
       --accent: #5865F2;
       --accent-hover: #4752c4;
       --accent-light: #7983f5;
@@ -25,11 +25,11 @@
       --accent-gradient: linear-gradient(135deg, #5865F2 0%, #8B5CF6 50%, #EC4899 100%);
       --accent-cyan: #00d2ff;
       --accent-emerald: #10b981;
-      
+
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --text-dim: #6b7280;
-      
+
       --danger: #ef4444;
       --danger-glow: rgba(239, 68, 68, 0.3);
       --success: #10b981;
@@ -37,17 +37,17 @@
       --warning: #f59e0b;
       --warning-glow: rgba(245, 158, 11, 0.3);
       --info: #3b82f6;
-      
+
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-light: rgba(255, 255, 255, 0.14);
       --border-accent: rgba(88, 101, 242, 0.4);
-      
+
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --radius-xl: 22px;
       --radius-full: 9999px;
-      
+
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
       --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
       --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
@@ -63,7 +63,7 @@
 
     body {
       background-color: var(--bg-base);
-      background-image: 
+      background-image:
         radial-gradient(circle at 10% 20%, rgba(88, 101, 242, 0.08) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.03) 0%, transparent 60%);
@@ -80,13 +80,16 @@
       width: 6px;
       height: 6px;
     }
+
     ::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.1);
     }
+
     ::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 4px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: var(--accent);
     }
@@ -128,6 +131,7 @@
       flex-shrink: 0;
       transition: transform 0.3s ease;
     }
+
     .bot-logo:hover {
       transform: scale(1.08) rotate(5deg);
     }
@@ -166,9 +170,19 @@
       box-shadow: 0 0 8px var(--success);
       animation: pulse-dot 2s infinite;
     }
+
     @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.85);
+      }
     }
 
     .nav-links {
@@ -220,6 +234,7 @@
       color: var(--text-main);
       transform: translateX(3px);
     }
+
     .nav-link:hover i {
       color: var(--accent-light);
       transform: scale(1.1);
@@ -232,6 +247,7 @@
       border-left: 3px solid var(--accent);
       box-shadow: inset 0 0 15px rgba(88, 101, 242, 0.1);
     }
+
     .nav-link.active i {
       color: var(--accent);
       filter: drop-shadow(0 0 8px var(--accent-glow));
@@ -318,11 +334,13 @@
       transition: all 0.2s ease;
       box-shadow: var(--shadow-sm);
     }
+
     .quick-search-trigger:hover {
       border-color: var(--border-accent);
       color: white;
       box-shadow: 0 0 15px rgba(88, 101, 242, 0.2);
     }
+
     .quick-search-trigger kbd {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -345,6 +363,7 @@
       box-shadow: var(--shadow-sm);
       transition: border-color 0.2s;
     }
+
     .user-profile:hover {
       border-color: var(--border-accent);
     }
@@ -366,6 +385,7 @@
       outline: none;
       max-width: 220px;
     }
+
     #global-guild-selector option {
       background: #111726;
       color: white;
@@ -399,6 +419,7 @@
       overflow: hidden;
       box-shadow: var(--shadow-md);
     }
+
     .dashboard-hero::before {
       content: '';
       position: absolute;
@@ -419,6 +440,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .hero-content p {
       color: var(--text-muted);
       font-size: 0.95rem;
@@ -431,6 +453,7 @@
       margin-top: 14px;
       flex-wrap: wrap;
     }
+
     .hero-tag {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -443,6 +466,7 @@
       align-items: center;
       gap: 6px;
     }
+
     .hero-tag i {
       color: var(--accent);
     }
@@ -469,12 +493,14 @@
       position: relative;
       overflow: hidden;
     }
+
     .stat-card:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
       border-color: var(--border-accent);
       background: var(--bg-card-hover);
     }
+
     .stat-card::after {
       content: '';
       position: absolute;
@@ -486,6 +512,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
+
     .stat-card:hover::after {
       opacity: 1;
     }
@@ -509,6 +536,7 @@
       margin-bottom: 2px;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
+
     .stat-info p {
       color: var(--text-muted);
       font-size: 0.82rem;
@@ -549,6 +577,7 @@
       overflow: hidden;
       box-shadow: var(--shadow-sm);
     }
+
     .module-card:hover {
       transform: translateY(-4px);
       border-color: var(--border-accent);
@@ -578,12 +607,14 @@
     .module-title-wrap {
       flex-grow: 1;
     }
+
     .module-title {
       font-size: 1.05rem;
       font-weight: 700;
       color: white;
       margin-bottom: 3px;
     }
+
     .module-desc {
       font-size: 0.82rem;
       color: var(--text-muted);
@@ -614,6 +645,7 @@
       transition: all 0.2s ease;
       text-decoration: none;
     }
+
     .module-btn:hover {
       background: var(--accent);
       color: white;
@@ -638,8 +670,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .section-header {
@@ -680,14 +719,17 @@
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
     }
+
     .view-btn:hover {
       background: var(--accent-hover);
       box-shadow: 0 0 15px var(--accent-glow);
       transform: translateY(-1px);
     }
+
     .view-btn:active {
       transform: translateY(1px);
     }
+
     .view-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -734,6 +776,7 @@
       padding: 6px !important;
       overflow-y: auto;
     }
+
     .log-select[multiple] option {
       padding: 8px 12px;
       border-radius: var(--radius-sm);
@@ -744,9 +787,11 @@
       border: none;
       transition: background 0.15s ease;
     }
+
     .log-select[multiple] option:hover {
       background: rgba(255, 255, 255, 0.08) !important;
     }
+
     .log-select[multiple] option:checked {
       background: var(--accent) !important;
       color: white !important;
@@ -761,11 +806,13 @@
       height: 26px;
       flex-shrink: 0;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -778,6 +825,7 @@
       border-radius: 26px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .slider:before {
       position: absolute;
       content: "";
@@ -790,12 +838,14 @@
       border-radius: 50%;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
-    input:checked + .slider {
+
+    input:checked+.slider {
       background-color: var(--success);
       border-color: var(--success);
       box-shadow: 0 0 12px var(--success-glow);
     }
-    input:checked + .slider:before {
+
+    input:checked+.slider:before {
       transform: translateX(22px);
     }
 
@@ -806,6 +856,7 @@
       border-spacing: 0;
       margin-top: 10px;
     }
+
     th {
       text-align: left;
       padding: 14px 16px;
@@ -817,25 +868,40 @@
       border-bottom: 1px solid var(--border-subtle);
       background: rgba(255, 255, 255, 0.02);
     }
-    th:first-child { border-top-left-radius: var(--radius-md); }
-    th:last-child { border-top-right-radius: var(--radius-md); }
+
+    th:first-child {
+      border-top-left-radius: var(--radius-md);
+    }
+
+    th:last-child {
+      border-top-right-radius: var(--radius-md);
+    }
+
     td {
       padding: 14px 16px;
       border-bottom: 1px solid var(--border-subtle);
       font-size: 0.9rem;
       transition: background 0.15s;
     }
+
     tr:hover td {
       background: rgba(255, 255, 255, 0.025);
     }
-    tr:last-child td:first-child { border-bottom-left-radius: var(--radius-md); }
-    tr:last-child td:last-child { border-bottom-right-radius: var(--radius-md); }
+
+    tr:last-child td:first-child {
+      border-bottom-left-radius: var(--radius-md);
+    }
+
+    tr:last-child td:last-child {
+      border-bottom-right-radius: var(--radius-md);
+    }
 
     .member-row {
       display: flex;
       align-items: center;
       gap: 12px;
     }
+
     .member-avatar {
       width: 38px;
       height: 38px;
@@ -860,6 +926,7 @@
       gap: 18px;
       margin-top: 20px;
     }
+
     .log-config-card {
       background: var(--bg-card-solid);
       border: 1px solid var(--border-subtle);
@@ -868,12 +935,14 @@
       transition: all 0.25s ease;
       box-shadow: var(--shadow-sm);
     }
+
     .log-config-card:hover {
       transform: translateY(-3px);
       box-shadow: var(--shadow-md);
       border-color: var(--border-accent);
       background: var(--bg-card-hover);
     }
+
     .log-card-header {
       display: flex;
       justify-content: space-between;
@@ -892,6 +961,7 @@
       letter-spacing: 0.5px;
       margin-top: 10px;
     }
+
     .color-input {
       width: 36px;
       height: 36px;
@@ -912,17 +982,20 @@
       margin-top: 16px;
       max-width: 520px;
     }
+
     .discord-msg-header {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 10px;
     }
+
     .discord-bot-avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
     }
+
     .discord-bot-author {
       font-weight: 600;
       font-size: 0.95rem;
@@ -931,6 +1004,7 @@
       align-items: center;
       gap: 6px;
     }
+
     .discord-bot-badge {
       background: var(--accent);
       color: white;
@@ -941,10 +1015,12 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     .discord-timestamp {
       color: #949ba4;
       font-size: 0.75rem;
     }
+
     .discord-preview {
       background: #2b2d31;
       border-radius: var(--radius-sm);
@@ -952,18 +1028,21 @@
       border-left: 4px solid var(--accent);
       color: #dbdee1;
     }
+
     .preview-title {
       color: #ffffff;
       font-weight: 700;
       font-size: 1rem;
       margin-bottom: 6px;
     }
+
     .preview-content {
       color: #dbdee1;
       font-size: 0.88rem;
       white-space: pre-wrap;
       line-height: 1.4;
     }
+
     .preview-image {
       width: 100%;
       border-radius: 6px;
@@ -972,6 +1051,7 @@
       max-height: 240px;
       object-fit: cover;
     }
+
     .preview-thumbnail {
       float: right;
       width: 50px;
@@ -995,6 +1075,7 @@
       border: 1px solid var(--border-light);
       box-shadow: var(--shadow-md);
     }
+
     .card-bg {
       position: absolute;
       top: 0;
@@ -1005,6 +1086,7 @@
       opacity: 0.65;
       filter: blur(1.5px);
     }
+
     .card-overlay {
       position: absolute;
       top: 0;
@@ -1013,6 +1095,7 @@
       height: 100%;
       background: radial-gradient(circle, transparent 20%, rgba(0, 0, 0, 0.85) 100%);
     }
+
     .card-avatar {
       width: 86px;
       height: 86px;
@@ -1022,11 +1105,13 @@
       margin-bottom: 12px;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
     }
+
     .card-text-container {
       z-index: 1;
       text-align: center;
       padding: 0 20px;
     }
+
     .card-title {
       color: white;
       font-size: 1.3rem;
@@ -1034,6 +1119,7 @@
       margin-bottom: 4px;
       text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
     }
+
     .card-subtitle {
       color: #d1d5db;
       font-size: 0.92rem;
@@ -1050,6 +1136,7 @@
       flex-direction: column;
       gap: 12px;
     }
+
     .toast {
       background: #181f30;
       border: 1px solid var(--border-light);
@@ -1066,13 +1153,34 @@
       font-size: 0.9rem;
       font-weight: 500;
     }
-    .toast.success { border-left: 4px solid var(--success); }
-    .toast.error { border-left: 4px solid var(--danger); }
-    .toast.info { border-left: 4px solid var(--accent); }
-    .toast i { font-size: 1.3rem; }
-    .toast.success i { color: var(--success); }
-    .toast.error i { color: var(--danger); }
-    .toast.info i { color: var(--accent); }
+
+    .toast.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .toast.info {
+      border-left: 4px solid var(--accent);
+    }
+
+    .toast i {
+      font-size: 1.3rem;
+    }
+
+    .toast.success i {
+      color: var(--success);
+    }
+
+    .toast.error i {
+      color: var(--danger);
+    }
+
+    .toast.info i {
+      color: var(--accent);
+    }
 
     /* FLOATING UNSAVED CHANGES BAR */
     #unsaved-bar {
@@ -1091,6 +1199,7 @@
       z-index: 9000;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     #unsaved-bar.visible {
       transform: translateX(-50%) translateY(0);
     }
@@ -1110,9 +1219,11 @@
       justify-content: center;
       padding-top: 15vh;
     }
+
     #quick-search-modal.active {
       display: flex;
     }
+
     .quick-search-box {
       width: 540px;
       max-width: 90%;
@@ -1123,10 +1234,19 @@
       overflow: hidden;
       animation: modalSlide 0.2s ease-out;
     }
+
     @keyframes modalSlide {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
+
     .quick-search-input-wrap {
       padding: 16px 20px;
       display: flex;
@@ -1134,10 +1254,12 @@
       gap: 12px;
       border-bottom: 1px solid var(--border-subtle);
     }
+
     .quick-search-input-wrap i {
       color: var(--text-dim);
       font-size: 1.1rem;
     }
+
     .quick-search-input-wrap input {
       background: transparent !important;
       border: none !important;
@@ -1145,6 +1267,7 @@
       padding: 0 !important;
       font-size: 1.05rem !important;
     }
+
     .quick-search-results {
       max-height: 320px;
       overflow-y: auto;
@@ -1153,6 +1276,7 @@
       flex-direction: column;
       gap: 4px;
     }
+
     .quick-search-item {
       display: flex;
       align-items: center;
@@ -1164,7 +1288,9 @@
       text-decoration: none;
       transition: background 0.15s;
     }
-    .quick-search-item:hover, .quick-search-item.selected {
+
+    .quick-search-item:hover,
+    .quick-search-item.selected {
       background: rgba(88, 101, 242, 0.2);
       color: white;
     }
@@ -1175,6 +1301,7 @@
       padding: 40px;
       color: var(--text-muted);
     }
+
     .spinner {
       border: 3px solid rgba(255, 255, 255, 0.1);
       border-top: 3px solid var(--accent);
@@ -1184,9 +1311,15 @@
       animation: spin 1s linear infinite;
       margin: 0 auto 16px;
     }
+
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     /* RESPONSIVE */
@@ -1194,6 +1327,7 @@
       .sidebar {
         width: 80px;
       }
+
       .sidebar .bot-name,
       .sidebar .bot-badge-status,
       .sidebar .nav-category,
@@ -1201,14 +1335,17 @@
       .sidebar .nav-badge {
         display: none;
       }
+
       .sidebar .sidebar-header {
         justify-content: center;
         padding: 16px;
       }
+
       .sidebar .nav-link {
         justify-content: center;
         padding: 12px;
       }
+
       .main-content {
         margin-left: 80px;
         max-width: calc(100% - 80px);
@@ -1220,17 +1357,19 @@
       .main-content {
         padding: 16px;
       }
+
       .dashboard-hero {
         padding: 20px;
       }
+
       .hero-content h1 {
         font-size: 1.3rem;
       }
     }
 
-  
-    
-    
+
+
+
     /* BOTONES DE MENÚ HAMBURGUESA / PLEGAR LATERAL (PERFECTAMENTE CENTRADOS) */
     .sidebar-toggle-btn {
       width: 38px;
@@ -1251,12 +1390,14 @@
       padding: 0;
       position: relative;
     }
+
     .sidebar-toggle-btn:hover {
       background: rgba(88, 101, 242, 0.2);
       border-color: var(--accent);
       box-shadow: 0 0 16px var(--accent-glow);
       transform: scale(1.06);
     }
+
     .sidebar-toggle-btn:active {
       transform: scale(0.94);
     }
@@ -1270,6 +1411,7 @@
       transform-origin: center;
       display: block;
     }
+
     .sidebar-toggle-btn:hover .bar {
       background-color: var(--accent-light);
       box-shadow: 0 0 8px var(--accent-glow);
@@ -1285,10 +1427,12 @@
     body.sidebar-mobile-open #sidebar-toggle-btn-sidebar .bar:nth-child(1) {
       transform: translateY(7px) rotate(45deg);
     }
+
     body.sidebar-mobile-open #sidebar-toggle-btn-sidebar .bar:nth-child(2) {
       opacity: 0;
       transform: scaleX(0);
     }
+
     body.sidebar-mobile-open #sidebar-toggle-btn-sidebar .bar:nth-child(3) {
       transform: translateY(-7px) rotate(-45deg);
     }
@@ -1297,6 +1441,7 @@
     #sidebar-toggle-btn-sidebar {
       background: rgba(255, 255, 255, 0.05);
     }
+
     #sidebar-toggle-btn-sidebar:hover {
       background: rgba(88, 101, 242, 0.25);
     }
@@ -1316,6 +1461,7 @@
       pointer-events: none;
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     body.sidebar-mobile-open .sidebar-backdrop {
       opacity: 1;
       pointer-events: auto;
@@ -1325,6 +1471,7 @@
     .sidebar {
       transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
     }
+
     .main-content {
       transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
     }
@@ -1335,6 +1482,7 @@
         transform: translateX(-280px);
         box-shadow: none;
       }
+
       body.sidebar-collapsed .main-content {
         margin-left: 0;
         max-width: 100%;
@@ -1348,6 +1496,7 @@
         transform: translateX(-100%);
         box-shadow: none;
       }
+
       .sidebar .bot-name,
       .sidebar .bot-badge-status,
       .sidebar .nav-category,
@@ -1355,31 +1504,34 @@
       .sidebar .nav-badge {
         display: inline-block !important;
       }
+
       .sidebar .sidebar-header {
         justify-content: flex-start !important;
         padding: 22px 20px !important;
       }
+
       .sidebar .nav-link {
         justify-content: flex-start !important;
         padding: 10px 14px !important;
       }
+
       .main-content {
         margin-left: 0 !important;
         max-width: 100% !important;
         padding: 20px;
       }
+
       body.sidebar-mobile-open .sidebar {
         transform: translateX(0) !important;
         box-shadow: 10px 0 35px rgba(0, 0, 0, 0.7) !important;
       }
     }
-
   </style>
 </head>
 
 <body class="bg-dark text-light">
   <div id="toast-container"></div>
-    <aside class="sidebar">
+  <aside class="sidebar">
     <div class="sidebar-header">
       <div class="bot-header-left">
         <div class="bot-logo" id="sidebar-bot-logo">
@@ -1394,7 +1546,8 @@
         </div>
       </div>
       <!-- Botón de los 3 Palitos justo al lado del nombre/logo -->
-      <button class="sidebar-toggle-btn" id="sidebar-toggle-btn-sidebar" onclick="toggleSidebar()" title="Plegar / Desplegar menú lateral">
+      <button class="sidebar-toggle-btn" id="sidebar-toggle-btn-sidebar" onclick="toggleSidebar()"
+        title="Plegar / Desplegar menú lateral">
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
@@ -1461,7 +1614,8 @@
       <a href="#servers" class="nav-link" onclick="showSection('servers')">
         <i class="fas fa-server"></i> <span>Servidores</span>
       </a>
-      <a href="/logout" class="nav-link" style="border-top: 1px solid rgba(255,255,255,0.06); color: #ff5555; margin-top: 10px;">
+      <a href="/logout" class="nav-link"
+        style="border-top: 1px solid rgba(255,255,255,0.06); color: #ff5555; margin-top: 10px;">
         <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
       </a>
     </nav>
@@ -1473,14 +1627,16 @@
     <header>
       <div class="header-left">
         <!-- Botón de 3 Palitos Animado (Hamburguesa) -->
-        <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Plegar / Desplegar menú lateral">
+        <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()"
+          title="Plegar / Desplegar menú lateral">
           <span class="bar"></span>
           <span class="bar"></span>
           <span class="bar"></span>
         </button>
 
         <div class="header-title-wrap">
-          <h2 id="section-title-header"><i class="fas fa-th-large" style="color: var(--accent); font-size: 1.3rem;"></i> Panel de Control</h2>
+          <h2 id="section-title-header"><i class="fas fa-th-large" style="color: var(--accent); font-size: 1.3rem;"></i>
+            Panel de Control</h2>
           <span class="breadcrumb-text">Dashboard &bull; Gestión y configuración en tiempo real</span>
         </div>
       </div>
@@ -1506,12 +1662,13 @@
     </header>
 
     <!-- Dashboard Section -->
-        <!-- Dashboard Section -->
+    <!-- Dashboard Section -->
     <div id="dashboard" class="section active">
       <div class="dashboard-hero">
         <div class="hero-content">
           <h1>¡Bienvenido a tu Panel de Control! ⚡</h1>
-          <p>Supervisa el estado de tu bot, administra la seguridad de tu comunidad y personaliza módulos avanzados al instante.</p>
+          <p>Supervisa el estado de tu bot, administra la seguridad de tu comunidad y personaliza módulos avanzados al
+            instante.</p>
           <div class="hero-tags">
             <span class="hero-tag"><i class="fas fa-shield-alt"></i> AutoMod Activo</span>
             <span class="hero-tag"><i class="fas fa-bolt"></i> Baja Latencia</span>
@@ -1578,7 +1735,8 @@
           </div>
           <div class="module-footer">
             <span class="ticket-badge"><i class="fas fa-lock"></i> Seguridad</span>
-            <button class="module-btn" onclick="showSection('moderation')">Configurar <i class="fas fa-chevron-right"></i></button>
+            <button class="module-btn" onclick="showSection('moderation')">Configurar <i
+                class="fas fa-chevron-right"></i></button>
           </div>
         </div>
 
@@ -1593,8 +1751,11 @@
             </div>
           </div>
           <div class="module-footer">
-            <span class="ticket-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.3);"><i class="fas fa-user-plus"></i> Comunidad</span>
-            <button class="module-btn" onclick="showSection('welcome')">Configurar <i class="fas fa-chevron-right"></i></button>
+            <span class="ticket-badge"
+              style="background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.3);"><i
+                class="fas fa-user-plus"></i> Comunidad</span>
+            <button class="module-btn" onclick="showSection('welcome')">Configurar <i
+                class="fas fa-chevron-right"></i></button>
           </div>
         </div>
 
@@ -1609,8 +1770,11 @@
             </div>
           </div>
           <div class="module-footer">
-            <span class="ticket-badge" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3);"><i class="fas fa-fire"></i> Anti-Ataques</span>
-            <button class="module-btn" onclick="showSection('antiraid')">Configurar <i class="fas fa-chevron-right"></i></button>
+            <span class="ticket-badge"
+              style="background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.3);"><i
+                class="fas fa-fire"></i> Anti-Ataques</span>
+            <button class="module-btn" onclick="showSection('antiraid')">Configurar <i
+                class="fas fa-chevron-right"></i></button>
           </div>
         </div>
 
@@ -1625,8 +1789,11 @@
             </div>
           </div>
           <div class="module-footer">
-            <span class="ticket-badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3);"><i class="fas fa-headset"></i> Soporte</span>
-            <button class="module-btn" onclick="showSection('tickets')">Configurar <i class="fas fa-chevron-right"></i></button>
+            <span class="ticket-badge"
+              style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3);"><i
+                class="fas fa-headset"></i> Soporte</span>
+            <button class="module-btn" onclick="showSection('tickets')">Configurar <i
+                class="fas fa-chevron-right"></i></button>
           </div>
         </div>
 
@@ -1641,8 +1808,11 @@
             </div>
           </div>
           <div class="module-footer">
-            <span class="ticket-badge" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(236, 72, 153, 0.3);"><i class="fas fa-palette"></i> Diseño</span>
-            <button class="module-btn" onclick="showSection('embed-builder')">Configurar <i class="fas fa-chevron-right"></i></button>
+            <span class="ticket-badge"
+              style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(236, 72, 153, 0.3);"><i
+                class="fas fa-palette"></i> Diseño</span>
+            <button class="module-btn" onclick="showSection('embed-builder')">Configurar <i
+                class="fas fa-chevron-right"></i></button>
           </div>
         </div>
 
@@ -1657,14 +1827,18 @@
             </div>
           </div>
           <div class="module-footer">
-            <span class="ticket-badge" style="background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: rgba(245, 158, 11, 0.3);"><i class="fas fa-trophy"></i> Eventos</span>
-            <button class="module-btn" onclick="showSection('giveaways')">Configurar <i class="fas fa-chevron-right"></i></button>
+            <span class="ticket-badge"
+              style="background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: rgba(245, 158, 11, 0.3);"><i
+                class="fas fa-trophy"></i> Eventos</span>
+            <button class="module-btn" onclick="showSection('giveaways')">Configurar <i
+                class="fas fa-chevron-right"></i></button>
           </div>
         </div>
       </div>
 
       <div class="section-header">
-        <span class="section-title"><i class="fas fa-history" style="color: var(--accent);"></i> Actividad Reciente</span>
+        <span class="section-title"><i class="fas fa-history" style="color: var(--accent);"></i> Actividad
+          Reciente</span>
       </div>
       <div id="recent-activity">
         <div class="loading">
@@ -2337,18 +2511,22 @@
           <!-- SECCIÓN: Cargar y Editar Mensaje como Servidor -->
           <div id="srv-load-section"
             style="background: rgba(87, 242, 135, 0.07); border: 1px solid rgba(87, 242, 135, 0.3); border-radius: 10px; padding: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-              <label style="margin: 0; font-size: 0.85rem; color: #57f287; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <label
+                style="margin: 0; font-size: 0.85rem; color: #57f287; font-weight: 700; display: flex; align-items: center; gap: 6px;">
                 <i class="fas fa-edit"></i> <span>✏️ CARGAR MENSAJE EXISTENTE PARA EDITAR</span>
               </label>
-              <span id="srv-edit-badge" style="display: none; background: #57f287; color: #111; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 12px;">
+              <span id="srv-edit-badge"
+                style="display: none; background: #57f287; color: #111; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 12px;">
                 MODO EDICIÓN ACTIVO
               </span>
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <input type="text" id="srv-message-id" placeholder="ID del mensaje o enlace de Discord..." class="log-select"
-                style="flex: 1.2; margin: 0; min-width: 170px;" oninput="onSrvMessageIdInput()">
-              <select id="srv-load-channel" class="log-select" style="flex: 1; margin: 0; min-width: 140px;" onchange="syncSrvLoadChannel()"></select>
+              <input type="text" id="srv-message-id" placeholder="ID del mensaje o enlace de Discord..."
+                class="log-select" style="flex: 1.2; margin: 0; min-width: 170px;" oninput="onSrvMessageIdInput()">
+              <select id="srv-load-channel" class="log-select" style="flex: 1; margin: 0; min-width: 140px;"
+                onchange="syncSrvLoadChannel()"></select>
               <button type="button" onclick="loadSrvMessage()" class="view-btn"
                 style="background: rgba(87, 242, 135, 0.25); border: 1px solid rgba(87, 242, 135, 0.6); color: white; padding: 9px 16px; white-space: nowrap; font-weight: 700; cursor: pointer; transition: all 0.2s;">
                 <i class="fas fa-cloud-download-alt"></i> Cargar Mensaje
@@ -2528,9 +2706,12 @@
 
           <!-- Controles en MODO EDICIÓN (ocultos por defecto) -->
           <div id="srv-edit-actions" style="display: none; flex-direction: column; gap: 10px;">
-            <div style="background: rgba(87, 242, 135, 0.12); border-left: 4px solid #57f287; padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; color: #dcddde; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-              <span><i class="fas fa-info-circle" style="color: #57f287;"></i> Estás editando un mensaje existente</span>
-              <span id="srv-editing-msg-tag" style="font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #57f287;"></span>
+            <div
+              style="background: rgba(87, 242, 135, 0.12); border-left: 4px solid #57f287; padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; color: #dcddde; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+              <span><i class="fas fa-info-circle" style="color: #57f287;"></i> Estás editando un mensaje
+                existente</span>
+              <span id="srv-editing-msg-tag"
+                style="font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: #57f287;"></span>
             </div>
             <div style="display: flex; gap: 10px;">
               <button type="button" onclick="saveEditedSrvMessage()" class="view-btn"
@@ -3680,17 +3861,22 @@
 
       <div
         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px; margin-bottom: 20px;">
-        <h4 style="margin-bottom: 15px; color: var(--accent);"><i class="fas fa-envelope-open-text" style="margin-right: 8px;"></i>1. Configuración del Mensaje</h4>
+        <h4 style="margin-bottom: 15px; color: var(--accent);"><i class="fas fa-envelope-open-text"
+            style="margin-right: 8px;"></i>1. Configuración del Mensaje</h4>
 
-        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Canal Destino</label>
+        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Canal
+          Destino</label>
         <select id="autorol-channel" class="log-select" style="margin-bottom: 15px;"></select>
 
-        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Título del Embed</label>
+        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Título del
+          Embed</label>
         <input type="text" id="autorol-title" class="log-select" placeholder="Ej: ✨ Elige tus roles de la comunidad"
           style="margin-bottom: 15px;">
 
-        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Descripción del Embed</label>
-        <textarea id="autorol-desc" class="log-select" placeholder="Ej: Reacciona a los emojis correspondientes para obtener tus roles..."
+        <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted);">Descripción del
+          Embed</label>
+        <textarea id="autorol-desc" class="log-select"
+          placeholder="Ej: Reacciona a los emojis correspondientes para obtener tus roles..."
           style="margin-bottom: 15px; min-height: 80px; resize: vertical;"></textarea>
 
         <label style="display:block; margin-bottom:6px; font-size:0.85rem; color:var(--text-muted); font-weight:600;">
@@ -3703,17 +3889,33 @@
           <input type="text" id="autorol-color" class="log-select" placeholder="#5865f2" value="#5865f2"
             style="margin: 0; width: 130px; font-family: monospace; font-weight: bold; text-transform: uppercase;"
             oninput="if(/^#[0-9A-Fa-f]{6}$/.test(this.value)) document.getElementById('autorol-color-picker').value = this.value">
-          
+
           <!-- Paleta de colores rápidos -->
           <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-            <button type="button" onclick="setAutorolColor('#5865f2')" title="Azul Discord" style="width: 26px; height: 26px; border-radius: 50%; background: #5865f2; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#57f287')" title="Verde" style="width: 26px; height: 26px; border-radius: 50%; background: #57f287; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#fee75c')" title="Amarillo" style="width: 26px; height: 26px; border-radius: 50%; background: #fee75c; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#eb459e')" title="Fucsia / Rosa" style="width: 26px; height: 26px; border-radius: 50%; background: #eb459e; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#ed4245')" title="Rojo" style="width: 26px; height: 26px; border-radius: 50%; background: #ed4245; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#00ffff')" title="Cyan" style="width: 26px; height: 26px; border-radius: 50%; background: #00ffff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#ffffff')" title="Blanco" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
-            <button type="button" onclick="setAutorolColor('#2b2d31')" title="Oscuro" style="width: 26px; height: 26px; border-radius: 50%; background: #2b2d31; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#5865f2')" title="Azul Discord"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #5865f2; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#57f287')" title="Verde"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #57f287; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#fee75c')" title="Amarillo"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #fee75c; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#eb459e')" title="Fucsia / Rosa"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #eb459e; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#ed4245')" title="Rojo"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #ed4245; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#00ffff')" title="Cyan"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #00ffff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#ffffff')" title="Blanco"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
+            <button type="button" onclick="setAutorolColor('#2b2d31')" title="Oscuro"
+              style="width: 26px; height: 26px; border-radius: 50%; background: #2b2d31; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.1s;"
+              onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>
           </div>
         </div>
       </div>
@@ -3721,54 +3923,69 @@
       <div
         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px; margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-          <h4 style="color: var(--success); margin: 0;"><i class="fas fa-tags" style="margin-right: 8px;"></i>2. Configuración de Roles y Emojis</h4>
-          <button onclick="addAutorolRow()" class="view-btn" style="background: rgba(88,101,242,0.3); color: white; border: 1px solid rgba(88,101,242,0.6);">
+          <h4 style="color: var(--success); margin: 0;"><i class="fas fa-tags" style="margin-right: 8px;"></i>2.
+            Configuración de Roles y Emojis</h4>
+          <button onclick="addAutorolRow()" class="view-btn"
+            style="background: rgba(88,101,242,0.3); color: white; border: 1px solid rgba(88,101,242,0.6);">
             <i class="fas fa-plus"></i> Añadir Rol
           </button>
         </div>
 
-        <div id="autorol-rows-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;"></div>
+        <div id="autorol-rows-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+        </div>
       </div>
 
       <!-- Paneles Activos -->
       <div
         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 22px;">
-        <h4 style="margin-bottom: 15px; color: var(--warning);"><i class="fas fa-list-alt" style="margin-right: 8px;"></i>3. Paneles de Auto-Rol Activos</h4>
+        <h4 style="margin-bottom: 15px; color: var(--warning);"><i class="fas fa-list-alt"
+            style="margin-right: 8px;"></i>3. Paneles de Auto-Rol Activos</h4>
         <div id="autorol-active-list">
-          <div class="loading"><div class="spinner"></div>Cargando paneles activos...</div>
+          <div class="loading">
+            <div class="spinner"></div>Cargando paneles activos...
+          </div>
         </div>
       </div>
     </div>
 
-        <!-- Verification Section -->
+    <!-- Verification Section -->
     <div id="verification" class="section">
       <div class="section-header">
         <div>
-          <span class="section-title"><i class="fas fa-user-check" style="color: var(--accent);"></i> Sistema de Verificación Dual</span>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Protege tu servidor exigiendo verificación por reacción de emoji o por aplicación autorizada (OAuth2).</p>
+          <span class="section-title"><i class="fas fa-user-check" style="color: var(--accent);"></i> Sistema de
+            Verificación Dual</span>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Protege tu servidor exigiendo
+            verificación por reacción de emoji o por aplicación autorizada (OAuth2).</p>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button onclick="loadVerificationConfig()" class="view-btn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border-subtle);">
+          <button onclick="loadVerificationConfig()" class="view-btn"
+            style="background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border-subtle);">
             <i class="fas fa-sync-alt"></i> Recargar
           </button>
-          <button onclick="saveVerificationConfig()" class="view-btn" style="background: var(--success); color: #0a0d14; font-weight: 700; box-shadow: 0 0 15px var(--success-glow);">
+          <button onclick="saveVerificationConfig()" class="view-btn"
+            style="background: var(--success); color: #0a0d14; font-weight: 700; box-shadow: 0 0 15px var(--success-glow);">
             <i class="fas fa-save"></i> Guardar Ajustes
           </button>
         </div>
       </div>
 
       <!-- Subtabs navigation estilo ProBot / Dyno -->
-      <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); width: fit-content;">
-        <button class="view-btn active-tab" onclick="switchVerificationSubTab('emoji')" id="verify-sub-emoji" style="background: var(--accent); color: white; padding: 7px 14px; font-size: 0.84rem;">
+      <div
+        style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); width: fit-content;">
+        <button class="view-btn active-tab" onclick="switchVerificationSubTab('emoji')" id="verify-sub-emoji"
+          style="background: var(--accent); color: white; padding: 7px 14px; font-size: 0.84rem;">
           <i class="fas fa-smile"></i> Verificación con Emoji
         </button>
-        <button class="view-btn" onclick="switchVerificationSubTab('oauth')" id="verify-sub-oauth" style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
+        <button class="view-btn" onclick="switchVerificationSubTab('oauth')" id="verify-sub-oauth"
+          style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
           <i class="fas fa-shield-alt"></i> Verificación por App (OAuth2)
         </button>
-        <button class="view-btn" onclick="switchVerificationSubTab('users')" id="verify-sub-users" style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
+        <button class="view-btn" onclick="switchVerificationSubTab('users')" id="verify-sub-users"
+          style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
           <i class="fas fa-users-cog"></i> Usuarios Verificados
         </button>
-        <button class="view-btn" onclick="switchVerificationSubTab('settings')" id="verify-sub-settings" style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
+        <button class="view-btn" onclick="switchVerificationSubTab('settings')" id="verify-sub-settings"
+          style="background: transparent; color: var(--text-muted); padding: 7px 14px; font-size: 0.84rem;">
           <i class="fas fa-cog"></i> Ajustes Avanzados
         </button>
       </div>
@@ -3778,14 +3995,18 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
           <!-- LEFT: Form -->
           <div class="log-config-card" style="padding: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div
+              style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
               <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(88, 101, 242, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.2rem;">
+                <div
+                  style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(88, 101, 242, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.2rem;">
                   <i class="fas fa-smile"></i>
                 </div>
                 <div>
-                  <h3 style="color: white; font-size: 1.05rem; font-weight: 700; margin: 0;">Verificación por Reacción</h3>
-                  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; margin-bottom: 0;">Reaccionar a un mensaje para ganar acceso inmediato.</p>
+                  <h3 style="color: white; font-size: 1.05rem; font-weight: 700; margin: 0;">Verificación por Reacción
+                  </h3>
+                  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; margin-bottom: 0;">Reaccionar
+                    a un mensaje para ganar acceso inmediato.</p>
                 </div>
               </div>
               <label class="switch">
@@ -3796,71 +4017,107 @@
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANAL DEL MENSAJE</label>
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANAL
+                  DEL MENSAJE</label>
                 <select id="verify-reaction-channel" class="log-select" style="margin: 0;"></select>
               </div>
 
               <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px;">
                 <div>
-                  <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">EMOJI</label>
-                  <input type="text" id="verify-reaction-emoji" class="log-select" placeholder="Ej: ✅" style="margin: 0;" oninput="updateVerifyPreview()">
+                  <label
+                    style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">EMOJI</label>
+                  <input type="text" id="verify-reaction-emoji" class="log-select" placeholder="Ej: ✅"
+                    style="margin: 0;" oninput="updateVerifyPreview()">
                 </div>
                 <div>
-                  <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ROL A ASIGNAR</label>
+                  <label
+                    style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ROL
+                    A ASIGNAR</label>
                   <select id="verify-reaction-role" class="log-select" style="margin: 0;"></select>
                 </div>
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TÍTULO DEL EMBED</label>
-                <input type="text" id="verify-reaction-title" placeholder="Ej: Verificación Requerida" class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TÍTULO
+                  DEL EMBED</label>
+                <input type="text" id="verify-reaction-title" placeholder="Ej: Verificación Requerida"
+                  class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DESCRIPCIÓN DEL EMBED</label>
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DESCRIPCIÓN
+                  DEL EMBED</label>
                 <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
-                  <button onclick="applyFormat('verify-reaction-desc','bold')" title="Negrita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><b>B</b></button>
-                  <button onclick="applyFormat('verify-reaction-desc','italic')" title="Cursiva" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i>I</i></button>
-                  <button onclick="applyFormat('verify-reaction-desc','underline')" title="Subrayado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:underline;">U</button>
-                  <button onclick="applyFormat('verify-reaction-desc','strikethrough')" title="Tachado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:line-through;">S</button>
-                  <button onclick="applyFormat('verify-reaction-desc','code')" title="Código" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--success); font-family:monospace;">&grave;c&grave;</button>
-                  <button onclick="applyFormat('verify-reaction-desc','link')" title="Insertar enlace" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--accent-cyan);"><i class="fas fa-link"></i> Link</button>
-                  <button onclick="applyFormat('verify-reaction-desc','quote')" title="Cita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted);"><i class="fas fa-quote-left"></i> Cita</button>
-                  <button onclick="applyFormat('verify-reaction-desc','list')" title="Lista" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i class="fas fa-list-ul"></i> Lista</button>
+                  <button onclick="applyFormat('verify-reaction-desc','bold')" title="Negrita" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><b>B</b></button>
+                  <button onclick="applyFormat('verify-reaction-desc','italic')" title="Cursiva" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i>I</i></button>
+                  <button onclick="applyFormat('verify-reaction-desc','underline')" title="Subrayado" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:underline;">U</button>
+                  <button onclick="applyFormat('verify-reaction-desc','strikethrough')" title="Tachado" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:line-through;">S</button>
+                  <button onclick="applyFormat('verify-reaction-desc','code')" title="Código" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--success); font-family:monospace;">&grave;c&grave;</button>
+                  <button onclick="applyFormat('verify-reaction-desc','link')" title="Insertar enlace" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--accent-cyan);"><i
+                      class="fas fa-link"></i> Link</button>
+                  <button onclick="applyFormat('verify-reaction-desc','quote')" title="Cita" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted);"><i
+                      class="fas fa-quote-left"></i> Cita</button>
+                  <button onclick="applyFormat('verify-reaction-desc','list')" title="Lista" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i
+                      class="fas fa-list-ul"></i> Lista</button>
                 </div>
-                <textarea id="verify-reaction-desc" placeholder="Ej: Reacciona al emoji de abajo para acceder al servidor." class="log-select" style="margin: 0; min-height: 85px;" oninput="updateVerifyPreview()"></textarea>
+                <textarea id="verify-reaction-desc"
+                  placeholder="Ej: Reacciona al emoji de abajo para acceder al servidor." class="log-select"
+                  style="margin: 0; min-height: 85px;" oninput="updateVerifyPreview()"></textarea>
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLOR DEL EMBED</label>
-                <input type="color" id="verify-reaction-color" value="#5865f2" class="color-input" style="width: 100%; height: 42px;" oninput="updateVerifyPreview()">
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLOR
+                  DEL EMBED</label>
+                <input type="color" id="verify-reaction-color" value="#5865f2" class="color-input"
+                  style="width: 100%; height: 42px;" oninput="updateVerifyPreview()">
               </div>
 
               <!-- Imagenes Adicionales para Reaccion -->
-              <div class="image-manager-container" style="border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 14px; background: rgba(0,0,0,0.2);">
-                <label style="display: block; margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
+              <div class="image-manager-container"
+                style="border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 14px; background: rgba(0,0,0,0.2);">
+                <label
+                  style="display: block; margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
                   🖼️ Imágenes Adicionales (Sin límite)
                 </label>
-                <div id="verif-emoji-image-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
-                <button type="button" onclick="addImageRow('verif-emoji')" class="view-btn" style="padding: 6px 14px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.15); color: var(--accent-light); border: 1px solid rgba(88, 101, 242, 0.3);">
+                <div id="verif-emoji-image-list"
+                  style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
+                <button type="button" onclick="addImageRow('verif-emoji')" class="view-btn"
+                  style="padding: 6px 14px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.15); color: var(--accent-light); border: 1px solid rgba(88, 101, 242, 0.3);">
                   <i class="fas fa-plus"></i> Añadir Imagen
                 </button>
               </div>
 
-              <button onclick="sendVerificationReaction()" class="view-btn" style="background: var(--accent); color: white; padding: 14px; font-weight: 700; border-radius: var(--radius-md); margin-top: 6px; width: 100%; justify-content: center;">
+              <button onclick="sendVerificationReaction()" class="view-btn"
+                style="background: var(--accent); color: white; padding: 14px; font-weight: 700; border-radius: var(--radius-md); margin-top: 6px; width: 100%; justify-content: center;">
                 <i class="fas fa-paper-plane"></i> Enviar Mensaje de Verificación
               </button>
-              <span id="verify-reaction-msg-status" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; display: block; margin-top: 4px;"></span>
+              <span id="verify-reaction-msg-status"
+                style="font-size: 0.8rem; color: var(--text-muted); text-align: center; display: block; margin-top: 4px;"></span>
             </div>
           </div>
 
           <!-- RIGHT: Preview -->
           <div>
             <div style="position: sticky; top: 20px;">
-              <label style="display: block; margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">VISTA PREVIA EN DISCORD</label>
+              <label
+                style="display: block; margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">VISTA
+                PREVIA EN DISCORD</label>
               <div class="discord-preview-container">
                 <div class="discord-msg-header">
-                  <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="discord-bot-avatar" id="verify-emoji-preview-avatar" />
+                  <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="discord-bot-avatar"
+                    id="verify-emoji-preview-avatar" />
                   <div>
                     <div class="discord-bot-author">
                       <span id="verify-emoji-preview-botname">CodeCord</span>
@@ -3872,10 +4129,12 @@
 
                 <div class="discord-preview" id="verify-emoji-preview-embed">
                   <div class="preview-title" id="verify-emoji-preview-title">Verificación Requerida</div>
-                  <div class="preview-content" id="verify-emoji-preview-desc">Reacciona al emoji de abajo para acceder al servidor.</div>
+                  <div class="preview-content" id="verify-emoji-preview-desc">Reacciona al emoji de abajo para acceder
+                    al servidor.</div>
                 </div>
 
-                <div style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: #2b2d31; padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08);">
+                <div
+                  style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: #2b2d31; padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08);">
                   <span id="verify-emoji-preview-emoji" style="font-size: 1.1rem;">✅</span>
                   <span style="color: #dbdee1; font-size: 0.85rem; font-weight: 700;">1</span>
                 </div>
@@ -3890,14 +4149,18 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
           <!-- LEFT: Form -->
           <div class="log-config-card" style="padding: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div
+              style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
               <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 1.2rem;">
+                <div
+                  style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 1.2rem;">
                   <i class="fas fa-shield-alt"></i>
                 </div>
                 <div>
-                  <h3 style="color: var(--success); font-size: 1.05rem; font-weight: 700; margin: 0;">Verificación por App Autorizada</h3>
-                  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; margin-bottom: 0;">Máxima seguridad anti-bots mediante OAuth2 de Discord.</p>
+                  <h3 style="color: var(--success); font-size: 1.05rem; font-weight: 700; margin: 0;">Verificación por
+                    App Autorizada</h3>
+                  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; margin-bottom: 0;">Máxima
+                    seguridad anti-bots mediante OAuth2 de Discord.</p>
                 </div>
               </div>
               <label class="switch">
@@ -3908,70 +4171,107 @@
 
             <div style="display: flex; flex-direction: column; gap: 16px;">
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANAL DEL PANEL</label>
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CANAL
+                  DEL PANEL</label>
                 <select id="verify-oauth-channel" class="log-select" style="margin: 0;"></select>
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ROL A ASIGNAR AL VERIFICAR</label>
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">ROL
+                  A ASIGNAR AL VERIFICAR</label>
                 <select id="verify-oauth-role" class="log-select" style="margin: 0;"></select>
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TEXTO DEL BOTÓN</label>
-                <input type="text" id="verify-oauth-btntext" placeholder="Ej: Verificarse" class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TEXTO
+                  DEL BOTÓN</label>
+                <input type="text" id="verify-oauth-btntext" placeholder="Ej: Verificarse" class="log-select"
+                  style="margin: 0;" oninput="updateVerifyPreview()">
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TÍTULO DEL EMBED</label>
-                <input type="text" id="verify-oauth-title" placeholder="Ej: Verificación Necesaria" class="log-select" style="margin: 0;" oninput="updateVerifyPreview()">
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">TÍTULO
+                  DEL EMBED</label>
+                <input type="text" id="verify-oauth-title" placeholder="Ej: Verificación Necesaria" class="log-select"
+                  style="margin: 0;" oninput="updateVerifyPreview()">
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DESCRIPCIÓN DEL EMBED</label>
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DESCRIPCIÓN
+                  DEL EMBED</label>
                 <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
-                  <button onclick="applyFormat('verify-oauth-desc','bold')" title="Negrita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><b>B</b></button>
-                  <button onclick="applyFormat('verify-oauth-desc','italic')" title="Cursiva" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i>I</i></button>
-                  <button onclick="applyFormat('verify-oauth-desc','underline')" title="Subrayado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:underline;">U</button>
-                  <button onclick="applyFormat('verify-oauth-desc','strikethrough')" title="Tachado" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:line-through;">S</button>
-                  <button onclick="applyFormat('verify-oauth-desc','code')" title="Código" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--success); font-family:monospace;">&grave;c&grave;</button>
-                  <button onclick="applyFormat('verify-oauth-desc','link')" title="Insertar enlace" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--accent-cyan);"><i class="fas fa-link"></i> Link</button>
-                  <button onclick="applyFormat('verify-oauth-desc','quote')" title="Cita" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted);"><i class="fas fa-quote-left"></i> Cita</button>
-                  <button onclick="applyFormat('verify-oauth-desc','list')" title="Lista" class="view-btn" style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i class="fas fa-list-ul"></i> Lista</button>
+                  <button onclick="applyFormat('verify-oauth-desc','bold')" title="Negrita" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><b>B</b></button>
+                  <button onclick="applyFormat('verify-oauth-desc','italic')" title="Cursiva" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i>I</i></button>
+                  <button onclick="applyFormat('verify-oauth-desc','underline')" title="Subrayado" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:underline;">U</button>
+                  <button onclick="applyFormat('verify-oauth-desc','strikethrough')" title="Tachado" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white; text-decoration:line-through;">S</button>
+                  <button onclick="applyFormat('verify-oauth-desc','code')" title="Código" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--success); font-family:monospace;">&grave;c&grave;</button>
+                  <button onclick="applyFormat('verify-oauth-desc','link')" title="Insertar enlace" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--accent-cyan);"><i
+                      class="fas fa-link"></i> Link</button>
+                  <button onclick="applyFormat('verify-oauth-desc','quote')" title="Cita" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted);"><i
+                      class="fas fa-quote-left"></i> Cita</button>
+                  <button onclick="applyFormat('verify-oauth-desc','list')" title="Lista" class="view-btn"
+                    style="padding:4px 10px; font-size:0.8rem; background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:white;"><i
+                      class="fas fa-list-ul"></i> Lista</button>
                 </div>
-                <textarea id="verify-oauth-desc" placeholder="Ej: Haz clic en el botón inferior para autorizar la aplicación de verificación y obtener acceso." class="log-select" style="margin: 0; min-height: 85px;" oninput="updateVerifyPreview()"></textarea>
+                <textarea id="verify-oauth-desc"
+                  placeholder="Ej: Haz clic en el botón inferior para autorizar la aplicación de verificación y obtener acceso."
+                  class="log-select" style="margin: 0; min-height: 85px;" oninput="updateVerifyPreview()"></textarea>
               </div>
 
               <div>
-                <label style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLOR DEL EMBED</label>
-                <input type="color" id="verify-oauth-color" value="#5865f2" class="color-input" style="width: 100%; height: 42px;" oninput="updateVerifyPreview()">
+                <label
+                  style="display: block; margin-bottom: 6px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">COLOR
+                  DEL EMBED</label>
+                <input type="color" id="verify-oauth-color" value="#5865f2" class="color-input"
+                  style="width: 100%; height: 42px;" oninput="updateVerifyPreview()">
               </div>
 
               <!-- Imagenes Adicionales para OAuth -->
-              <div class="image-manager-container" style="border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 14px; background: rgba(0,0,0,0.2);">
-                <label style="display: block; margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
+              <div class="image-manager-container"
+                style="border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 14px; background: rgba(0,0,0,0.2);">
+                <label
+                  style="display: block; margin-bottom: 8px; font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
                   🖼️ Imágenes Adicionales (Sin límite)
                 </label>
-                <div id="verif-oauth-image-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
-                <button type="button" onclick="addImageRow('verif-oauth')" class="view-btn" style="padding: 6px 14px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.15); color: var(--accent-light); border: 1px solid rgba(88, 101, 242, 0.3);">
+                <div id="verif-oauth-image-list"
+                  style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
+                <button type="button" onclick="addImageRow('verif-oauth')" class="view-btn"
+                  style="padding: 6px 14px; font-size: 0.8rem; background: rgba(88, 101, 242, 0.15); color: var(--accent-light); border: 1px solid rgba(88, 101, 242, 0.3);">
                   <i class="fas fa-plus"></i> Añadir Imagen
                 </button>
               </div>
 
-              <button onclick="sendVerificationOAuth()" class="view-btn" style="background: var(--success); color: #0a0d14; padding: 14px; font-weight: 700; border-radius: var(--radius-md); margin-top: 6px; width: 100%; justify-content: center; box-shadow: 0 0 15px var(--success-glow);">
+              <button onclick="sendVerificationOAuth()" class="view-btn"
+                style="background: var(--success); color: #0a0d14; padding: 14px; font-weight: 700; border-radius: var(--radius-md); margin-top: 6px; width: 100%; justify-content: center; box-shadow: 0 0 15px var(--success-glow);">
                 <i class="fas fa-paper-plane"></i> Enviar Panel de App Autorizada
               </button>
-              <span id="verify-oauth-msg-status" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; display: block; margin-top: 4px;"></span>
+              <span id="verify-oauth-msg-status"
+                style="font-size: 0.8rem; color: var(--text-muted); text-align: center; display: block; margin-top: 4px;"></span>
             </div>
           </div>
 
           <!-- RIGHT: Preview -->
           <div>
             <div style="position: sticky; top: 20px;">
-              <label style="display: block; margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">VISTA PREVIA EN DISCORD</label>
+              <label
+                style="display: block; margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">VISTA
+                PREVIA EN DISCORD</label>
               <div class="discord-preview-container">
                 <div class="discord-msg-header">
-                  <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="discord-bot-avatar" id="verify-oauth-preview-avatar" />
+                  <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="discord-bot-avatar"
+                    id="verify-oauth-preview-avatar" />
                   <div>
                     <div class="discord-bot-author">
                       <span id="verify-oauth-preview-botname">CodeCord</span>
@@ -3983,11 +4283,13 @@
 
                 <div class="discord-preview" id="verify-oauth-preview-embed">
                   <div class="preview-title" id="verify-oauth-preview-title">Verificación Requerida</div>
-                  <div class="preview-content" id="verify-oauth-preview-desc">Haz clic en el botón inferior para autorizar la aplicación de verificación y obtener acceso.</div>
+                  <div class="preview-content" id="verify-oauth-preview-desc">Haz clic en el botón inferior para
+                    autorizar la aplicación de verificación y obtener acceso.</div>
                 </div>
 
                 <div style="margin-top: 12px;">
-                  <button style="background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 12px var(--accent-glow);">
+                  <button
+                    style="background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 12px var(--accent-glow);">
                     <i class="fas fa-external-link-alt"></i> <span id="verify-oauth-preview-btntext">Verificarse</span>
                   </button>
                 </div>
@@ -4000,12 +4302,15 @@
       <!-- TAB 3: USUARIOS VERIFICADOS -->
       <div id="verify-tab-users" style="display: none;">
         <div class="log-config-card" style="padding: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px; flex-wrap: wrap; gap: 12px;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px; flex-wrap: wrap; gap: 12px;">
             <div>
               <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin: 0;">👥 Usuarios Verificados</h3>
-              <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; margin-bottom: 0;">Usuarios que han completado la verificación OAuth2. Puedes restaurar su membresía si se salen.</p>
+              <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; margin-bottom: 0;">Usuarios que
+                han completado la verificación OAuth2. Puedes restaurar su membresía si se salen.</p>
             </div>
-            <button onclick="loadVerifiedUsers()" class="view-btn" style="background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border-subtle);">
+            <button onclick="loadVerifiedUsers()" class="view-btn"
+              style="background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border-subtle);">
               <i class="fas fa-sync"></i> Actualizar Lista
             </button>
           </div>
@@ -4023,7 +4328,8 @@
               <tbody id="verify-users-body">
                 <tr>
                   <td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">
-                    <div class="spinner" style="width: 24px; height: 24px; margin-bottom: 8px;"></div> Cargando usuarios...
+                    <div class="spinner" style="width: 24px; height: 24px; margin-bottom: 8px;"></div> Cargando
+                    usuarios...
                   </td>
                 </tr>
               </tbody>
@@ -4035,29 +4341,38 @@
       <!-- TAB 4: AJUSTES DE VERIFICACIÓN -->
       <div id="verify-tab-settings" style="display: none;">
         <div class="log-config-card" style="padding: 26px; max-width: 780px;">
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
-            <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--warning);">
+          <div
+            style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div
+              style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--warning);">
               <i class="fas fa-sliders-h"></i>
             </div>
             <div>
-              <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin: 0;">Ajustes Avanzados de Verificación</h3>
-              <p style="color: var(--text-muted); font-size: 0.82rem; margin: 2px 0 0;">Configuración de aislamiento de canales y roles automáticos.</p>
+              <h3 style="color: white; font-size: 1.1rem; font-weight: 700; margin: 0;">Ajustes Avanzados de
+                Verificación</h3>
+              <p style="color: var(--text-muted); font-size: 0.82rem; margin: 2px 0 0;">Configuración de aislamiento de
+                canales y roles automáticos.</p>
             </div>
           </div>
 
           <!-- Rol sin verificar -->
           <div style="margin-bottom: 24px;">
-            <div style="display: flex; align-items: flex-start; gap: 14px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
+            <div
+              style="display: flex; align-items: flex-start; gap: 14px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
               <div style="font-size: 1.3rem; color: var(--warning);"><i class="fas fa-shield-alt"></i></div>
               <div>
-                <h4 style="color: var(--warning); margin: 0 0 4px; font-size: 0.92rem; font-weight: 700;">Aislamiento para No Verificados</h4>
+                <h4 style="color: var(--warning); margin: 0 0 4px; font-size: 0.92rem; font-weight: 700;">Aislamiento
+                  para No Verificados</h4>
                 <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0; line-height: 1.5;">
-                  Al crear un canal nuevo en el servidor, el bot configurará automáticamente ese canal para que el rol no verificado <strong style="color: var(--danger);">no pueda verlo</strong>, protegiéndolo hasta completar la verificación.
+                  Al crear un canal nuevo en el servidor, el bot configurará automáticamente ese canal para que el rol
+                  no verificado <strong style="color: var(--danger);">no pueda verlo</strong>, protegiéndolo hasta
+                  completar la verificación.
                 </p>
               </div>
             </div>
 
-            <label style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+            <label
+              style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
               <i class="fas fa-user-slash" style="color: var(--warning); margin-right: 6px;"></i>
               Rol sin verificar (ocultar canales nuevos automáticamente)
             </label>
@@ -4068,7 +4383,8 @@
 
           <!-- Rol a retirar al verificar -->
           <div style="margin-bottom: 24px;">
-            <label style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+            <label
+              style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
               <i class="fas fa-user-minus" style="color: var(--danger); margin-right: 6px;"></i>
               Rol a retirar al verificarse
             </label>
@@ -4078,17 +4394,21 @@
           </div>
 
           <!-- Estado actual -->
-          <div id="verify-settings-status" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px;">
+          <div id="verify-settings-status"
+            style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.2rem;"></i>
               <div>
-                <div style="color: var(--success); font-weight: 700; font-size: 0.9rem;">Protección automática activa</div>
-                <div id="verify-settings-status-text" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;"></div>
+                <div style="color: var(--success); font-weight: 700; font-size: 0.9rem;">Protección automática activa
+                </div>
+                <div id="verify-settings-status-text"
+                  style="color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;"></div>
               </div>
             </div>
           </div>
 
-          <button onclick="saveVerificationSettings()" class="view-btn" style="background: linear-gradient(135deg, var(--accent) 0%, #7950F2 100%); color: white; font-weight: 700; width: 100%; padding: 13px; font-size: 0.95rem; justify-content: center; box-shadow: 0 0 15px var(--accent-glow);">
+          <button onclick="saveVerificationSettings()" class="view-btn"
+            style="background: linear-gradient(135deg, var(--accent) 0%, #7950F2 100%); color: white; font-weight: 700; width: 100%; padding: 13px; font-size: 0.95rem; justify-content: center; box-shadow: 0 0 15px var(--accent-glow);">
             <i class="fas fa-save"></i> Guardar Ajustes de Verificación
           </button>
         </div>
@@ -4097,129 +4417,144 @@
 
   </main>
 
-  
+
   <!-- Modal de Búsqueda Rápida (Ctrl+K) -->
   <div id="quick-search-modal" onclick="if(event.target === this) closeQuickSearch()">
     <div class="quick-search-box">
       <div class="quick-search-input-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" id="quick-search-input" placeholder="Buscar módulo (ej. moderación, tickets, embeds)..." onkeyup="filterQuickSearch(this.value)">
+        <input type="text" id="quick-search-input" placeholder="Buscar módulo (ej. moderación, tickets, embeds)..."
+          onkeyup="filterQuickSearch(this.value)">
         <kbd onclick="closeQuickSearch()" style="cursor: pointer;">ESC</kbd>
       </div>
       <div class="quick-search-results" id="quick-search-results">
-        <div class="quick-search-item" onclick="selectQuickSearch('dashboard')"><i class="fas fa-th-large"></i> Dashboard General</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('moderation')"><i class="fas fa-shield-alt"></i> Moderación y AutoMod</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('antiraid')"><i class="fas fa-shield-virus"></i> Sistema Anti-Raid</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('welcome')"><i class="fas fa-door-open"></i> Bienvenidas y Despedidas</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('embed-builder')"><i class="fas fa-magic"></i> Constructor de Embeds</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('tickets')"><i class="fas fa-ticket-alt"></i> Sistema de Tickets</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('giveaways')"><i class="fas fa-gift"></i> Sorteos & Giveaways</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('suggestions')"><i class="fas fa-lightbulb"></i> Sugerencias</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('auto-responses')"><i class="fas fa-robot"></i> Auto-Respuestas</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('dashboard')"><i class="fas fa-th-large"></i>
+          Dashboard General</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('moderation')"><i class="fas fa-shield-alt"></i>
+          Moderación y AutoMod</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('antiraid')"><i class="fas fa-shield-virus"></i>
+          Sistema Anti-Raid</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('welcome')"><i class="fas fa-door-open"></i>
+          Bienvenidas y Despedidas</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('embed-builder')"><i class="fas fa-magic"></i>
+          Constructor de Embeds</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('tickets')"><i class="fas fa-ticket-alt"></i> Sistema
+          de Tickets</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('giveaways')"><i class="fas fa-gift"></i> Sorteos &
+          Giveaways</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('suggestions')"><i class="fas fa-lightbulb"></i>
+          Sugerencias</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('auto-responses')"><i class="fas fa-robot"></i>
+          Auto-Respuestas</div>
         <div class="quick-search-item" onclick="selectQuickSearch('autorol')"><i class="fas fa-tags"></i> Auto-Rol</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('verification')"><i class="fas fa-user-check"></i> Verificación</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('logs-config')"><i class="fas fa-cog"></i> Configuración de Logs</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('members')"><i class="fas fa-users"></i> Miembros del Servidor</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('logs')"><i class="fas fa-list-ul"></i> Logs Recientes</div>
-        <div class="quick-search-item" onclick="selectQuickSearch('servers')"><i class="fas fa-server"></i> Lista de Servidores</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('verification')"><i class="fas fa-user-check"></i>
+          Verificación</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('logs-config')"><i class="fas fa-cog"></i>
+          Configuración de Logs</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('members')"><i class="fas fa-users"></i> Miembros del
+          Servidor</div>
+        <div class="quick-search-item" onclick="selectQuickSearch('logs')"><i class="fas fa-list-ul"></i> Logs Recientes
+        </div>
+        <div class="quick-search-item" onclick="selectQuickSearch('servers')"><i class="fas fa-server"></i> Lista de
+          Servidores</div>
       </div>
     </div>
   </div>
 
   <script>
 
-  // --- CONTROL DE SIDEBAR DESPLEGABLE / PLEGABLE (BOTÓN 3 PALITOS) ---
-  function toggleSidebar(forceState) {
-    const isMobile = window.innerWidth <= 992;
-    if (isMobile) {
-      if (typeof forceState === 'boolean') {
-        if (forceState) document.body.classList.add('sidebar-mobile-open');
-        else document.body.classList.remove('sidebar-mobile-open');
+    // --- CONTROL DE SIDEBAR DESPLEGABLE / PLEGABLE (BOTÓN 3 PALITOS) ---
+    function toggleSidebar(forceState) {
+      const isMobile = window.innerWidth <= 992;
+      if (isMobile) {
+        if (typeof forceState === 'boolean') {
+          if (forceState) document.body.classList.add('sidebar-mobile-open');
+          else document.body.classList.remove('sidebar-mobile-open');
+        } else {
+          document.body.classList.toggle('sidebar-mobile-open');
+        }
       } else {
-        document.body.classList.toggle('sidebar-mobile-open');
+        if (typeof forceState === 'boolean') {
+          if (forceState) document.body.classList.remove('sidebar-collapsed');
+          else document.body.classList.add('sidebar-collapsed');
+        } else {
+          document.body.classList.toggle('sidebar-collapsed');
+        }
+        // Guardar preferencia en desktop
+        try {
+          const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+          localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+        } catch (e) { }
       }
-    } else {
-      if (typeof forceState === 'boolean') {
-        if (forceState) document.body.classList.remove('sidebar-collapsed');
-        else document.body.classList.add('sidebar-collapsed');
-      } else {
-        document.body.classList.toggle('sidebar-collapsed');
-      }
-      // Guardar preferencia en desktop
+    }
+
+    // Restaurar estado de sidebar al cargar la página
+    document.addEventListener('DOMContentLoaded', function () {
       try {
-        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-        localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
-      } catch (e) {}
-    }
-  }
+        if (window.innerWidth > 992 && localStorage.getItem('sidebar_collapsed') === 'true') {
+          document.body.classList.add('sidebar-collapsed');
+        }
+      } catch (e) { }
+    });
 
-  // Restaurar estado de sidebar al cargar la página
-  document.addEventListener('DOMContentLoaded', function() {
-    try {
-      if (window.innerWidth > 992 && localStorage.getItem('sidebar_collapsed') === 'true') {
-        document.body.classList.add('sidebar-collapsed');
-      }
-    } catch(e) {}
-  });
-
-  // Cerrar sidebar en móvil al hacer clic en cualquier enlace
-  document.addEventListener('click', function(e) {
-    if (window.innerWidth <= 992 && e.target.closest('.nav-link')) {
-      document.body.classList.remove('sidebar-mobile-open');
-    }
-  });
-
-
-
-  // --- FUNCIONES HELPER DE INTERFAZ MODERNA (PROBOT / DYNO / NEKOTINA) ---
-  function openQuickSearch() {
-    const modal = document.getElementById('quick-search-modal');
-    if (modal) {
-      modal.classList.add('active');
-      const input = document.getElementById('quick-search-input');
-      if (input) {
-        input.value = '';
-        input.focus();
-        filterQuickSearch('');
-      }
-    }
-  }
-
-  function closeQuickSearch() {
-    const modal = document.getElementById('quick-search-modal');
-    if (modal) modal.classList.remove('active');
-  }
-
-  function filterQuickSearch(query) {
-    const term = (query || '').toLowerCase().trim();
-    const items = document.querySelectorAll('#quick-search-results .quick-search-item');
-    items.forEach(item => {
-      const text = item.textContent.toLowerCase();
-      if (!term || text.includes(term)) {
-        item.style.display = 'flex';
-      } else {
-        item.style.display = 'none';
+    // Cerrar sidebar en móvil al hacer clic en cualquier enlace
+    document.addEventListener('click', function (e) {
+      if (window.innerWidth <= 992 && e.target.closest('.nav-link')) {
+        document.body.classList.remove('sidebar-mobile-open');
       }
     });
-  }
 
-  function selectQuickSearch(sectionId) {
-    closeQuickSearch();
-    if (typeof showSection === 'function') {
-      showSection(sectionId);
-    }
-  }
 
-  // Atajo de teclado global Ctrl+K / Cmd+K y ESC
-  document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      openQuickSearch();
+
+    // --- FUNCIONES HELPER DE INTERFAZ MODERNA (PROBOT / DYNO / NEKOTINA) ---
+    function openQuickSearch() {
+      const modal = document.getElementById('quick-search-modal');
+      if (modal) {
+        modal.classList.add('active');
+        const input = document.getElementById('quick-search-input');
+        if (input) {
+          input.value = '';
+          input.focus();
+          filterQuickSearch('');
+        }
+      }
     }
-    if (e.key === 'Escape') {
+
+    function closeQuickSearch() {
+      const modal = document.getElementById('quick-search-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function filterQuickSearch(query) {
+      const term = (query || '').toLowerCase().trim();
+      const items = document.querySelectorAll('#quick-search-results .quick-search-item');
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (!term || text.includes(term)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    function selectQuickSearch(sectionId) {
       closeQuickSearch();
+      if (typeof showSection === 'function') {
+        showSection(sectionId);
+      }
     }
-  });
+
+    // Atajo de teclado global Ctrl+K / Cmd+K y ESC
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openQuickSearch();
+      }
+      if (e.key === 'Escape') {
+        closeQuickSearch();
+      }
+    });
 
 
     // Permitir selección múltiple haciendo clic simple sin necesidad de presionar la tecla Ctrl
@@ -7848,7 +8183,7 @@
       style="background:#1e1e2e;border-radius:16px;padding:24px;width:90%;max-width:540px;max-height:85vh;overflow-y:auto;position:relative;border:1px solid rgba(255,255,255,0.12);box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
       <button onclick="closeAutorolEmojiModal()"
         style="position:absolute;top:14px;right:18px;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;">&times;</button>
-      
+
       <h3 style="margin-bottom: 14px; color: white; display:flex; align-items:center; gap:8px;">
         <i class="far fa-smile" style="color:var(--accent);"></i> Seleccionar Emoji para Auto-Rol
       </h3>
@@ -7861,26 +8196,33 @@
 
       <!-- Sección Emojis del Servidor -->
       <div style="margin-bottom: 20px;">
-        <div style="font-weight:700; font-size:0.85rem; color:var(--accent); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+        <div
+          style="font-weight:700; font-size:0.85rem; color:var(--accent); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
           <i class="fas fa-server"></i> Emojis Personalizados del Servidor
         </div>
-        <div id="emoji-picker-server-grid" style="display:flex; flex-wrap:wrap; gap:8px; max-height:160px; overflow-y:auto; padding:8px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+        <div id="emoji-picker-server-grid"
+          style="display:flex; flex-wrap:wrap; gap:8px; max-height:160px; overflow-y:auto; padding:8px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
         </div>
       </div>
 
       <!-- Sección Emojis Estándar Populares -->
       <div>
-        <div style="font-weight:700; font-size:0.85rem; color:var(--success); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+        <div
+          style="font-weight:700; font-size:0.85rem; color:var(--success); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
           <i class="far fa-grin"></i> Emojis Estándar Populares
         </div>
-        <div id="emoji-picker-standard-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap:6px; max-height:180px; overflow-y:auto; padding:8px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+        <div id="emoji-picker-standard-grid"
+          style="display:grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap:6px; max-height:180px; overflow-y:auto; padding:8px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
         </div>
       </div>
 
       <!-- Opción Manual -->
-      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display:flex; gap:10px;">
-        <input type="text" id="emoji-picker-manual-input" placeholder="O escribe/pega cualquier emoji aquí..." class="log-select" style="margin:0; flex:1;">
-        <button onclick="applyManualEmoji()" class="view-btn" style="background:var(--accent); color:white; padding:0 16px;">
+      <div
+        style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display:flex; gap:10px;">
+        <input type="text" id="emoji-picker-manual-input" placeholder="O escribe/pega cualquier emoji aquí..."
+          class="log-select" style="margin:0; flex:1;">
+        <button onclick="applyManualEmoji()" class="view-btn"
+          style="background:var(--accent); color:white; padding:0 16px;">
           Usar
         </button>
       </div>
