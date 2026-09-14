@@ -13,6 +13,8 @@ const { loadStaffConfig } = require('../systems/ticketSystem.js');
 const { loadLogChannelConfig } = require('../systems/loggerSystem.js');
 const { findWaitingRoom } = require('../systems/voiceSystem.js');
 const { startColorRotation } = require('../systems/colorSystem.js');
+const youtubeSystem = require('../systems/youtube/index.js');
+const tiktokSystem = require('../systems/tiktok/index.js');
 
 
 let hasInitialized = false;
@@ -41,6 +43,10 @@ async function onClientReady(client) {
         // Cargar configuraciones iniciales
         loadStaffConfig(client);
         loadLogChannelConfig(client);
+
+        // Iniciar sistemas de YouTube y TikTok
+        youtubeSystem.startPolling(client);
+        tiktokSystem.startPolling(client);
 
         // Restaurar rotación automática de colores
         try {

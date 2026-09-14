@@ -3824,6 +3824,27 @@ app.get('/verify-callback', async (req, res) => {
 // 📺 SISTEMA DE ANUNCIOS DE YOUTUBE - CODECORD
 // =====================================================================
 
+// GET: Buscar canales de YouTube
+app.get('/api/youtube/search', async (req, res) => {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) return res.json([]);
+    try {
+        const RssParser = require('rss-parser');
+        const parser = new RssParser();
+        const searchUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${q.trim()}`;
+        const feed = await parser.parseURL(searchUrl);
+        res.json([{
+            channelId: feed.link?.split('/channel/')[1] || q.trim(),
+            channelName: feed.title || 'Canal desconocido',
+            channelUrl: feed.link || '',
+            thumbnail: feed.image?.url || null
+        }]);
+    } catch (e) {
+        console.error('[YouTube Search] Error:', e.message);
+        res.json([]);
+    }
+});
+
 // GET: Obtener configuración de anuncios de YouTube
 app.get('/api/guilds/:guildId/youtube-config', (req, res) => {
     const config = configManager.loadGuildConfig(req.params.guildId, 'youtube', {
@@ -3911,6 +3932,117 @@ app.post('/api/guilds/:guildId/youtube-global-toggle', (req, res) => {
     config.globalEnabled = req.body.enabled !== false;
     configManager.saveGuildConfig(req.params.guildId, 'youtube', config);
     logPanelActivity(req.params.guildId, 'YOUTUBE_TOGGLE', `Anuncios de YouTube ${config.globalEnabled ? 'activados' : 'desactivados'}`);
+    res.json({ success: true, globalEnabled: config.globalEnabled });
+});
+
+// =====================================================================
+
+// 📺 SISTEMA DE ANUNCIOS DE TIKTOK - CODECORD (BETA)
+// =====================================================================
+
+// GET: Buscar perfiles de TikTok
+app.get('/api/tiktok/search', async (req, res) => {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) return res.json([]);
+    try {
+        const { TikTokClient } = require('@ssut/tiktok-api');
+        const tiktokClient = new TikTokClient({ region: 'US' });
+        const resp = await tiktokClient.searchUsers(q.trim());
+        const users = resp?.data?.users || [];
+        res.json(users.map(u => ({
+            username: u.uniqueId,
+            displayName: u.nickname,
+            secUid: u.secUid,
+            avatar: u.avatarLarger || u.avatarThumb || null,
+            verified: u.verified || false,
+            followers: u.followerCount || 0,
+            videos: u.videoCount || 0
+        })).slice(0, 8));
+    } catch (e) {
+        console.error('[TikTok Search] Error:', e.message);
+        res.json([]);
+    }
+});
+
+// GET: Obtener configuración de TikTok
+app.get('/api/guilds/:guildId/tiktok-config', (req, res) => {
+    const config = configManager.loadGuildConfig(req.params.guildId, 'tiktok', {
+        profiles: [],
+        globalEnabled: true
+    });
+    res.json(config);
+});
+
+// POST: Añadir perfil de TikTok
+app.post('/api/guilds/:guildId/tiktok-profiles', (req, res) => {
+    const config = configManager.loadGuildConfig(req.params.guildId, 'tiktok', { profiles: [], globalEnabled: true });
+
+    const { username, secUid, displayName, avatar, discordChannelId, mentionRoleId, announceNewVideos } = req.body;
+
+    if (!username || !discordChannelId) {
+        return res.status(400).json({ error: 'Faltan campos: username y discordChannelId son obligatorios' });
+    }
+
+    const exists = config.profiles.find(p => p.username.toLowerCase() === username.toLowerCase());
+    if (exists) return res.status(400).json({ error: 'Este perfil ya está configurado' });
+
+    const newProfile = {
+        id: `tt_${Date.now()}`,
+        username: username.trim(),
+        secUid: (secUid || '').trim(),
+        displayName: (displayName || username).trim(),
+        avatar: (avatar || '').trim(),
+        discordChannelId: discordChannelId.trim(),
+        mentionRoleId: mentionRoleId || '',
+        enabled: true,
+        announceNewVideos: announceNewVideos !== false,
+        createdAt: new Date().toISOString()
+    };
+
+    config.profiles.push(newProfile);
+    configManager.saveGuildConfig(req.params.guildId, 'tiktok', config);
+    logPanelActivity(req.params.guildId, 'TIKTOK_ADD', `Perfil de TikTok añadido: @${newProfile.username}`);
+    res.json({ success: true, profile: newProfile });
+});
+
+// PUT: Actualizar perfil de TikTok
+app.put('/api/guilds/:guildId/tiktok-profiles/:profileId', (req, res) => {
+    const config = configManager.loadGuildConfig(req.params.guildId, 'tiktok', { profiles: [], globalEnabled: true });
+    const profile = config.profiles.find(p => p.id === req.params.profileId);
+    if (!profile) return res.status(404).json({ error: 'Perfil no encontrado' });
+
+    const { username, displayName, discordChannelId, mentionRoleId, enabled, announceNewVideos } = req.body;
+
+    if (username !== undefined) profile.username = username.trim();
+    if (displayName !== undefined) profile.displayName = displayName.trim();
+    if (discordChannelId !== undefined) profile.discordChannelId = discordChannelId.trim();
+    if (mentionRoleId !== undefined) profile.mentionRoleId = mentionRoleId;
+    if (enabled !== undefined) profile.enabled = enabled;
+    if (announceNewVideos !== undefined) profile.announceNewVideos = announceNewVideos;
+
+    configManager.saveGuildConfig(req.params.guildId, 'tiktok', config);
+    logPanelActivity(req.params.guildId, 'TIKTOK_EDIT', `Perfil de TikTok editado: @${profile.username}`);
+    res.json({ success: true, profile });
+});
+
+// DELETE: Eliminar perfil de TikTok
+app.delete('/api/guilds/:guildId/tiktok-profiles/:profileId', (req, res) => {
+    const config = configManager.loadGuildConfig(req.params.guildId, 'tiktok', { profiles: [], globalEnabled: true });
+    const index = config.profiles.findIndex(p => p.id === req.params.profileId);
+    if (index === -1) return res.status(404).json({ error: 'Perfil no encontrado' });
+
+    const removed = config.profiles.splice(index, 1)[0];
+    configManager.saveGuildConfig(req.params.guildId, 'tiktok', config);
+    logPanelActivity(req.params.guildId, 'TIKTOK_DELETE', `Perfil de TikTok eliminado: @${removed.username}`);
+    res.json({ success: true });
+});
+
+// POST: Activar/desactivar global TikTok
+app.post('/api/guilds/:guildId/tiktok-global-toggle', (req, res) => {
+    const config = configManager.loadGuildConfig(req.params.guildId, 'tiktok', { profiles: [], globalEnabled: true });
+    config.globalEnabled = req.body.enabled !== false;
+    configManager.saveGuildConfig(req.params.guildId, 'tiktok', config);
+    logPanelActivity(req.params.guildId, 'TIKTOK_TOGGLE', `Anuncios de TikTok ${config.globalEnabled ? 'activados' : 'desactivados'}`);
     res.json({ success: true, globalEnabled: config.globalEnabled });
 });
 

@@ -1824,9 +1824,12 @@
         <i class="fas fa-tags"></i> <span>Auto-Rol</span>
       </a>
 
-      <div class="nav-category">YouTube</div>
+      <div class="nav-category">Redes</div>
       <a href="#youtube" class="nav-link" onclick="showSection('youtube')">
         <i class="fab fa-youtube"></i> <span>Anuncios YouTube</span>
+      </a>
+      <a href="#tiktok" class="nav-link" onclick="showSection('tiktok')">
+        <i class="fab fa-tiktok"></i> <span>Anuncios TikTok <span style="background:rgba(255,200,0,0.15); color:#ffc800; font-size:0.55rem; font-weight:700; padding:2px 5px; border-radius:9999px; margin-left:4px;">BETA</span></span>
       </a>
 
       <div class="nav-category">Copias de Seguridad</div>
@@ -4665,6 +4668,158 @@
       </div>
     </div>
 
+    <!-- SECCIÓN ANUNCIOS DE TIKTOK - BETA -->
+    <div id="tiktok" class="section">
+      <div class="section-header">
+        <span class="section-title"><i class="fab fa-tiktok" style="color: #000;"></i> Anuncios de TikTok <span style="background:rgba(255,200,0,0.15); color:#ffc800; font-size:0.65rem; font-weight:700; padding:3px 8px; border-radius:9999px; margin-left:8px; vertical-align:middle;">BETA</span></span>
+        <div style="display: flex; gap: 12px;">
+          <button onclick="loadTiktokConfig()" class="view-btn" style="background: rgba(255,255,255,0.1);">
+            <i class="fas fa-sync"></i> Recargar
+          </button>
+        </div>
+      </div>
+      <div style="background: rgba(255,200,0,0.06); border: 1px solid rgba(255,200,0,0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;">
+        <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">
+          Detecta automáticamente nuevos vídeos de TikTok y envía notificaciones a Discord. <strong style="color:#ffc800;">Versión Beta</strong> — el enlace lleva al perfil del creador (TikTok no permite enlace directo al vídeo desde servidor).
+        </p>
+      </div>
+
+      <!-- Toggle Global -->
+      <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 8px 11px;">
+              <i class="fab fa-tiktok" style="color: #fff; font-size: 1.2rem;"></i>
+            </div>
+            <div>
+              <span style="font-weight: 700; font-size: 1rem; display: block;">Activar Anuncios de TikTok</span>
+              <small style="color: var(--text-muted);">Activa o desactiva todos los anuncios de TikTok globalmente.</small>
+            </div>
+          </div>
+          <label class="switch"><input type="checkbox" id="tt-global-enabled" onchange="toggleTiktokGlobal()"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Formulario Añadir Perfil -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 22px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+          <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 8px 11px;">
+            <i class="fas fa-plus" style="color: #fff;"></i>
+          </div>
+          <div>
+            <span style="font-weight: 700; font-size: 1rem; display: block;">Añadir Perfil de TikTok</span>
+            <small style="color: var(--text-muted);">Busca un perfil de TikTok y configura las notificaciones.</small>
+          </div>
+        </div>
+
+        <!-- Buscador -->
+        <div style="margin-bottom: 18px;">
+          <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Buscar Perfil de TikTok *</label>
+          <div style="position:relative;">
+            <div style="position:relative;">
+              <i class="fas fa-search" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:0.85rem;"></i>
+              <input type="text" id="tt-search-input" placeholder="Busca un usuario de TikTok..." oninput="searchTiktokProfiles()" onfocus="searchTiktokProfiles()" style="width:100%; padding:12px 14px 12px 40px; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-md); color:white; font-size:0.9rem; box-sizing:border-box;">
+            </div>
+            <div id="tt-search-results" style="display:none; position:absolute; top:100%; left:0; right:0; background:#1a1f2e; border:1px solid var(--border-subtle); border-radius:var(--radius-md); margin-top:4px; max-height:280px; overflow-y:auto; z-index:100; box-shadow:0 12px 30px rgba(0,0,0,0.5);"></div>
+          </div>
+        </div>
+
+        <input type="hidden" id="tt-add-username">
+        <input type="hidden" id="tt-add-secuid">
+        <input type="hidden" id="tt-add-displayname">
+        <input type="hidden" id="tt-add-avatar">
+
+        <!-- Preview -->
+        <div id="tt-selected-preview" style="display:none; background:rgba(0,0,0,0.15); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 18px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <img id="tt-selected-thumb" src="" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png';" style="width:48px; height:48px; border-radius:50%; background:#333;">
+            <div>
+              <div id="tt-selected-name" style="font-weight:700; font-size:1rem;"></div>
+              <div id="tt-selected-username" style="font-size:0.78rem; color:var(--text-muted);"></div>
+            </div>
+            <button onclick="clearTiktokSelection()" style="margin-left:auto; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+
+        <!-- Discord Config -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Canal de Discord *</label>
+            <select id="tt-add-discord-channel" class="log-select" style="margin:0; width:100%;"></select>
+          </div>
+          <div>
+            <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Rol a Mencionar</label>
+            <select id="tt-add-mention-role" class="log-select" style="margin:0; width:100%;"><option value="">— Ninguno —</option></select>
+          </div>
+        </div>
+        <div style="margin-top: 16px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+            <input type="checkbox" id="tt-add-new-videos" checked><span>🎵 Nuevos vídeos</span>
+          </label>
+        </div>
+        <button onclick="addTiktokProfile()" class="view-btn" style="margin-top: 18px; background: #000; color: white; font-weight: 700; padding: 12px 28px;">
+          <i class="fas fa-plus"></i> Añadir Perfil
+        </button>
+      </div>
+
+      <!-- Lista de Perfiles -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 22px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+          <div style="background: rgba(88,101,242,0.15); border-radius: 8px; padding: 8px 11px;">
+            <i class="fas fa-list" style="color: var(--accent);"></i>
+          </div>
+          <div>
+            <span style="font-weight: 700; font-size: 1rem; display: block;">Perfiles Configurados</span>
+            <small style="color: var(--text-muted);">Gestiona los perfiles de TikTok monitoreados.</small>
+          </div>
+        </div>
+        <div id="tt-profiles-list">
+          <div class="loading"><div class="spinner"></div>Cargando perfiles...</div>
+        </div>
+      </div>
+
+      <!-- Modal Editar -->
+      <div id="tt-edit-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:#131929; border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:28px; width:90%; max-width:600px; box-shadow:var(--shadow-lg);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border-subtle);">
+            <h3 style="margin:0; font-weight:700; font-size:1.1rem;"><i class="fas fa-edit" style="color:var(--accent); margin-right:8px;"></i>Editar Perfil TikTok</h3>
+            <button onclick="closeTiktokEditModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.3rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+          </div>
+          <input type="hidden" id="tt-edit-profile-id">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div>
+              <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Username</label>
+              <input type="text" id="tt-edit-username" style="width:100%; padding:10px 14px; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-md); color:white; font-size:0.9rem;">
+            </div>
+            <div>
+              <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Nombre</label>
+              <input type="text" id="tt-edit-displayname" style="width:100%; padding:10px 14px; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-md); color:white; font-size:0.9rem;">
+            </div>
+            <div>
+              <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Canal de Discord</label>
+              <select id="tt-edit-discord-channel" class="log-select" style="margin:0; width:100%;"></select>
+            </div>
+            <div>
+              <label style="display:block; margin-bottom:6px; font-size:0.8rem; font-weight:600; color:var(--text-muted);">Rol a Mencionar</label>
+              <select id="tt-edit-mention-role" class="log-select" style="margin:0; width:100%;"><option value="">— Ninguno —</option></select>
+            </div>
+          </div>
+          <div style="display:flex; gap:16px; margin-top:16px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+              <input type="checkbox" id="tt-edit-enabled" checked><span>✅ Activo</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.88rem; cursor:pointer;">
+              <input type="checkbox" id="tt-edit-new-videos" checked><span>🎵 Vídeos</span>
+            </label>
+          </div>
+          <div style="display:flex; gap:12px; margin-top:20px; justify-content:flex-end;">
+            <button onclick="closeTiktokEditModal()" style="padding:10px 20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); border-radius:var(--radius-md); color:white; font-weight:600; cursor:pointer;">Cancelar</button>
+            <button onclick="saveTiktokEdit()" style="padding:10px 20px; background:var(--success); color:#181825; border:none; border-radius:var(--radius-md); font-weight:700; cursor:pointer;">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SECCIÓN ANUNCIOS DE YOUTUBE - CODECORD -->
     <div id="youtube" class="section">
       <div class="section-header">
@@ -5238,6 +5393,7 @@
       if (sectionId === 'antiraid') loadAntiraidConfig(); if (sectionId === 'verification') loadVerificationData();
       if (sectionId === 'backups') loadBackupsData();
       if (sectionId === 'youtube') loadYoutubeConfig();
+      if (sectionId === 'tiktok') loadTiktokConfig();
     }
 
     function showSection(sectionId) {
@@ -5273,6 +5429,7 @@
         'autorol': 'Auto-Rol (Reaction Roles)',
         'verification': 'Sistema de Verificación',
         'youtube': 'Anuncios de YouTube',
+        'tiktok': 'Anuncios de TikTok (Beta)',
         'backups': 'Copias de Seguridad (Backups)'
       };
       document.getElementById('section-title-header').innerText = titles[sectionId] || 'Panel'; refreshSection(sectionId);
@@ -9647,6 +9804,231 @@
         } catch (e) { console.error(e); showToast('❌ Error de conexión', 'error'); }
       }
 
+      // =====================================================================
+
+      // =====================================================================
+      // 🎵 TIKTOK ANNOUNCEMENTS FUNCTIONS (BETA)
+      // =====================================================================
+      let ttConfig = { profiles: [], globalEnabled: true };
+      let ttSearchTimeout = null;
+
+      async function searchTiktokProfiles() {
+        const input = document.getElementById('tt-search-input');
+        const resultsDiv = document.getElementById('tt-search-results');
+        const query = input.value.trim();
+        if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
+        clearTimeout(ttSearchTimeout);
+        ttSearchTimeout = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/tiktok/search?q=${encodeURIComponent(query)}`);
+            const results = await res.json();
+            if (results.length === 0) {
+              resultsDiv.innerHTML = '<div style="padding:14px; color:var(--text-muted); text-align:center; font-size:0.85rem;">No se encontraron perfiles</div>';
+              resultsDiv.style.display = 'block';
+              return;
+            }
+            resultsDiv.innerHTML = results.map(p => `
+              <div onclick="selectTiktokProfile('${p.username}', '${p.secUid}', '${p.displayName.replace(/'/g, "\\'")}', '${(p.avatar || '').replace(/'/g, "\\'")}')"
+                style="display:flex; align-items:center; gap:12px; padding:10px 14px; cursor:pointer; transition:background 0.15s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.06)'"
+                onmouseout="this.style.background='transparent'">
+                <img src="${p.avatar || 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'}"
+                  onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png';"
+                  style="width:40px; height:40px; border-radius:50%; background:#333; object-fit:cover;">
+                <div style="flex:1;">
+                  <div style="font-weight:600; font-size:0.9rem; color:white;">${p.displayName} ${p.verified ? '<i class="fas fa-check-circle" style="color:#20d5ec; font-size:0.7rem;"></i>' : ''}</div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">@${p.username} · ${(p.followers||0).toLocaleString()} seguidores · ${(p.videos||0)} vídeos</div>
+                </div>
+              </div>
+            `).join('');
+            resultsDiv.style.display = 'block';
+          } catch (e) { console.error(e); }
+        }, 500);
+
+        document.addEventListener('click', function closeSearch(e) {
+          if (!e.target.closest('#tt-search-input') && !e.target.closest('#tt-search-results')) {
+            resultsDiv.style.display = 'none';
+            document.removeEventListener('click', closeSearch);
+          }
+        });
+      }
+
+      function selectTiktokProfile(username, secUid, displayName, avatar) {
+        document.getElementById('tt-add-username').value = username;
+        document.getElementById('tt-add-secuid').value = secUid;
+        document.getElementById('tt-add-displayname').value = displayName;
+        document.getElementById('tt-add-avatar').value = avatar;
+        document.getElementById('tt-search-input').value = '';
+        document.getElementById('tt-search-results').style.display = 'none';
+        document.getElementById('tt-selected-preview').style.display = 'block';
+        document.getElementById('tt-selected-thumb').src = avatar || 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png';
+        document.getElementById('tt-selected-name').textContent = displayName;
+        document.getElementById('tt-selected-username').textContent = '@' + username;
+      }
+
+      function clearTiktokSelection() {
+        document.getElementById('tt-add-username').value = '';
+        document.getElementById('tt-add-secuid').value = '';
+        document.getElementById('tt-add-displayname').value = '';
+        document.getElementById('tt-add-avatar').value = '';
+        document.getElementById('tt-selected-preview').style.display = 'none';
+      }
+
+      async function loadTiktokConfig() {
+        try {
+          const res = await fetch(`/api/guilds/${currentGuildId}/tiktok-config`);
+          ttConfig = await res.json();
+          document.getElementById('tt-global-enabled').checked = ttConfig.globalEnabled !== false;
+          renderTiktokProfiles();
+          populateTiktokSelectors();
+        } catch (e) { console.error('Error cargando config TikTok:', e); }
+      }
+
+      function populateTiktokSelectors() {
+        const chSelects = [document.getElementById('tt-add-discord-channel'), document.getElementById('tt-edit-discord-channel')];
+        chSelects.forEach(sel => {
+          if (!sel) return;
+          const current = sel.value;
+          sel.innerHTML = '<option value="">Seleccionar canal...</option>' +
+            guildChannels.map(c => `<option value="${c.id}" ${c.id === current ? 'selected' : ''}>${c.name}</option>`).join('');
+        });
+        const rlSelects = [document.getElementById('tt-add-mention-role'), document.getElementById('tt-edit-mention-role')];
+        rlSelects.forEach(sel => {
+          if (!sel) return;
+          sel.innerHTML = '<option value="">— Ninguno —</option>' +
+            guildRoles.sort((a, b) => a.name.localeCompare(b.name))
+              .map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        });
+      }
+
+      function renderTiktokProfiles() {
+        const container = document.getElementById('tt-profiles-list');
+        if (!ttConfig.profiles || ttConfig.profiles.length === 0) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:32px; color:var(--text-muted);">
+              <i class="fab fa-tiktok" style="font-size:2.5rem; color:rgba(255,255,255,0.15); margin-bottom:12px; display:block;"></i>
+              <p style="font-size:0.95rem; margin-bottom:6px; font-weight:600;">No hay perfiles configurados</p>
+              <small>Añade un perfil de TikTok arriba para comenzar.</small>
+            </div>`;
+          return;
+        }
+        container.innerHTML = ttConfig.profiles.map(p => {
+          const ch = guildChannels.find(c => c.id === p.discordChannelId);
+          const rl = guildRoles.find(r => r.id === p.mentionRoleId);
+          return `
+            <div style="background:rgba(255,255,255,0.03); border:1px solid ${p.enabled ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
+                <img src="${p.avatar || 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'}"
+                  onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png';"
+                  style="width:44px; height:44px; border-radius:50%; background:#333; object-fit:cover;">
+                <div style="min-width:0;">
+                  <div style="font-weight:700; font-size:0.95rem; margin-bottom:3px; display:flex; align-items:center; gap:8px;">
+                    <span>${p.displayName || p.username}</span>
+                    <span style="background:${p.enabled ? 'rgba(16,185,129,0.15); color:#10b981' : 'rgba(239,68,68,0.15); color:#ef4444'}; padding:2px 8px; border-radius:9999px; font-size:0.7rem; font-weight:700;">${p.enabled ? 'Activo' : 'Inactivo'}</span>
+                  </div>
+                  <div style="font-size:0.8rem; color:var(--text-muted); display:flex; gap:12px; flex-wrap:wrap;">
+                    <span>@${p.username}</span>
+                    ${ch ? `<span><i class="fas fa-comment"></i> ${ch.name}</span>` : ''}
+                    ${rl ? `<span><i class="fas fa-at"></i> @${rl.name}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; flex-shrink:0;">
+                <button onclick="openTiktokEditModal('${p.id}')" class="view-btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(88,101,242,0.15); color:var(--accent);"><i class="fas fa-edit"></i></button>
+                <button onclick="deleteTiktokProfile('${p.id}', '${(p.username||'').replace(/'/g, "\\'")}')" class="view-btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(239,68,68,0.15); color:#ef4444;"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      async function toggleTiktokGlobal() {
+        const enabled = document.getElementById('tt-global-enabled').checked;
+        try {
+          await fetch(`/api/guilds/${currentGuildId}/tiktok-global-toggle`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled })
+          });
+          showToast(enabled ? '✅ Anuncios de TikTok activados' : '⏸️ Anuncios de TikTok desactivados', 'success');
+        } catch (e) { console.error(e); showToast('❌ Error', 'error'); }
+      }
+
+      async function addTiktokProfile() {
+        const username = document.getElementById('tt-add-username').value.trim();
+        const secUid = document.getElementById('tt-add-secuid').value.trim();
+        const displayName = document.getElementById('tt-add-displayname').value.trim();
+        const avatar = document.getElementById('tt-add-avatar').value.trim();
+        const dcChannel = document.getElementById('tt-add-discord-channel').value;
+        const role = document.getElementById('tt-add-mention-role').value;
+        const newVideos = document.getElementById('tt-add-new-videos').checked;
+
+        if (!username) { showToast('❌ Busca y selecciona un perfil de TikTok primero', 'error'); return; }
+        if (!dcChannel) { showToast('❌ Selecciona un canal de Discord', 'error'); return; }
+
+        try {
+          const res = await fetch(`/api/guilds/${currentGuildId}/tiktok-profiles`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, secUid, displayName, avatar, discordChannelId: dcChannel, mentionRoleId: role, announceNewVideos: newVideos })
+          });
+          if (res.ok) {
+            showToast('✅ Perfil de TikTok añadido', 'success');
+            clearTiktokSelection();
+            document.getElementById('tt-add-discord-channel').value = '';
+            document.getElementById('tt-add-mention-role').value = '';
+            loadTiktokConfig();
+          } else {
+            const err = await res.json();
+            showToast(`❌ ${err.error || 'Error'}`, 'error');
+          }
+        } catch (e) { console.error(e); showToast('❌ Error de conexión', 'error'); }
+      }
+
+      function openTiktokEditModal(profileId) {
+        const p = ttConfig.profiles.find(x => x.id === profileId);
+        if (!p) return;
+        document.getElementById('tt-edit-profile-id').value = p.id;
+        document.getElementById('tt-edit-username').value = p.username;
+        document.getElementById('tt-edit-displayname').value = p.displayName || p.username;
+        document.getElementById('tt-edit-enabled').checked = p.enabled;
+        document.getElementById('tt-edit-new-videos').checked = p.announceNewVideos;
+        const dcSel = document.getElementById('tt-edit-discord-channel');
+        dcSel.innerHTML = '<option value="">Seleccionar canal...</option>' +
+          guildChannels.map(c => `<option value="${c.id}" ${c.id === p.discordChannelId ? 'selected' : ''}>${c.name}</option>`).join('');
+        const rlSel = document.getElementById('tt-edit-mention-role');
+        rlSel.innerHTML = '<option value="">— Ninguno —</option>' +
+          guildRoles.sort((a, b) => a.name.localeCompare(b.name))
+            .map(r => `<option value="${r.id}" ${r.id === p.mentionRoleId ? 'selected' : ''}>${r.name}</option>`).join('');
+        document.getElementById('tt-edit-modal').style.display = 'flex';
+      }
+
+      function closeTiktokEditModal() { document.getElementById('tt-edit-modal').style.display = 'none'; }
+
+      async function saveTiktokEdit() {
+        const profileId = document.getElementById('tt-edit-profile-id').value;
+        try {
+          const res = await fetch(`/api/guilds/${currentGuildId}/tiktok-profiles/${profileId}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: document.getElementById('tt-edit-username').value.trim(),
+              displayName: document.getElementById('tt-edit-displayname').value.trim(),
+              discordChannelId: document.getElementById('tt-edit-discord-channel').value,
+              mentionRoleId: document.getElementById('tt-edit-mention-role').value,
+              enabled: document.getElementById('tt-edit-enabled').checked,
+              announceNewVideos: document.getElementById('tt-edit-new-videos').checked
+            })
+          });
+          if (res.ok) { showToast('✅ Actualizado', 'success'); closeTiktokEditModal(); loadTiktokConfig(); }
+          else { const err = await res.json(); showToast(`❌ ${err.error}`, 'error'); }
+        } catch (e) { console.error(e); showToast('❌ Error', 'error'); }
+      }
+
+      async function deleteTiktokProfile(profileId, username) {
+        if (!confirm(`¿Eliminar el perfil @${username}?`)) return;
+        try {
+          const res = await fetch(`/api/guilds/${currentGuildId}/tiktok-profiles/${profileId}`, { method: 'DELETE' });
+          if (res.ok) { showToast(`✅ @${username} eliminado`, 'success'); loadTiktokConfig(); }
+          else { showToast('❌ Error', 'error'); }
+        } catch (e) { console.error(e); showToast('❌ Error', 'error'); }
+      }
       // =====================================================================
 
   </script>
