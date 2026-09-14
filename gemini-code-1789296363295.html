@@ -1,0 +1,11 @@
+<audio id="bg-music" src="tu_musica.mp3" loop></audio>
+
+<script>
+  // Al hacer clic o tocar cualquier parte de la página, la música empieza
+  document.addEventListener('click', function() {
+    const audio = document.getElementById('bg-music');
+    if (audio.paused) {
+      audio.play();
+    }
+  }, { once: true }); // Se ejecuta solo con el primer clic
+</script>

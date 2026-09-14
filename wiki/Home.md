@@ -1,0 +1,143 @@
+# 🤖 Wiki de CodeCord
+
+**CodeCord** es un bot multifuncional de Discord escrito en **Node.js + discord.js v14** que incluye un **panel web administrativo** (Express) para configurar todo el bot desde el navegador, sin tocar archivos JSON ni memorizar comandos.
+
+* Repositorio: <https://github.com/aitor1234567899/CodeCord>
+* Rama principal: `VERSION-11.0`
+* Servidor de soporte: <https://discord.gg/PzSNTqFCuW>
+* Licencia: ver [`LICENSE`](https://github.com/aitor1234567899/CodeCord/blob/VERSION-11.0/LICENSE)
+
+---
+
+## 🚀 Empezar en 5 minutos
+
+```bash
+git clone https://github.com/aitor1234567899/CodeCord.git
+cd CodeCord
+npm install
+cp .env.example .env      # rellena BOT_TOKEN, CLIENT_ID, CLIENT_SECRET...
+npm run deploy            # registra los slash commands
+npm start                 # arranca el bot + panel web
+```
+
+Panel web: <http://localhost:22550> (puerto configurable con `PORT`).
+
+Guía detallada: **[[Instalacion]]**.
+
+---
+
+## 📚 Índice de la wiki
+
+| Página | Contenido |
+|---|---|
+| **[[Instalacion]]** | Requisitos, instalación, despliegue de comandos, arranque |
+| **[[Configuracion]]** | Variables de `.env`, `panel-config.json`, OAuth2 de Discord, opción `LOGIN` |
+| **[[Comandos]]** | Los 57 slash commands (usuario y administración) |
+| **[[Panel-Web]]** | Secciones del panel, login con Discord, uso diario |
+| **[[Sistemas]]** | Anti-Raid, tickets, voz temporal, logs, bienvenidas, auto-respuestas, sanciones, verificación, colores, **copias de seguridad** |
+| **[[API-del-Panel]]** | Referencia de todos los endpoints HTTP del panel |
+| **[[Arquitectura]]** | Estructura de carpetas, handlers, flujo de arranque |
+| **[[Almacenamiento-de-Datos]]** | Carpeta `servidores/`, ficheros JSON por servidor |
+| **[[Solucion-de-Problemas]]** | Errores frecuentes y cómo resolverlos |
+| **[[Contribuir]]** | Convenciones de código, cómo añadir comandos, eventos y sistemas |
+
+---
+
+## ✨ Funcionalidades principales
+
+* **Moderación**: ban, kick, timeout, warn (con aviso privado por MD), historial de sanciones, clear, slowmode, automod.
+* **Anti-Raid**: 12 módulos de vigilancia (canales, roles, emojis, bans, webhooks) con ventana deslizante de 60 s, aislamiento automático y lista blanca.
+* **Tickets**: paneles con hasta 5 botones, formularios, roles de soporte, transcripciones HTML.
+* **Salas de voz temporales**: creación automática al entrar en «Crear sala» + panel privado de control (nombre, límite, privacidad, invitar, expulsar, ban, transferir…).
+* **Soporte de voz por cola**: sala de espera, comando de siguiente turno y roles sancionados.
+* **Bienvenidas**: mensaje personalizado + tarjeta gráfica generada con Jimp.
+* **Logs**: canal y color configurables por evento, más «Actividad Reciente» en el panel.
+* **Sorteos, sugerencias, auto-respuestas, censura, embeds, verificación OAuth2 o por reacción.**
+
+---
+
+## 🚀 Versión 11.0 - Novedades
+
+### 💾 Sistema Completo de Copias de Seguridad (Backups)
+
+* Creación de copias de seguridad de servidores con **versionado personalizado** (ej. "v1.0 - Configuración inicial").
+* Respaldo exhaustivo: nombre del servidor, icono, categorías, canales (texto, voz, anuncio), roles y la **matriz completa de permisos y sobrescrituras (overwrites)** por rol.
+* Almacenamiento en `servidores/<NombreDelServidor>_<GuildID>/backups/<backup_id>.json`.
+
+### 🖥️ Visualizador Estilo Discord en la Web
+
+* Inspección visual interactiva de backups directamente desde el panel web.
+* Árbol de canales y categorías que replica la interfaz de Discord con iconos (`#`, `🔊`, `📢`, `🔒` para canales privados).
+* Inspector de permisos por rol: muestra permisos concedidos (verde), denegados (rojo) o heredados/neutrales (gris), igual que en los ajustes de Discord.
+
+### ⚡ Motor de Restauración con Protección Anti-Rate-Limit
+
+* Restauración segura y automatizada: elimina estructura previa y recrea categorías, canales, roles y permisos con pausas reguladas (~850ms).
+* Gestión automática de respuestas **429** de Discord con `retry-after`.
+* Remapeo automático de IDs de roles nuevos sobre las restricciones de canales y categorías.
+* Modal web con barra de progreso en vivo y estado en tiempo real.
+
+### 🌐 Nueva Categoría en el Panel Web
+
+* Categoría lateral **Copias de Seguridad** (`#backups`) con tarjetas visuales, métricas, estadísticas y acciones directas (crear, ver, restaurar, eliminar).
+* Acceso directo desde el buscador rápido (`Ctrl + K`).
+
+---
+
+## 🚀 Versión 10.50 - Novedades
+
+### 🎨 Nueva Interfaz Web de Alta Gama (Estilo ProBot / Dyno / Nekotina)
+
+* **Diseño Futurista & Gamer**: Transformación completa del Panel Web (`WEB/admin.html`) con una estética moderna de temática oscura profunda (`#0A0D14`, `#0F1422`), efectos *Glassmorphism* (`backdrop-filter: blur(12px)`), acentos Discord Blurple (`#5865F2`) y cian neón, además de tipografía moderna (**Plus Jakarta Sans** y **JetBrains Mono**).
+* **Barra Lateral Categorizada**: Módulos organizados en categorías lógicas (*Principal*, *Seguridad & Moderación*, *Comunicación*, *Comunidad & Engagement*, *Administración & Sistema*) con estado del bot en vivo (punto verde pulsante con animación).
+* **Botón de Menú de 3 Palitos Animado (Hamburguesa)**: Ubicado en la cabecera lateral junto a CodeCord Online y en el header principal. Cuenta con micro-animación fluida de 3 barras para plegar/desplegar la barra con transición suave (`cubic-bezier`), soporte para pantalla completa en desktop y menú flotante (*drawer*) con fondo oscuro desenfocado en móviles.
+* **Buscador Rápido Global (`Ctrl + K` / Quick Jump)**: Barra de búsqueda instantánea interactiva que permite filtrar y saltar a cualquier módulo o ajuste de inmediato.
+* **Dashboard con Hero Banner y Module Cards**: Banner visual con resumen de salud del bot e indicadores en vivo, junto a una cuadrícula de tarjetas de módulos (*Module Cards*) con accesos directos de configuración.
+* **Página Web de Verificación OAuth2 para Miembros**: La pantalla que ven los miembros al verificarse (`/verify-callback`) fue rediseñada al estilo ProBot/Nekotina con tarjeta glassmorphism, avatar con resplandor neón, insignia esmeralda animada y botón de regreso a Discord.
+* **Formularios y Controles Modernizados**: Switches estilo iOS/Discord con resplandor neón verde, selectores con foco luminoso y previsualizaciones fidedignas al chat de Discord.
+
+### ⚠️ Notificación automática por Mensaje Directo (MD) en `/warn`
+
+* El comando `/warn` ahora envía automáticamente un **mensaje directo (MD)** privado y detallado al usuario advertido con la razón, el servidor y el moderador que aplicó la sanción.
+* Cuenta con control de excepciones y reporte en el canal indicando si la notificación privada fue entregada con éxito o si el usuario tenía los MD bloqueados/cerrados.
+* Registro automático de auditoría en el sistema de logs del servidor (`sendLogEmbed`) y almacenamiento aislado en el directorio de sanciones del servidor.
+
+### 🏠 Cargar y editar mensajes en "Enviar Mensaje como Servidor"
+
+* Ahora puedes **cargar cualquier mensaje existente** (enviado como servidor con webhook o como bot) ingresando su ID de mensaje o pegando directamente el enlace de Discord (`https://discord.com/channels/...`).
+* El panel detecta automáticamente el canal y si el mensaje es de texto normal o contiene un Embed, cargando todos sus campos (título, descripción, color, imágenes, pie de página y texto adicional).
+* Permite modificar el contenido con vista previa en vivo y cuenta con botones para **Guardar Cambios en Discord** en tiempo real o cancelar la edición.
+
+### 🎫 Formularios de tickets corregidos (Panel Web)
+
+* Los botones del panel de tickets publicados desde el **Panel Web** ahora muestran correctamente el formulario (modal) con la pregunta configurada antes de abrir el ticket.
+* Compatibilidad con los botones `create_ticket_q{1-5}` / `create_ticket_{1-5}` del panel web y `create_ticket_btn_{1-5}` del comando `/ticketpanel`.
+* Las preguntas se leen desde `panelConfigs` de la configuración de tickets de cada servidor.
+
+### 📁 Sanciones aisladas por servidor
+
+* El archivo de sanciones de cada servidor ya no se guarda en una carpeta global compartida.
+* Cada servidor almacena sus sanciones en su propia carpeta: `servidores/<NombreDelServidor>_<GuildID>/sanciones/sanciones_<GuildID>.txt`.
+* Los datos quedan totalmente aislados: cada servidor tiene su propia carpeta dentro de `servidores/`, sin mezclarse con los demás.
+
+### 🎭 Auto-Rol mejorado (Panel Web)
+
+* **Selector visual de emojis** con búsqueda en tiempo real: muestra los emojis personalizados del servidor (con su imagen real) y los emojis unicode más populares.
+* Los emojis del servidor se cargan directamente desde Discord (`guild.emojis.fetch()`) y se muestran con su imagen animada o estática.
+* **Selector de color de embed** con paleta de colores rápida (Blurple, Verde, Amarillo, Rosa, Rojo, Cyan, Blanco, Oscuro) y soporte para color hex personalizado con previsualización en tiempo real.
+* Las tarjetas de Auto-Rol activas ahora muestran la imagen real del emoji si es personalizado del servidor.
+
+### 🐛 Bug: Ajustes Avanzados de Verificación persistente (Arreglado)
+
+* Corregido un bug de anidamiento HTML en el que el bloque `#verify-tab-settings` quedaba fuera del `<div id="verification">`, haciendo que los «Ajustes Avanzados de Verificación» aparecieran visibles en cualquier otra sección del panel.
+* Ahora el contenido de verificación se oculta correctamente al navegar a otras secciones.
+
+### 👥 Lista de Miembros — Paginación corregida (Panel Web)
+
+* **Arreglado**: al pasar de página en la «Lista de Miembros», se mostraban siempre los mismos miembros porque Discord.js ignora el parámetro `after` en `guild.members.fetch({ limit, after })`.
+* Ahora el backend obtiene todos los miembros, los ordena por ID (snowflake cronológico) y aplica el cursor `after` manualmente, garantizando que cada página muestre un conjunto distinto.
+* La lógica del `afterStack` en el frontend también fue corregida para que «Página anterior» vuelva al grupo correcto sin desincronizarse.
+
+---
+
+> ℹ️ Esta wiki documenta el estado del código en la rama `VERSION-11.0`. Las versiones anteriores viven en las ramas `VERSION-1.5` … `VERSION-10.50`.
