@@ -13,8 +13,37 @@ Cada sistema vive en `src/systems/` y es consumido por los eventos (`src/events/
 | `sanctionSystem.js` | Sanciones y advertencias |
 | `colorSystem.js` | Rotación automática de color de un rol |
 | `backupSystem.js` | Copias de seguridad de servidores |
+| `src/systems/youtube/index.js` | Anuncios de YouTube (RSS polling) |
+| `src/systems/tiktok/index.js` | Anuncios de TikTok (Beta, @ssut/tiktok-api) |
 
 Además, `scripts/antiraid.js` inicializa la versión 2 del anti-raid (`initAntiRaid(client)`) y `scripts/welcome-card.js` genera la imagen de bienvenida con **Jimp**.
+
+## 📺 Anuncios de YouTube
+
+Sistema de detección de nuevos vídeos mediante **RSS Feed** (sin necesidad de API key).
+
+* **Almacenamiento**: `servidores/<NombreDelServidor>_<GuildID>/configuracion/youtube.json`
+* **Tracking**: `data/youtube-tracked.json` almacena el último `videoId` por canal y servidor
+* **Polling**: cada 30 segundos comprueba todos los canales configurados
+* **Detección**: compara el último vídeo conocido con el feed RSS actual
+* **Notificación**: embed automático con título, miniatura y enlace al vídeo
+* **Primer run**: guarda estado sin notificar (evita spam al reiniciar)
+
+Configurable desde la sección **Redes → Anuncios YouTube** del panel web.
+
+## 🎵 Anuncios de TikTok (Beta)
+
+Sistema de detección de nuevos vídeos mediante **`@ssut/tiktok-api`** (gratis, sin API key).
+
+* **Almacenamiento**: `servidores/<NombreDelServidor>_<GuildID>/configuracion/tiktok.json`
+* **Tracking**: `data/tiktok-tracked.json` almacena el `videoCount` por perfil y servidor
+* **Polling**: cada 30 segundos comprueba todos los perfiles configurados
+* **Detección**: compara el conteo de vídeos con el valor anterior
+* **Notificación**: embed con avatar, seguidores, vídeos, likes y enlace al perfil
+* **Vídeos eliminados**: si baja el conteo, resetea sin notificar
+* **Limitación**: TikTok bloquea acceso a vídeos de cuentas pequeñas; el enlace lleva al perfil, no al vídeo
+
+Configurable desde la sección **Redes → Anuncios TikTok (Beta)** del panel web.
 
 ---
 

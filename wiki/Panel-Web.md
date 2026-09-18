@@ -63,6 +63,8 @@ El panel soporta rutas directas en el navegador, por ejemplo `/embed`, `/enbet` 
 | | **Logs Recientes** | Visor de auditoría y eventos recientes con opción de limpieza |
 | | **Servidores** | Lista de servidores donde está el bot y selector activo |
 | **Copias de Seguridad** | **Backups** | Crear, listar, visualizar, restaurar y eliminar copias de seguridad del servidor. Versionado personalizado, visualizador estilo Discord (categorías, canales, permisos) y motor de restauración con protección anti-rate-limit (~850ms) y barra de progreso en vivo |
+| **Redes** | **Anuncios YouTube** | Detecta nuevos vídeos mediante RSS Feed y envía embeds automáticos a Discord. Configuración por canal, toggle global |
+| | **Anuncios TikTok (Beta)** | Detecta nuevos vídeos mediante @ssut/tiktok-api y envía embeds automáticos a Discord. Búsqueda de perfiles, toggle global |
 
 ---
 

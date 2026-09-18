@@ -31,6 +31,10 @@
 >   * Modal con barra de progreso en vivo y estado en tiempo real.
 > * **🌐 Nueva Categoría en el Panel Web**:
 >   * Categoría lateral **Copias de Seguridad** con tarjetas visuales, métricas y acciones directas.
+> * **📺 Anuncios de YouTube y TikTok**:
+>   * **YouTube**: detección automática de nuevos vídeos mediante RSS Feed (sin API key). Polling cada 30 segundos.
+>   * **TikTok (Beta)**: detección de nuevos vídeos mediante `@ssut/tiktok-api`. Búsqueda de perfiles por username.
+>   * Configurables desde la categoría **Redes** del panel web con toggle global por servidor.
 
 ---
 
@@ -143,6 +147,26 @@ El panel web te permite controlar la configuración del bot en tiempo real desde
 * Eliminación automática de mensajes de usuarios expulsados.
 * Eliminación automática de mensajes de usuarios baneados.
 * Configuración desde el panel administrativo.
+
+### 📺 Anuncios de YouTube
+
+* Detección automática de nuevos vídeos mediante **RSS Feed** (sin API key).
+* Polling cada 30 segundos por todos los canales configurados.
+* Embed automático en Discord con título, miniatura y enlace al vídeo.
+* Configuración por canal: canal de Discord, rol a mencionar, tipo de anuncio.
+* Toggle global para activar/desactivar todos los canales.
+* Prevención de spam: el primer check guarda estado sin notificar.
+
+### 🎵 Anuncios de TikTok (Beta)
+
+* Detección de nuevos vídeos mediante **`@ssut/tiktok-api`** (gratis, sin API key).
+* Polling cada 30 segundos por todos los perfiles configurados.
+* Embed automático en Discord con avatar, seguidores, vídeos y likes.
+* El enlace lleva al perfil del creador (TikTok bloquea el acceso a vídeos de cuentas pequeñas).
+* Búsqueda de perfiles por username desde el panel web.
+* Configuración por perfil: canal de Discord, rol a mencionar.
+* Toggle global para activar/desactivar todos los perfiles.
+* Manejo de vídeos eliminados: si baja el conteo, resetea sin notificar.
 
 ---
 

@@ -131,3 +131,26 @@ Todas las rutas las sirve `WEB/admin-panel.js` en el mismo puerto que el panel. 
 | DELETE | `/api/guilds/:guildId/backups/:backupId` | Elimina un backup |
 | POST | `/api/guilds/:guildId/backups/:backupId/restore` | Inicia la restauración destructiva del servidor desde un backup |
 | GET | `/api/guilds/:guildId/backups/restore-status` | Estado en tiempo real de la restauración en curso (paso, total, porcentaje, mensaje) |
+
+## Anuncios de YouTube
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/youtube/search?q=...` | Busca canales de YouTube |
+| GET | `/api/guilds/:guildId/youtube-config` | Obtiene la configuración de YouTube |
+| POST | `/api/guilds/:guildId/youtube-config` | Guarda la configuración completa de YouTube |
+| POST | `/api/guilds/:guildId/youtube-channels` | Añade un canal de YouTube |
+| PUT | `/api/guilds/:guildId/youtube-channels/:channelConfigId` | Actualiza un canal de YouTube |
+| DELETE | `/api/guilds/:guildId/youtube-channels/:channelConfigId` | Elimina un canal de YouTube |
+| POST | `/api/guilds/:guildId/youtube-global-toggle` | Activa/desactiva todos los anuncios de YouTube |
+
+## Anuncios de TikTok (Beta)
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/tiktok/search?q=...` | Busca perfiles de TikTok |
+| GET | `/api/guilds/:guildId/tiktok-config` | Obtiene la configuración de TikTok |
+| POST | `/api/guilds/:guildId/tiktok-profiles` | Añade un perfil de TikTok |
+| PUT | `/api/guilds/:guildId/tiktok-profiles/:profileId` | Actualiza un perfil de TikTok |
+| DELETE | `/api/guilds/:guildId/tiktok-profiles/:profileId` | Elimina un perfil de TikTok |
+| POST | `/api/guilds/:guildId/tiktok-global-toggle` | Activa/desactiva todos los anuncios de TikTok |

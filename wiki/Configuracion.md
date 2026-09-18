@@ -54,6 +54,6 @@ El panel también lee `config/panel-config.json`, que puede fijar `url`, `port` 
 
 ## Configuración por servidor
 
-Todo lo demás (logs, tickets, bienvenidas, anti-raid, verificación, sorteos, auto-respuestas…) **no** se configura por fichero global, sino por servidor, desde el panel web o los comandos de administración. Se guarda en `servidores/<NombreServidor>_<GuildID>/configuracion/*.json`. Ver **[[Almacenamiento-de-Datos]]**.
+Todo lo demás (logs, tickets, bienvenidas, anti-raid, verificación, sorteos, auto-respuestas, **YouTube**, **TikTok**…) **no** se configura por fichero global, sino por servidor, desde el panel web o los comandos de administración. Se guarda en `servidores/<NombreServidor>_<GuildID>/configuracion/*.json`. Ver **[[Almacenamiento-de-Datos]]**.
 
 Los ficheros `config/*.json.bak` son copias heredadas de la configuración antigua global; `configManager.migrateExistingConfigs()` se encarga de migrarlas al formato por servidor durante el arranque.

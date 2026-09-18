@@ -34,7 +34,7 @@ Guía detallada: **[[Instalacion]]**.
 | **[[Configuracion]]** | Variables de `.env`, `panel-config.json`, OAuth2 de Discord, opción `LOGIN` |
 | **[[Comandos]]** | Los 57 slash commands (usuario y administración) |
 | **[[Panel-Web]]** | Secciones del panel, login con Discord, uso diario |
-| **[[Sistemas]]** | Anti-Raid, tickets, voz temporal, logs, bienvenidas, auto-respuestas, sanciones, verificación, colores, **copias de seguridad** |
+| **[[Sistemas]]** | Anti-Raid, tickets, voz temporal, logs, bienvenidas, auto-respuestas, sanciones, verificación, colores, **copias de seguridad**, **anuncios de YouTube**, **anuncios de TikTok** |
 | **[[API-del-Panel]]** | Referencia de todos los endpoints HTTP del panel |
 | **[[Arquitectura]]** | Estructura de carpetas, handlers, flujo de arranque |
 | **[[Almacenamiento-de-Datos]]** | Carpeta `servidores/`, ficheros JSON por servidor |
@@ -53,6 +53,8 @@ Guía detallada: **[[Instalacion]]**.
 * **Bienvenidas**: mensaje personalizado + tarjeta gráfica generada con Jimp.
 * **Logs**: canal y color configurables por evento, más «Actividad Reciente» en el panel.
 * **Sorteos, sugerencias, auto-respuestas, censura, embeds, verificación OAuth2 o por reacción.**
+* **Anuncios de YouTube**: detecta nuevos vídeos mediante RSS y envía embeds automáticos a Discord.
+* **Anuncios de TikTok (Beta)**: detecta nuevos perfiles y envía notificaciones a Discord.
 
 ---
 
@@ -81,6 +83,14 @@ Guía detallada: **[[Instalacion]]**.
 
 * Categoría lateral **Copias de Seguridad** (`#backups`) con tarjetas visuales, métricas, estadísticas y acciones directas (crear, ver, restaurar, eliminar).
 * Acceso directo desde el buscador rápido (`Ctrl + K`).
+
+### 📺 Anuncios de YouTube y TikTok
+
+* **YouTube**: detección automática de nuevos vídeos mediante RSS Feed (sin API key). Polling cada 30 segundos. Embed automático con título, miniatura y enlace al vídeo.
+* **TikTok (Beta)**: detección de nuevos vídeos mediante `@ssut/tiktok-api`. Búsqueda de perfiles por username. Embed con avatar, seguidores, vídeos y likes. El enlace lleva al perfil del creador (TikTok bloquea acceso a vídeos de cuentas pequeñas).
+* Ambos sistemas configurables desde la categoría **Redes** del panel web.
+* Toggle global para activar/desactivar cada sistema por servidor.
+* Prevención de spam: primer check guarda estado sin notificar.
 
 ---
 

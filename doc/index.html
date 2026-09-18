@@ -482,7 +482,7 @@ npm start                 # arranca el bot + panel web</code></pre>
                                 <tr>
                                     <td><strong>Sistemas</strong></td>
                                     <td>Anti-Raid, tickets, voz temporal, logs, bienvenidas, auto-respuestas, sanciones,
-                                        verificación, colores, <strong>copias de seguridad</strong></td>
+                                        verificación, colores, <strong>copias de seguridad</strong>, <strong>anuncios de YouTube</strong>, <strong>anuncios de TikTok</strong></td>
                                 </tr>
                                 <tr>
                                     <td><strong>API del Panel</strong></td>
@@ -527,6 +527,8 @@ npm start                 # arranca el bot + panel web</code></pre>
                             el panel.</li>
                         <li><strong>Sorteos, sugerencias, auto-respuestas, censura, embeds, verificación OAuth2 o por
                                 reacción.</strong></li>
+                        <li><strong>Anuncios de YouTube</strong>: detecta nuevos vídeos mediante RSS y envía embeds automáticos a Discord.</li>
+                        <li><strong>Anuncios de TikTok (Beta)</strong>: detecta nuevos perfiles y envía notificaciones a Discord.</li>
                     </ul>
                     <hr>
                     <h2 id="novedades-v110">🚀 Versión 11.0 - Novedades</h2>
@@ -564,6 +566,13 @@ npm start                 # arranca el bot + panel web</code></pre>
                         <li>Categoría lateral <strong>Copias de Seguridad</strong> (<code>#backups</code>) con tarjetas
                             visuales, métricas, estadísticas y acciones directas (crear, ver, restaurar, eliminar).</li>
                         <li>Acceso directo desde el buscador rápido (<code>Ctrl + K</code>).</li>
+                    </ul>
+                    <h3 id="youtube-tiktok-announcements">📺 Anuncios de YouTube y TikTok</h3>
+                    <ul>
+                        <li><strong>YouTube</strong>: detección automática de nuevos vídeos mediante RSS Feed (sin API key). Polling cada 30 segundos. Embed automático con título, miniatura y enlace.</li>
+                        <li><strong>TikTok (Beta)</strong>: detección de nuevos vídeos mediante <code>@ssut/tiktok-api</code>. Búsqueda de perfiles por username. Embed con avatar, seguidores, vídeos y likes. El enlace lleva al perfil del creador.</li>
+                        <li>Ambos sistemas configurables desde la categoría <strong>Redes</strong> del panel web.</li>
+                        <li>Toggle global para activar/desactivar cada sistema por servidor.</li>
                     </ul>
                     <hr>
                     <h2 id="novedades-v1050">🚀 Versión 10.50 - Novedades</h2>
