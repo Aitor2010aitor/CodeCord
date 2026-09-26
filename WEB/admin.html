@@ -1746,6 +1746,241 @@
           background-position: -100% 0;
         }
       }
+
+    /* =====================================================================
+       PANTALLA DE SELECCIÓN DE SERVIDORES (DISEÑO SCREENSHOT & MIDNIGHT PULSE)
+       ===================================================================== */
+    .guild-selection-wrapper {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 36px 24px 64px 24px;
+    }
+
+    .guild-selection-header {
+      margin-bottom: 28px;
+    }
+
+    .guild-selection-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 20px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .guild-search-container {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .guild-search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    .guild-search-input {
+      width: 100%;
+      background: #11141e !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      border-radius: 10px !important;
+      padding: 12px 16px 12px 44px !important;
+      color: #ffffff !important;
+      font-size: 0.92rem !important;
+      outline: none !important;
+      transition: all 0.2s ease !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+      box-sizing: border-box !important;
+    }
+
+    .guild-search-input:focus {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+      background: #151926 !important;
+    }
+
+    .guild-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 22px;
+      margin-top: 24px;
+    }
+
+    @media (min-width: 1200px) {
+      .guild-cards-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .guild-card {
+      background: #141824;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .guild-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .guild-card-banner {
+      height: 72px;
+      width: 100%;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .guild-card-avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: -30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .guild-card-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px solid #141824;
+      background: #1e2230;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .guild-card-avatar-fallback {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px solid #141824;
+      background: linear-gradient(135deg, #5865f2 0%, #38bdf8 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      text-transform: uppercase;
+    }
+
+    .guild-card-body {
+      padding: 12px 16px 16px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .guild-card-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .guild-card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.01em;
+    }
+
+    .guild-card-role {
+      font-size: 0.78rem;
+      color: #87929a;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .guild-btn-go {
+      background: #ffb1c5;
+      color: #3f001a;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(255, 177, 197, 0.25);
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .guild-btn-go:hover {
+      background: #ffc4d4;
+      transform: scale(1.04);
+      box-shadow: 0 4px 12px rgba(255, 177, 197, 0.4);
+    }
+
+    .guild-btn-add {
+      background: #2b3040;
+      color: #e0e2ef;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .guild-btn-add:hover {
+      background: #383e52;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.04);
+    }
+
+    .btn-change-guild-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 177, 197, 0.12);
+      border: 1px solid rgba(255, 177, 197, 0.3);
+      border-radius: 9px;
+      color: #ffb1c5;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-right: 8px;
+    }
+
+    .btn-change-guild-trigger:hover {
+      background: rgba(255, 177, 197, 0.25);
+      border-color: #ffb1c5;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 
@@ -1775,6 +2010,12 @@
     </div>
     <nav class="nav-links">
       <div class="nav-category">Principal</div>
+      <a href="/" class="nav-link" title="Ver la web pública del bot" style="border: 1px solid rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.08); margin-bottom: 6px;">
+        <i class="fas fa-globe" style="color: #38bdf8;"></i> <span>Ver Web Principal</span>
+      </a>
+      <a href="#guild-select-screen" class="nav-link" onclick="openGuildSelectorScreen()" id="nav-select-guild-btn" style="border: 1px solid rgba(255, 177, 197, 0.25); background: rgba(255, 177, 197, 0.08); margin-bottom: 6px;">
+        <i class="fas fa-server" style="color: #ffb1c5;"></i> <span>Seleccionar Servidor</span>
+      </a>
       <a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">
         <i class="fas fa-th-large"></i> <span>Dashboard</span>
       </a>
@@ -1875,6 +2116,11 @@
       </div>
 
       <div class="header-actions">
+        <a href="/" class="btn-top-web" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 0.85rem; font-weight: 500; border-radius: 10px; text-decoration: none; color: #e0e2ef; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;" title="Ir a la web pública del bot" onmouseover="this.style.background='rgba(56,189,248,0.15)'; this.style.borderColor='rgba(56,189,248,0.4)';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.borderColor='rgba(255,255,255,0.1)';">
+          <i class="fas fa-globe" style="color: #38bdf8;"></i>
+          <span>Web Info</span>
+        </a>
+
         <div class="quick-search-trigger" onclick="openQuickSearch()">
           <i class="fas fa-search"></i>
           <span>Buscar módulo...</span>
@@ -1882,6 +2128,10 @@
         </div>
 
         <div class="user-profile">
+          <button class="btn-change-guild-trigger" onclick="openGuildSelectorScreen()" title="Cambiar o seleccionar servidor">
+            <i class="fas fa-server"></i>
+            <span>Servidores</span>
+          </button>
           <div id="guild-header-selector">
             <i class="fas fa-server" style="color: var(--accent); margin-left: 6px; font-size: 0.9rem;"></i>
             <select id="global-guild-selector" onchange="updateGlobalGuild(this.value)">
@@ -1894,7 +2144,26 @@
       </div>
     </header>
 
-    <!-- Dashboard Section -->
+    <!-- PANTALLA SELECCIONA UN SERVIDOR -->
+    <div id="guild-select-screen" class="section">
+      <div class="guild-selection-wrapper">
+        <div class="guild-selection-header">
+          <h1 class="guild-selection-title">Selecciona un servidor</h1>
+          <div class="guild-search-container">
+            <i class="fas fa-search guild-search-icon"></i>
+            <input type="text" id="guild-search-input" class="guild-search-input" placeholder="Buscar servidores..." oninput="filterGuildCards(this.value)">
+          </div>
+        </div>
+
+        <div id="guild-cards-grid" class="guild-cards-grid">
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+            <div class="spinner" style="margin: 0 auto 12px auto;"></div>
+            Cargando servidores...
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Dashboard Section -->
     <div id="dashboard" class="section active">
       <div class="dashboard-hero">
@@ -5418,6 +5687,7 @@
         section.classList.remove('active');
       }); document.getElementById(sectionId).classList.add('active');
       const titles = {
+        'guild-select-screen': 'Selecciona un Servidor',
         'dashboard': 'Panel de Control',
         'logs-config': 'Configuración de Logs', 'welcome': 'Configuración de Bienvenidas',
         'moderation': 'Moderación y AutoMod', 'say': 'Enviar Mensaje',
@@ -6892,22 +7162,140 @@
       } catch (e) { }
     }
 
+    let allGuildsList = [];
+
+    async function loadGuildCards() {
+      const grid = document.getElementById('guild-cards-grid');
+      if (!grid) return;
+      grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);"><div class="spinner" style="margin: 0 auto 12px auto;"></div>Cargando servidores...</div>';
+
+      try {
+        const res = await fetch('/api/guilds');
+        if (!res.ok) throw new Error('Error al obtener servidores');
+        allGuildsList = await res.json();
+        renderGuildCards(allGuildsList);
+      } catch (err) {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--danger);">
+          <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 8px; display: block;"></i>
+          No se pudieron cargar los servidores: ${err.message}
+        </div>`;
+      }
+    }
+
+    function renderGuildCards(guilds) {
+      const grid = document.getElementById('guild-cards-grid');
+      if (!grid) return;
+
+      if (!guilds || guilds.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+          <i class="fas fa-search-minus" style="font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.5;"></i>
+          No se encontraron servidores coincidentes.
+        </div>`;
+        return;
+      }
+
+      const gradients = [
+        'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+        'linear-gradient(135deg, #134e4a 0%, #0f172a 100%)',
+        'linear-gradient(135deg, #312e81 0%, #0f172a 100%)',
+        'linear-gradient(135deg, #3730a3 0%, #1e1b4b 100%)',
+        'linear-gradient(135deg, #831843 0%, #0f172a 100%)',
+        'linear-gradient(135deg, #701a75 0%, #180d28 100%)'
+      ];
+
+      let html = '';
+      guilds.forEach((g, idx) => {
+        const bgGrad = gradients[idx % gradients.length];
+        const bannerStyle = g.banner 
+          ? `background-image: url('${g.banner}'); background-size: cover; background-position: center;`
+          : `background: ${bgGrad};`;
+
+        const initials = (g.name || 'S').trim().substring(0, 2).toUpperCase();
+        const avatarHtml = g.icon
+          ? `<img src="${g.icon}" alt="${g.name}" class="guild-card-avatar" onerror="this.outerHTML='<div class=\\'guild-card-avatar-fallback\\'>${initials}</div>'">`
+          : `<div class="guild-card-avatar-fallback">${initials}</div>`;
+
+        const actionBtn = g.botInGuild
+          ? `<button class="guild-btn-go" onclick="selectGuildAndOpenDashboard('${g.id}')">Ir</button>`
+          : `<a href="${g.inviteUrl || '/api/invite'}" target="_blank" class="guild-btn-add">Añadir</a>`;
+
+        html += `
+          <div class="guild-card" data-guild-id="${g.id}" data-guild-name="${(g.name || '').toLowerCase()}">
+            <div class="guild-card-banner" style="${bannerStyle}"></div>
+            <div class="guild-card-avatar-wrap">
+              ${avatarHtml}
+            </div>
+            <div class="guild-card-body">
+              <div class="guild-card-info">
+                <span class="guild-card-name" title="${g.name}">${g.name}</span>
+                <span class="guild-card-role">${g.role || 'Admin'}</span>
+              </div>
+              <div class="guild-card-action">
+                ${actionBtn}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function filterGuildCards(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        renderGuildCards(allGuildsList);
+        return;
+      }
+      const filtered = allGuildsList.filter(g => (g.name || '').toLowerCase().includes(q));
+      renderGuildCards(filtered);
+    }
+
+    function selectGuildAndOpenDashboard(guildId) {
+      const g = allGuildsList.find(x => x.id === guildId);
+      updateGlobalGuild(guildId);
+      const selector = document.getElementById('global-guild-selector');
+      if (selector) selector.value = guildId;
+      showSection('dashboard');
+      if (typeof showToast === 'function') {
+        showToast(`Servidor seleccionado: ${g ? g.name : guildId}`, 'success');
+      }
+    }
+
+    function openGuildSelectorScreen() {
+      showSection('guild-select-screen');
+      loadGuildCards();
+    }
+
     async function loadGuildsForSelector() {
       const selector = document.getElementById('global-guild-selector');
       try {
         const res = await fetch('/api/guilds');
-        const guilds = await res.json(); selector.innerHTML = '<option value="">Seleccionar servidor...</option>';
-        guilds.forEach(g => {
-          const opt = document.createElement('option');
-          opt.value = g.id; opt.innerText = g.name;
-          selector.appendChild(opt);
-        });
-
-        // Restaurar servidor seleccionado anteriormente
-        const savedGuildId = localStorage.getItem('selectedGuildId'); if (savedGuildId && guilds.some(g => g.id === savedGuildId)) {
-          selector.value = savedGuildId; updateGlobalGuild(savedGuildId);
+        const guilds = await res.json();
+        allGuildsList = Array.isArray(guilds) ? guilds : [];
+        if (selector) {
+          selector.innerHTML = '<option value="">Seleccionar servidor...</option>';
+          allGuildsList.filter(g => g.botInGuild !== false).forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g.id; opt.innerText = g.name;
+            selector.appendChild(opt);
+          });
         }
-      } catch (e) { }
+
+        renderGuildCards(allGuildsList);
+
+        // Restaurar servidor seleccionado anteriormente si es válido
+        const savedGuildId = localStorage.getItem('selectedGuildId');
+        if (savedGuildId && allGuildsList.some(g => g.id === savedGuildId && g.botInGuild !== false)) {
+          if (selector) selector.value = savedGuildId;
+          updateGlobalGuild(savedGuildId);
+        } else {
+          // Si no hay servidor seleccionado previo, mostrar la pantalla de selección de servidores
+          openGuildSelectorScreen();
+        }
+      } catch (e) {
+        console.error('Error cargando lista de servidores:', e);
+      }
     }
 
     async function loadTickets() {

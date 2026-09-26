@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="es"><head>
+<title>CodeCord - Bot Multifuncional Avanzado para Discord</title>
+<meta name="description" content="Bot de Discord con moderación inteligente, tickets, bienvenidas, anti-raid, sorteos, constructor de embeds y panel web.">
+<link rel="icon" type="image/png" href="/uploads/favicon.png"><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Sora:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{width:8px;}::-webkit-scrollbar-track{background:#0b0e17;}::-webkit-scrollbar-thumb{background:#1c1f29;border-radius:4px;}::-webkit-scrollbar-thumb:hover{background:#38bdf8;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"error-container":"#93000a","on-error":"#690005","tertiary-fixed-dim":"#ffb1c5","on-surface-variant":"#bdc8d1","on-secondary-fixed-variant":"#2f3aa3","surface-variant":"#32343f","tertiary":"#ffbacb","surface-card":"#1a2234","on-tertiary-container":"#890042","surface-bright":"#363943","surface-raised":"#111827","surface-container-highest":"#32343f","primary-container":"#38bdf8","background":"#10131c","error":"#ffb4ab","accent-cyan":"#38bdf8","on-secondary":"#131e8c","on-primary-container":"#004965","accent-blue":"#60a5fa","accent-pink":"#e3427e","tertiary-fixed":"#ffd9e1","status-error":"#ef4444","on-background":"#e0e2ef","primary":"#8ed5ff","accent-indigo":"#818cf8","inverse-primary":"#00668a","surface-container-high":"#272a34","on-primary":"#00354a","on-secondary-fixed":"#000767","status-warning":"#f59e0b","secondary-container":"#2f3aa3","surface-container-lowest":"#0b0e17","secondary-fixed-dim":"#bdc2ff","secondary-fixed":"#e0e0ff","outline":"#87929a","on-secondary-container":"#a8afff","on-primary-fixed":"#001e2c","on-tertiary-fixed":"#3f001a","surface-dim":"#10131c","discord-blurple":"#5865f2","surface-base":"#0b0e17","on-tertiary":"#65002f","on-tertiary-fixed-variant":"#8f0045","inverse-on-surface":"#2d303a","inverse-surface":"#e0e2ef","primary-fixed-dim":"#7bd0ff","surface-container":"#1c1f29","outline-variant":"#3e484f","primary-fixed":"#c4e7ff","surface":"#10131c","tertiary-container":"#ff8faf","status-success":"#10b981","on-error-container":"#ffdad6","surface-tint":"#7bd0ff","on-primary-fixed-variant":"#004c69","secondary":"#bdc2ff","on-surface":"#e0e2ef","accent-pink-soft":"#f6adc6","surface-container-low":"#181b25"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"gutter":"1.5rem","space-md":"1rem","margin":"2rem","space-xl":"2.5rem","margin-mobile":"1rem","space-2xl":"4rem","space-lg":"1.5rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter-mobile":"1rem"},fontFamily:{"label-code":["JetBrains Mono"],"headline-lg":["Sora"],"headline-xl-mobile":["Sora"],"headline-lg-mobile":["Sora"],"body-md":["DM Sans"],"headline-xl":["Sora"],"label-lg":["DM Sans"],"title-lg":["Sora"],"headline-md":["Sora"],"body-sm":["DM Sans"],"title-md":["DM Sans"],"body-lg":["DM Sans"],"label-badge":["DM Sans"]},fontSize:{"label-code":["13px",{lineHeight:"18px",letterSpacing:"0",fontWeight:"500"}],"headline-lg":["36px",{lineHeight:"44px",letterSpacing:"-0.015em",fontWeight:"700"}],"headline-xl-mobile":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"800"}],"headline-lg-mobile":["26px",{lineHeight:"34px",letterSpacing:"-0.01em",fontWeight:"700"}],"body-md":["14px",{lineHeight:"22px",fontWeight:"400"}],"headline-xl":["48px",{lineHeight:"56px",letterSpacing:"-0.02em",fontWeight:"800"}],"label-lg":["14px",{lineHeight:"20px",letterSpacing:"0.01em",fontWeight:"600"}],"title-lg":["20px",{lineHeight:"28px",fontWeight:"600"}],"headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"18px",fontWeight:"400"}],"title-md":["18px",{lineHeight:"26px",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"26px",fontWeight:"400"}],"label-badge":["11px",{lineHeight:"14px",letterSpacing:"0.05em",fontWeight:"700"}]}}}};</script></head><body class="bg-surface-base text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary selection:text-on-primary"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-raised/85 backdrop-blur-xl border-b border-surface-container-high/40 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group" href="#inicio" id="brand-link"><div class="relative flex items-center justify-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-accent-cyan/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2pN7iba2v6z8oMke1GLWLejAq-munrFewuNb5Uxuet9uCOoBrd1Fnehe0rIS_MvoPj4IKqWMnAJQrF1OK2Pk358t3EQ3apzDv8DIF5AoyDKZkHA_5xE2vMqcSFkaRsmZQxx3cTFRed7SyLtCQWdoLe3n_Kpknqer6oirIEplYhlafoLjL2ucN9tDkPRrsB6pwMbrHgxarnf72sDr-iYs4rYXOElxMwNvALpkSYrjUSFevhBuqYPzJYepMi38fP2UBbDQ"><span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-status-success rounded-full ring-2 ring-surface-raised"></span><span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-status-success rounded-full animate-ping opacity-75"></span></div><div class="flex flex-col"><span class="font-title-lg text-title-lg tracking-tight text-on-surface group-hover:text-primary transition-colors">CodeCord</span></div></a><nav class="hidden lg:flex items-center gap-space-xs p-space-xs rounded-xl bg-surface-container-low/60" id="main-nav"><a class="nav-item px-space-md py-space-xs rounded-lg transition-all font-title-md text-title-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high bg-surface-card text-primary" data-section="inicio" href="#inicio">Inicio</a><a class="nav-item px-space-md py-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all font-title-md text-title-md" data-section="comandos" href="#comandos">Comandos</a><a class="nav-item px-space-md py-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all font-title-md text-title-md" data-section="modulos" href="#modulos">Módulos</a><a class="nav-item px-space-md py-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all font-title-md text-title-md" data-section="caracteristicas" href="#caracteristicas">Características</a><a class="nav-item px-space-md py-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all font-title-md text-title-md" data-section="soporte" href="#soporte">Comunidad / Soporte</a></nav></div><div class="flex items-center gap-space-sm"><a aria-label="GitHub Repository" class="hidden sm:inline-flex items-center justify-center p-space-sm rounded-xl bg-surface-container text-on-surface hover:text-accent-cyan hover:bg-surface-bright transition-all shadow-sm border border-outline-variant/30 active:scale-95" href="https://github.com/Aitor2010aitor/CodeCord" rel="noopener noreferrer" target="_blank" title="GitHub Repository"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg></a><a href="/dashboard" class="inline-flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container text-on-surface hover:bg-surface-bright hover:text-primary transition-all font-label-lg text-label-lg shadow-sm border border-outline-variant/30 active:scale-95"><span class="material-symbols-outlined text-primary text-base">dashboard</span>Panel de Control</a><a href="/api/invite" target="_blank" class="action-invite-btn relative inline-flex items-center justify-center gap-space-xs px-space-lg py-space-sm rounded-xl bg-gradient-to-r from-accent-cyan via-discord-blurple to-accent-indigo text-on-primary font-label-lg text-label-lg shadow-[0_0_24px_rgba(56,189,248,0.35)] hover:shadow-[0_0_32px_rgba(56,189,248,0.5)] hover:brightness-110 transition-all active:scale-95"><span class="material-symbols-outlined text-on-primary text-lg">smart_toy</span>Invitar Bot</a></div></div></header><main class="w-full pt-20 flex-1 bg-surface-base"><div class="flex flex-col w-full relative overflow-hidden">
+<!-- Dynamic Ambient Glow Backgrounds -->
+<div class="absolute top-10 left-1/4 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+<div class="absolute top-80 right-10 w-[480px] h-[480px] bg-discord-blurple/15 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+<div class="absolute top-[1800px] left-10 w-[500px] h-[500px] bg-accent-pink/10 rounded-full blur-[180px] pointer-events-none -z-10"></div>
+<!-- SECTION 1: HERO (High Impact Nekotina Style) -->
+<section class="w-full max-w-7xl mx-auto px-margin pt-space-xl pb-space-2xl scroll-mt-28" id="inicio">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+<!-- Left Column: Copy & CTAs -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Eyebrow Pill -->
+<div class="inline-flex items-center gap-space-xs self-start px-space-md py-1 rounded-full bg-surface-card/90 shadow-sm border border-outline-variant/20">
+<span class="w-2 h-2 rounded-full bg-status-success animate-pulse"></span>
+<span class="font-label-badge text-label-badge text-accent-cyan tracking-wider uppercase">✨ Tu servidor de Discord al siguiente nivel • V3.2 Activo</span>
+</div>
+<!-- Main Headline -->
+<h1 class="font-headline-xl text-headline-xl text-on-surface leading-tight tracking-tight">
+          El bot multifunción que hace que tu comunidad <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-primary to-accent-indigo">cobre vida</span>
+</h1>
+<!-- Subheadline -->
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+          Moderación inteligente, sistema de tickets reactivo, bienvenidas personalizables, anti-raid avanzado, constructor de embeds visual y más. Todo en un solo bot rápido y seguro para llevar tu comunidad al máximo nivel.
+        </p>
+<!-- CTA Action Buttons -->
+<div class="flex flex-wrap items-center gap-space-md pt-space-xs">
+<a href="/api/invite" target="_blank" class="action-invite-btn relative inline-flex items-center gap-space-sm px-space-xl py-space-md rounded-xl bg-gradient-to-r from-accent-cyan via-discord-blurple to-accent-indigo text-on-primary font-label-lg text-label-lg shadow-[0_0_32px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+<path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path>
+</svg>
+<span class="">Añadir a Discord</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-lowest/40 font-body-sm text-body-sm text-primary-fixed" id="hero-badge">+2,856 Servidores</span>
+</a>
+<a class="nav-item inline-flex items-center gap-space-xs px-space-lg py-space-md rounded-xl bg-surface-container hover:bg-surface-bright text-on-surface transition-all font-label-lg text-label-lg shadow-sm border border-outline-variant/30" data-section="comandos" href="#comandos">
+<span class="">Explorar Comandos</span>
+<span class="material-symbols-outlined text-base text-accent-cyan">arrow_downward</span>
+</a>
+</div>
+<!-- Live Stats Ribbon -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm pt-space-lg">
+<div class="p-space-sm rounded-xl bg-surface-card/60 backdrop-blur-md flex flex-col gap-1 shadow-sm border border-outline-variant/20">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-status-success animate-ping"></span>
+<span class="font-label-badge text-label-badge text-status-success uppercase">Estado</span>
+</div>
+<span class="font-title-md text-title-md text-on-surface" id="stat-uptime">99.9% Uptime</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">En línea 24/7</span>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-card/60 backdrop-blur-md flex flex-col gap-1 shadow-sm border border-outline-variant/20">
+<span class="font-label-badge text-label-badge text-accent-cyan uppercase">Comunidades</span>
+<span class="font-title-md text-title-md text-on-surface" id="stat-servers">2,856+</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Servidores activos</span>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-card/60 backdrop-blur-md flex flex-col gap-1 shadow-sm border border-outline-variant/20">
+<span class="font-label-badge text-label-badge text-accent-indigo uppercase">Alcance</span>
+<span class="font-title-md text-title-md text-on-surface" id="stat-users">150,000+</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Usuarios gestionados</span>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-card/60 backdrop-blur-md flex flex-col gap-1 shadow-sm border border-outline-variant/20">
+<span class="font-label-badge text-label-badge text-status-warning uppercase">Velocidad</span>
+<span class="font-title-md text-title-md text-on-surface" id="stat-ping">12ms</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Latencia de Gateway</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Nekotina Mascot Showcase & Interactive Floating Discord Cards -->
+<div class="lg:col-span-5 relative flex items-center justify-center min-h-[460px]">
+<!-- Mascot Aura Glow Backdrop -->
+<div class="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-accent-cyan/25 to-accent-pink/20 blur-3xl"></div>
+<!-- Bot Mascot Image with Floating Animation -->
+<div class="relative z-10 p-space-md rounded-3xl bg-surface-card/40 backdrop-blur-xl shadow-xl hover:scale-105 transition-transform duration-500 border border-outline-variant/20">
+<img alt="Mascota oficial CodeCord Bot en pose futurista" class="w-72 h-72 sm:w-80 sm:h-80 object-contain drop-shadow-[0_20px_35px_rgba(56,189,248,0.25)] rounded-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1QnGjfKl3q_7Y61JSbEEJkDFT162OnAGqP9wMIK0GO4mepn2ngcKbNrM4GUQYaHriHozmwsRlEp9449bjvkDCliUNlSWoV8dwvbYmEFSb8UV9l6sRP1D3EEjdgdcKAtQAxijObfT67ZSvnks2jq6X1jfTOgXiCJh_WLws_8l4DXHWdbSwHhKaUMH4EY2HALZVxeAMNNNTpZCQqo8z_fIo0dAeier5kMXF7aTxohe_Ltdcv81yhYML0Q8E5MQO69W4aWs">
+<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-space-md py-1 rounded-full bg-surface-raised/95 text-accent-cyan font-label-badge text-label-badge uppercase tracking-wider shadow-lg flex items-center gap-1.5 whitespace-nowrap border border-outline-variant/30">
+<span class="material-symbols-outlined text-sm text-status-success" style="font-variation-settings: &quot;FILL&quot; 1;">verified</span>
+            CodeCord Verified Application
+          </div>
+</div>
+<!-- Floating Discord Element 2: Welcome Notification (Bottom Left) -->
+<div class="absolute -bottom-6 -left-4 sm:-left-8 z-20 p-space-sm rounded-xl bg-surface-card/90 backdrop-blur-xl shadow-xl max-w-[220px] hidden sm:flex items-center gap-space-sm border border-outline-variant/20">
+<div class="w-8 h-8 rounded-lg bg-status-success/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-status-success text-base">waving_hand</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-badge text-label-badge text-status-success uppercase tracking-wider">Bienvenida #general</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">¡Nuevo miembro verificado!</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: KEY MODULES & CAPABILITIES (Grid showcase from panel) -->
+<section class="w-full max-w-7xl mx-auto px-margin py-space-2xl scroll-mt-24" id="modulos">
+<div class="flex flex-col items-center text-center gap-space-xs mb-space-xl">
+<div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-card text-accent-cyan font-label-badge text-label-badge tracking-wider uppercase border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm">view_quilt</span> Módulos del Sistema
+      </div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Módulos Potentes &amp; Fáciles de Usar</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+        Configura tu servidor en segundos con módulos reactivos y sincronización en tiempo real desde tu panel web.
+      </p>
+</div>
+<!-- 8 Modules Grid with distinctive color tags and glassmorphism hover -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Card 1: Moderación & AutoMod -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-accent-blue/15 text-accent-cyan flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">security</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-blue/10 text-accent-cyan font-label-badge text-label-badge">Seguridad</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-accent-cyan transition-colors">Moderación &amp; AutoMod</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Filtro de palabras prohibidas, enlaces maliciosos, protección anti-spam, auto-mute y sanciones instantáneas.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-status-success flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>Listo para activar</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 2: Bienvenidas & Despedidas -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-status-success/15 text-status-success flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">person_add</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-status-success/10 text-status-success font-label-badge text-label-badge">Comunidad</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-status-success transition-colors">Bienvenidas &amp; Despedidas</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Mensajes enriquecidos, tarjetas gráficas personalizadas con el avatar del usuario y asignación automática de auto-roles.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Plantillas visuales</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 3: Protección Anti-Raid -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-accent-pink/15 text-accent-pink flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">gshield</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-pink/10 text-accent-pink font-label-badge text-label-badge">Anti-Ataques</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-accent-pink transition-colors">Protección Anti-Raid</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Bloqueo de ataques masivos, filtrado inteligente de cuentas recién creadas y modo pánico de aislamiento en 1 clic.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Respuesta &lt;50ms</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 4: Sistema de Tickets -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-accent-indigo/15 text-accent-indigo flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">confirmation_number</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-indigo/10 text-accent-indigo font-label-badge text-label-badge">Soporte</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-accent-indigo transition-colors">Sistema de Tickets</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Paneles interactivos con botones, roles de soporte específicos, límites por usuario y transcripciones automáticas en HTML.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Transcripciones web</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 5: Constructor de Embeds -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-accent-pink/15 text-accent-pink-soft flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">draw</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-pink/10 text-accent-pink font-label-badge text-label-badge">Diseño</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-accent-pink-soft transition-colors">Constructor de Embeds</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Crea anuncios y mensajes visuales llamativos con vista previa exacta a Discord sin necesidad de código ni configuraciones complejas.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Editor WYSIWYG</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 6: Sorteos & Giveaways -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-status-warning/15 text-status-warning flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">featured_seasonal_and_gifts</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-status-warning/10 text-status-warning font-label-badge text-label-badge">Eventos</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-status-warning transition-colors">Sorteos &amp; Giveaways</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Sorteos programados con tiempo exacto, botón de entrada instantáneo, filtros de roles y selección transparente y justa.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Re-roll con 1 clic</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 7: Copias de Seguridad -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-primary/15 text-accent-cyan flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">cloud_sync</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-accent-cyan font-label-badge text-label-badge">Sistema</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-accent-cyan transition-colors">Copias de Seguridad</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Guarda la estructura íntegra de tu servidor (canales, roles, permisos y emojis) para restaurarla ante cualquier catástrofe.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Snapshots cifrados</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<!-- Card 8: Niveles & Economía -->
+<div class="group relative p-space-lg rounded-2xl bg-surface-card/60 backdrop-blur-md hover:bg-surface-card transition-all duration-300 shadow-md flex flex-col justify-between border border-outline-variant/20">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="w-12 h-12 rounded-xl bg-discord-blurple/15 text-secondary-fixed-dim flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">military_tech</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-discord-blurple/10 text-secondary-fixed-dim font-label-badge text-label-badge">Engagement</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary-fixed-dim transition-colors">Niveles &amp; Economía</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Recompensa la actividad en texto y voz con tarjetas de rango, experiencia dinámica, roles automáticos y tabla de líderes.</p>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-lg text-label-lg group-hover:text-on-surface">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ranking en vivo</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: DISCORD EMBED PREVIEW INTERACTIVE SHOWCASE -->
+<section class="w-full max-w-7xl mx-auto px-margin py-space-xl scroll-mt-24" id="caracteristicas">
+<div class="p-space-xl lg:p-space-2xl rounded-3xl bg-surface-container-low/80 backdrop-blur-xl shadow-2xl relative overflow-hidden border border-outline-variant/20">
+<!-- Glow effect inside frame -->
+<div class="absolute -right-20 -bottom-20 w-96 h-96 bg-accent-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+<!-- Showcase Description -->
+<div class="lg:col-span-5 flex flex-col gap-space-sm">
+<span class="font-label-badge text-label-badge text-accent-cyan uppercase tracking-wider">Simulación en Tiempo Real</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Así es como tu comunidad experimenta CodeCord</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Mensajes nítidos, interactivos y con identidad visual que respetan el diseño oficial de Discord. Botones táctiles, menús desplegables y transcripciones seguras.
+          </p>
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-center gap-space-xs text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-status-success text-lg">check_circle</span>
+<span class="">Totalmente compatible con Discord Slash Commands</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-status-success text-lg">check_circle</span>
+<span class="">Componentes interactivos (Botones V2 &amp; Modales)</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface font-body-md text-body-md">
+<span class="material-symbols-outlined text-status-success text-lg">check_circle</span>
+<span class="">Cero spam ni menciones no autorizadas</span>
+</div>
+</div>
+</div>
+<!-- Simulated Discord Message Box -->
+<div class="lg:col-span-7 bg-[#1e1f22] p-space-md sm:p-space-lg rounded-2xl shadow-xl flex flex-col gap-space-sm text-on-surface border border-[#2b2d31]">
+<!-- Bot author row -->
+<div class="flex items-center gap-space-sm">
+<img alt="Bot Avatar" class="w-10 h-10 rounded-full object-cover ring-1 ring-accent-cyan/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJqXX3REe4QSwz1-BH4YkPoricbcLOuK1PN8PbCuUPTmANzqsCz6Qp4tbUANvBlEU25UtJ8nzaX5qxoaWuUt6TMaK5rfBwLPfgxlCHvaFWym6Cu_bsl3Ckwwd_1HAaYR2cvxHuL8cKqKF1U3zQT3Q9AsZ3hUGChtkhxBT93MuRrJbsdGiIODQQMZsoqiopNinxzcIDWBHuQZpv94pS-3cDbGt-fueD0_pZycG1RPdmhNHtLfStLFaQcSXikdGWsvpoSlU">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface">CodeCord</span>
+<span class="px-1 py-0.5 bg-discord-blurple text-[10px] font-bold text-white rounded uppercase tracking-wider flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[10px]" style="font-variation-settings: &quot;FILL&quot; 1;">check</span>BOT
+              </span>
+<span class="font-body-sm text-body-sm text-outline ml-1">hoy a las 14:32</span>
+</div>
+</div>
+<!-- Embed body with colored left border indicator -->
+<div class="ml-2 sm:ml-6 pl-space-md py-space-sm bg-[#2b2d31] rounded-r-xl rounded-l-sm relative flex flex-col gap-space-sm" style="border-left: 4px solid #38bdf8;">
+<div class="flex items-center justify-between">
+<span class="font-label-badge text-label-badge text-accent-cyan uppercase tracking-wider font-semibold">SISTEMA CENTRAL • SERVIDOR PROTEGIDO</span>
+<span class="material-symbols-outlined text-accent-cyan text-sm">verified_user</span>
+</div>
+<h4 class="font-title-md text-title-md text-white font-bold">¡Bienvenido al Centro de Soporte &amp; Comunidad! 🛡️</h4>
+<p class="font-body-md text-body-md text-[#dbdee1] leading-relaxed">
+              Selecciona una de las opciones debajo para ser atendido por el equipo de moderación o explorar las ventajas de nuestro servidor. Todos los tickets quedan grabados y protegidos.
+            </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm pt-space-xs text-sm">
+<div class="flex flex-col">
+<span class="text-xs uppercase text-outline font-semibold">Tiempo medio de respuesta</span>
+<span class="text-white font-medium">&lt; 3 minutos</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs uppercase text-outline font-semibold">Estado del AutoMod</span>
+<span class="text-status-success font-medium flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-status-success"></span> Máxima Seguridad
+                </span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs text-xs text-outline pt-space-xs">
+<span class="">CodeCord V3.2 • Panel de Administración Oficial</span>
+</div>
+</div>
+<!-- Interactive Action Buttons -->
+<div class="ml-2 sm:ml-6 flex flex-wrap items-center gap-space-xs pt-1">
+<button class="px-space-md py-1.5 rounded-lg bg-discord-blurple hover:bg-discord-blurple/80 text-white font-label-lg text-label-lg flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" onclick="showNotification('Ticket creado exitosamente en #ticket-0412')">
+<span class="material-symbols-outlined text-sm">confirmation_number</span> Crear Ticket
+            </button>
+<button class="px-space-md py-1.5 rounded-lg bg-[#4e5058] hover:bg-[#6d6f78] text-white font-label-lg text-label-lg flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" onclick="showNotification('Reglas: Respeto mutuo, sin spam y disfruta tu estancia.')">
+<span class="material-symbols-outlined text-sm">menu_book</span> Ver Reglas
+            </button>
+<button class="px-space-md py-1.5 rounded-lg bg-status-success/80 hover:bg-status-success text-white font-label-lg text-label-lg flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" onclick="showNotification('¡Entrada confirmada para el sorteo activo!')">
+<span class="material-symbols-outlined text-sm">redeem</span> Participar en Sorteo
+            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: EXPLORADOR DE COMANDOS (Interactive Command Explorer like Nekotina) -->
+<section class="w-full max-w-7xl mx-auto px-margin py-space-2xl scroll-mt-24" id="comandos">
+<div class="flex flex-col gap-space-md">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-card text-accent-cyan font-label-badge text-label-badge tracking-wider uppercase self-start border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm">terminal</span> Directorio de Comandos
+          </div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Explorador de Comandos</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+            Descubre todos los comandos Slash integrados en CodeCord con su sintaxis y permisos requeridos.
+          </p>
+</div>
+<!-- Quick Search Bar -->
+<div class="relative w-full md:w-80">
+<span class="material-symbols-outlined absolute left-space-md top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="w-full bg-surface-card/90 text-on-surface pl-10 pr-space-md py-space-sm rounded-xl outline-none focus:ring-2 focus:ring-accent-cyan transition-all font-body-md text-body-md placeholder:text-on-surface-variant/60 shadow-sm border border-outline-variant/20" id="command-search" placeholder="Buscar comando (ej. /ban, /ticket)..." type="text">
+</div>
+</div>
+<!-- Filter Tabs (Nekotina Style) -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-2 scrollbar-none" id="command-filters">
+<button class="cmd-filter-btn active px-space-md py-space-xs rounded-xl bg-accent-cyan/15 text-accent-cyan font-label-lg text-label-lg whitespace-nowrap transition-all border border-accent-cyan/20" data-category="all">
+          Todos (9)
+        </button>
+<button class="cmd-filter-btn px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright font-label-lg text-label-lg whitespace-nowrap transition-all border border-outline-variant/20" data-category="moderacion">
+          Moderación
+        </button>
+<button class="cmd-filter-btn px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright font-label-lg text-label-lg whitespace-nowrap transition-all border border-outline-variant/20" data-category="seguridad">
+          Seguridad &amp; Anti-Raid
+        </button>
+<button class="cmd-filter-btn px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright font-label-lg text-label-lg whitespace-nowrap transition-all border border-outline-variant/20" data-category="utilidad">
+          Utilidad &amp; Embeds
+        </button>
+<button class="cmd-filter-btn px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright font-label-lg text-label-lg whitespace-nowrap transition-all border border-outline-variant/20" data-category="tickets">
+          Tickets
+        </button>
+<button class="cmd-filter-btn px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-bright font-label-lg text-label-lg whitespace-nowrap transition-all border border-outline-variant/20" data-category="sorteos">
+          Entretenimiento &amp; Sorteos
+        </button>
+</div>
+<!-- Empty Search State -->
+<div class="hidden p-space-xl rounded-2xl bg-surface-card/40 border border-outline-variant/20 text-center flex-col items-center justify-center gap-space-sm" id="no-commands-msg">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant">search_off</span>
+<p class="font-title-md text-on-surface">No se encontraron comandos coincidentes</p>
+<p class="font-body-sm text-on-surface-variant">Intenta con otro término o selecciona la categoría 'Todos'.</p>
+</div>
+<!-- Command Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md mt-space-sm" id="commands-container">
+<!-- Command 1: /help -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="utilidad" data-name="/help">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-accent-cyan bg-accent-cyan/10 px-2 py-0.5 rounded-md font-semibold">/help</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge uppercase">Todos</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Muestra la lista de comandos disponibles, guías interactivas y documentación de uso.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/help [módulo]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-accent-cyan">Slash</span>
+</div>
+</div>
+<!-- Command 2: /ban -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="moderacion" data-name="/ban">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-status-error bg-status-error/10 px-2 py-0.5 rounded-md font-semibold">/ban</span>
+<span class="px-space-xs py-0.5 rounded-full bg-status-error/10 text-status-error font-label-badge text-label-badge uppercase">Admin / Mod</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Sanciona y expulsa permanentemente a un usuario infractor con registro automático en logs.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/ban [usuario] [razón]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-status-error">Sanción</span>
+</div>
+</div>
+<!-- Command 3: /ticket setup -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="tickets" data-name="/ticket">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-accent-indigo bg-accent-indigo/10 px-2 py-0.5 rounded-md font-semibold">/ticket setup</span>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-indigo/10 text-accent-indigo font-label-badge text-label-badge uppercase">Admin</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Despliega un panel interactivo de soporte en el canal deseado con botones personalizables.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/ticket setup [canal]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-accent-indigo">Panel</span>
+</div>
+</div>
+<!-- Command 4: /embed create -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="utilidad" data-name="/embed">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-accent-pink bg-accent-pink/10 px-2 py-0.5 rounded-md font-semibold">/embed create</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge uppercase">Mod</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Abre el constructor interactivo con editor de título, descripción, color hex y previsualización en vivo.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/embed create [canal]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-accent-pink">Diseño</span>
+</div>
+</div>
+<!-- Command 5: /warn -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="moderacion" data-name="/warn">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-status-warning bg-status-warning/10 px-2 py-0.5 rounded-md font-semibold">/warn</span>
+<span class="px-space-xs py-0.5 rounded-full bg-status-warning/10 text-status-warning font-label-badge text-label-badge uppercase">Mod</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Registra una advertencia formal y aplica auto-silencio si el infractor acumula el límite configurado.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/warn [usuario] [motivo]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-status-warning">AutoMod</span>
+</div>
+</div>
+<!-- Command 6: /sorteo -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="sorteos" data-name="/sorteo">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-status-success bg-status-success/10 px-2 py-0.5 rounded-md font-semibold">/sorteo</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-badge text-label-badge uppercase">Mod</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Inicia un sorteo con temporizador automático, botón de entrada y elección criptográfica justa.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/sorteo [tiempo] [ganadores] [premio]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-status-success">Giveaway</span>
+</div>
+</div>
+<!-- Command 7: /backup create -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="seguridad" data-name="/backup">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-primary bg-primary/10 px-2 py-0.5 rounded-md font-semibold">/backup create</span>
+<span class="px-space-xs py-0.5 rounded-full bg-status-error/10 text-status-error font-label-badge text-label-badge uppercase">Owner Only</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Genera un respaldo completo de la estructura del servidor protegido con cifrado y clave de restauración.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/backup create</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-primary">Seguridad</span>
+</div>
+</div>
+<!-- Command 8: /autorole -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="utilidad" data-name="/autorole">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-accent-cyan bg-accent-cyan/10 px-2 py-0.5 rounded-md font-semibold">/autorole</span>
+<span class="px-space-xs py-0.5 rounded-full bg-accent-cyan/10 text-accent-cyan font-label-badge text-label-badge uppercase">Admin</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Asigna automáticamente un rol predefinido a nuevos miembros o bots al ingresar al servidor.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/autorole [rol]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-accent-cyan">Auto</span>
+</div>
+</div>
+<!-- Command 9: /clear -->
+<div class="cmd-card p-space-md rounded-2xl bg-surface-card/70 backdrop-blur-md hover:bg-surface-card transition-all flex flex-col justify-between shadow-md border border-outline-variant/20" data-category="moderacion" data-name="/clear">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-accent-pink-soft bg-accent-pink/10 px-2 py-0.5 rounded-md font-semibold">/clear</span>
+<span class="px-space-xs py-0.5 rounded-full bg-status-warning/10 text-status-warning font-label-badge text-label-badge uppercase">Mod</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Elimina de 1 a 100 mensajes de un canal con opciones de filtro por usuario, bots o enlaces.</p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-code text-label-code text-on-surface-variant/80 text-xs">
+<span class="">Uso: <span class="text-on-surface">/clear [cantidad] [filtro]</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-[11px] text-accent-pink-soft">Purge</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: CALL TO ACTION BOTTOM BANNER & COMMUNITY SUPPORT -->
+<section class="w-full max-w-7xl mx-auto px-margin py-space-2xl mb-space-xl scroll-mt-24" id="soporte">
+<div class="relative rounded-3xl bg-gradient-to-r from-surface-card via-surface-card to-surface-container p-space-xl lg:p-space-2xl shadow-2xl overflow-hidden text-center flex flex-col items-center gap-space-md border border-outline-variant/30">
+<!-- Top Decorative Glow Orb -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-32 bg-accent-cyan/20 blur-3xl rounded-full pointer-events-none"></div>
+<div class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-highest/60 text-accent-cyan font-label-badge text-label-badge uppercase tracking-wider border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm">rocket_launch</span> Instalación Instantánea
+      </div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface max-w-2xl leading-tight">
+        ¿Listo para transformar tu servidor?
+      </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+        Añade CodeCord hoy mismo en menos de 1 minuto y disfruta de una comunidad más segura, activa y perfectamente organizada. Sin costo inicial.
+      </p>
+<div class="flex flex-wrap items-center justify-center gap-space-md pt-space-sm z-10">
+<a href="/api/invite" target="_blank" class="action-invite-btn relative inline-flex items-center gap-space-sm px-space-xl py-space-md rounded-xl bg-gradient-to-r from-accent-cyan via-discord-blurple to-accent-indigo text-on-primary font-label-lg text-label-lg shadow-[0_0_32px_rgba(56,189,248,0.45)] hover:shadow-[0_0_48px_rgba(56,189,248,0.65)] hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-xl">smart_toy</span>
+<span class="">Invitar CodeCord Gratis</span>
+</a>
+<button class="action-support-btn inline-flex items-center gap-space-xs px-space-xl py-space-md rounded-xl bg-surface-container-high/80 hover:bg-surface-bright text-on-surface transition-all font-label-lg text-label-lg shadow-sm border border-outline-variant/30 active:scale-95">
+<span class="material-symbols-outlined text-accent-cyan text-lg">support_agent</span>
+<span class="">Unirse al Servidor de Soporte</span>
+</button>
+</div>
+<!-- Trust signals -->
+<div class="flex items-center gap-space-lg text-on-surface-variant font-body-sm text-body-sm pt-space-xs">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-status-success text-base">check</span> 100% Gratuito</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-status-success text-base">check</span> Sin tarjeta requerida</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-status-success text-base">check</span> Configuración guiada</span>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface-container-lowest mt-auto relative overflow-hidden"><div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-accent-cyan/20 to-transparent"></div><div class="max-w-7xl mx-auto px-margin py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl"><div class="lg:col-span-2 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-7 h-7 rounded-lg bg-surface-card flex items-center justify-center border border-outline-variant/20"><span class="material-symbols-outlined text-accent-cyan text-lg">terminal</span></div><span class="font-title-lg text-title-lg text-on-surface tracking-tight">CodeCord</span></div><p class="font-body-md text-body-md text-on-surface-variant max-w-sm">El bot multifunción definitivo para potenciar, proteger y dinamizar tu comunidad de Discord con herramientas automáticas y arquitectura de alta velocidad.</p><div class="flex items-center gap-space-sm mt-space-xs"><span class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container font-label-badge text-label-badge text-status-success border border-status-success/20"><span class="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>Sistemas Operativos 99.9%</span></div></div><div class="flex flex-col gap-space-sm"><h3 class="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">Producto</h3><div class="flex flex-col gap-space-xs"><a class="nav-item font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" data-section="comandos" href="#comandos">Comandos</a><a href="/api/invite" target="_blank" class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors">Invitación</a>
+<a href="/dashboard" class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors">Panel de Control</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#caracteristicas">Guías</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#modulos">Registro de cambios</a></div></div><div class="flex flex-col gap-space-sm"><h3 class="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">Recursos</h3><div class="flex flex-col gap-space-xs"><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#" onclick="showNotification('Documentación API en preparación')">Documentación</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#" onclick="showNotification('Términos de servicio verificados y vigentes')">Términos de servicio</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#" onclick="showNotification('Tu privacidad está 100% protegida')">Política de privacidad</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#" onclick="showNotification('Endpoints públicos: api.codecord.io/v1')">API</a></div></div><div class="flex flex-col gap-space-sm"><h3 class="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">Comunidad</h3><div class="flex flex-col gap-space-xs"><a class="nav-item font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" data-section="soporte" href="#soporte">Servidor de Soporte</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#" onclick="showNotification('¡Gracias por apoyar a CodeCord con tu voto!')">Votar en Top.gg</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="#" onclick="showNotification('Conectando con @CodeCordBot...')">Twitter / X</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-cyan transition-colors" href="https://github.com/Aitor2010aitor/CodeCord" rel="noopener noreferrer" target="_blank">GitHub</a></div></div></div><div class="mt-space-2xl pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md bg-surface-container-low/40 px-space-md py-space-sm rounded-xl border border-outline-variant/20"><p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 CodeCord. Todos los derechos reservados.</p><div class="inline-flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><span class="material-symbols-outlined text-accent-pink text-sm">favorite</span><span class="">Desarrollado con dedicación para Discord</span></div></div></div></footer>
+<!-- Interactive Modal for Panel & Invites -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200" id="action-modal">
+<div class="relative w-full max-w-md p-space-xl rounded-3xl bg-surface-card border border-outline-variant/30 shadow-2xl flex flex-col items-center text-center gap-space-md">
+<button class="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface transition-colors" id="modal-close">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+<div class="w-16 h-16 rounded-2xl bg-accent-cyan/15 text-accent-cyan flex items-center justify-center" id="modal-icon-container">
+<span class="material-symbols-outlined text-3xl" id="modal-icon">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-md text-headline-md text-on-surface" id="modal-title">Invitar CodeCord</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="modal-desc">Serás redirigido a Discord para otorgar permisos a CodeCord en tu servidor oficial.</p>
+</div>
+<div class="w-full flex flex-col gap-space-xs pt-space-xs">
+<a class="w-full py-space-sm px-space-md rounded-xl bg-gradient-to-r from-accent-cyan to-discord-blurple text-on-primary font-label-lg text-label-lg shadow-md hover:brightness-110 transition-all text-center" href="https://discord.com" id="modal-action-btn" target="_blank">Continuar</a>
+<button class="w-full py-space-sm px-space-md rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg transition-all" id="modal-cancel-btn">Cerrar</button>
+</div>
+</div>
+</div>
+<!-- Toast Feedback Notification -->
+<div class="fixed bottom-6 right-6 z-50 flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-raised/95 backdrop-blur-md border border-accent-cyan/40 text-on-surface shadow-2xl transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none" id="toast-notify">
+<span class="material-symbols-outlined text-accent-cyan text-xl">info</span>
+<span class="font-body-md text-body-md" id="toast-text">Notificación</span>
+</div>
+<!-- Interactive Search, Navigation & Filter Script -->
+<script>
+  let toastTimer = null;
+  function showNotification(msg) {
+    const toast = document.getElementById('toast-notify');
+    const text = document.getElementById('toast-text');
+    if (!toast || !text) return;
+    text.textContent = msg;
+    toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+    toast.classList.add('translate-y-0', 'opacity-100');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+      toast.classList.remove('translate-y-0', 'opacity-100');
+    }, 3200);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Navigation Smooth Scroll & Active Tracking
+    const navItems = document.querySelectorAll('#main-nav .nav-item');
+    const sections = ['inicio', 'comandos', 'modulos', 'caracteristicas', 'soporte'].map(id => document.getElementById(id)).filter(Boolean);
+
+    function setActiveNav(targetId) {
+      navItems.forEach(item => {
+        if (item.getAttribute('data-section') === targetId) {
+          item.classList.add('bg-surface-card', 'text-primary');
+          item.classList.remove('text-on-surface-variant');
+        } else {
+          item.classList.remove('bg-surface-card', 'text-primary');
+          item.classList.add('text-on-surface-variant');
+        }
+      });
+    }
+
+    // Click handler for navigation items
+    document.querySelectorAll('.nav-item').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const targetId = link.getAttribute('data-section') || link.getAttribute('href')?.replace('#', '');
+        const targetElem = document.getElementById(targetId);
+        if (targetElem) {
+          e.preventDefault();
+          targetElem.scrollIntoView({ behavior: 'smooth' });
+          setActiveNav(targetId);
+          if (targetId === 'comandos') {
+            const searchInput = document.getElementById('command-search');
+            if (searchInput) {
+              setTimeout(() => {
+                searchInput.focus();
+                searchInput.classList.add('ring-2', 'ring-accent-cyan');
+                setTimeout(() => searchInput.classList.remove('ring-2', 'ring-accent-cyan'), 1200);
+              }, 400);
+            }
+          }
+        }
+      });
+    });
+
+    // Scroll listener for dynamic nav highlighting
+    window.addEventListener('scroll', () => {
+      const scrollPosition = window.scrollY + 160;
+      let currentSectionId = 'inicio';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+          currentSectionId = section.id;
+        }
+      });
+      setActiveNav(currentSectionId);
+    }, { passive: true });
+
+    // 2. Command Filter & Search Functionality
+    const searchInput = document.getElementById('command-search');
+    const filterBtns = document.querySelectorAll('.cmd-filter-btn');
+    const commandCards = document.querySelectorAll('.cmd-card');
+    const noCommandsMsg = document.getElementById('no-commands-msg');
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    function filterCommands() {
+      let visibleCount = 0;
+      commandCards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        const cardName = (card.getAttribute('data-name') || '').toLowerCase();
+        const cardContent = card.textContent.toLowerCase();
+
+        const matchesCategory = (currentCategory === 'all') || (cardCategory === currentCategory);
+        const matchesSearch = (searchQuery === '') || cardName.includes(searchQuery) || cardContent.includes(searchQuery);
+
+        if (matchesCategory && matchesSearch) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (noCommandsMsg) {
+        if (visibleCount === 0) {
+          noCommandsMsg.classList.remove('hidden');
+          noCommandsMsg.classList.add('flex');
+        } else {
+          noCommandsMsg.classList.add('hidden');
+          noCommandsMsg.classList.remove('flex');
+        }
+      }
+    }
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => {
+          b.classList.remove('bg-accent-cyan/15', 'text-accent-cyan', 'border-accent-cyan/20');
+          b.classList.add('bg-surface-container', 'text-on-surface-variant', 'border-outline-variant/20');
+        });
+        btn.classList.add('bg-accent-cyan/15', 'text-accent-cyan', 'border-accent-cyan/20');
+        btn.classList.remove('bg-surface-container', 'text-on-surface-variant', 'border-outline-variant/20');
+
+        currentCategory = btn.getAttribute('data-category');
+        filterCommands();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        filterCommands();
+      });
+    }
+
+    // 3. Modal Interactions for Panel & Invites
+    const modal = document.getElementById('action-modal');
+    const modalClose = document.getElementById('modal-close');
+    const modalCancel = document.getElementById('modal-cancel-btn');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalActionBtn = document.getElementById('modal-action-btn');
+
+    function openModal(type) {
+      if (!modal) return;
+      if (type === 'panel') {
+        modalTitle.textContent = 'Panel de Control Web';
+        modalDesc.textContent = 'Inicia sesión con tu cuenta de Discord para gestionar servidores, permisos y copias de seguridad de CodeCord.';
+        modalIcon.textContent = 'dashboard';
+        modalActionBtn.textContent = 'Iniciar Sesión con Discord';
+      } else {
+        modalTitle.textContent = 'Invitar CodeCord Bot';
+        modalDesc.textContent = 'Agrega CodeCord a tu comunidad con 1 clic y activa la protección instantánea anti-raid y moderación.';
+        modalIcon.textContent = 'smart_toy';
+        modalActionBtn.textContent = 'Autorizar en Discord';
+      }
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.add('opacity-100');
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      modal.classList.remove('opacity-100');
+    }
+
+    
+    // Carga de estadisticas reales y sincronizacion con el bot
+    async function loadBotPublicInfo() {
+      try {
+        const res = await fetch('/api/public-info');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.botName) {
+          const brandNames = document.querySelectorAll('#brand-link span, .font-title-lg');
+          brandNames.forEach(el => { if (el.textContent.includes('CodeCord')) el.textContent = data.botName; });
+        }
+        if (data.botAvatar) {
+          const avatars = document.querySelectorAll('img[alt="Profile"], img[alt="Bot Avatar"]');
+          avatars.forEach(img => { img.src = data.botAvatar; });
+        }
+        if (data.servers) {
+          const sText = Number(data.servers).toLocaleString() + '+';
+          const el = document.getElementById('stat-servers');
+          if (el) el.textContent = sText;
+          const heroBadge = document.getElementById('hero-badge');
+          if (heroBadge) heroBadge.textContent = '+' + Number(data.servers).toLocaleString() + ' Servidores';
+        }
+        if (data.users) {
+          const uText = Number(data.users).toLocaleString() + '+';
+          const el = document.getElementById('stat-users');
+          if (el) el.textContent = uText;
+        }
+        if (data.ping !== undefined && data.ping !== null) {
+          const el = document.getElementById('stat-ping');
+          if (el) el.textContent = (data.ping > 0 ? data.ping : 12) + 'ms';
+        }
+        if (data.inviteUrl) {
+          document.querySelectorAll('a[href="/api/invite"]').forEach(a => {
+            a.href = data.inviteUrl;
+          });
+        }
+      } catch (err) {
+        console.log('Bot info offline o usando valores predeterminados');
+      }
+    }
+    loadBotPublicInfo();
+
+    // Actualizar modal para /dashboard
+    const origOpenModal = openModal;
+    openModal = function(type) {
+      if (type === 'panel') {
+        window.location.href = '/dashboard';
+        return;
+      }
+      origOpenModal(type);
+      if (type === 'invite') {
+        modalActionBtn.href = '/api/invite';
+      }
+    };
+
+    document.querySelectorAll('.action-panel-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal('panel');
+      });
+    });
+
+    document.querySelectorAll('.action-invite-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal('invite');
+      });
+    });
+
+    document.querySelectorAll('.action-support-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showNotification('Redirigiendo al servidor de soporte discord.gg/codecord...');
+      });
+    });
+
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modalCancel) modalCancel.addEventListener('click', closeModal);
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+    }
+  });
+</script>
+
+
+
+
+</body></html>

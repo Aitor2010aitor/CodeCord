@@ -8,7 +8,7 @@ let pollIntervals = [];
 const parser = new RssParser();
 
 async function checkChannel(client, guildId, channelConfig) {
-    if (!channelConfig.enabled) return;
+    if (!channelConfig || !channelConfig.enabled || !channelConfig.channelId) return;
 
     const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelConfig.channelId}`;
     try {

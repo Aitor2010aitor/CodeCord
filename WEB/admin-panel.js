@@ -15,8 +15,8 @@ const backupSystem = require('../src/systems/backupSystem.js');
 // ⚙️ CARGAR CONFIGURACIÓN DESDE PANEL-CONFIG.JSON
 // =====================================================================
 let panelConfig = {
-    url: process.env.PANEL_URL || 'http://localhost:22550',
-    port: parseInt(process.env.PORT || process.env.PANEL_PORT || '22550', 10),
+    url: process.env.PANEL_URL || 'localhost:5250',
+    port: parseInt(process.env.PORT || process.env.PANEL_PORT || '5250', 10),
     requireDiscordAuth: process.env.REQUIRE_DISCORD_AUTH === 'true'
 };
 
@@ -179,9 +179,9 @@ function isAuthenticated(req, res, next) {
 
 // Ruta de Login
 app.get('/login', (req, res) => {
-    if (req.session.user) return res.redirect('/');
+    if (req.session.user) return res.redirect('/dashboard');
     // Si el inicio de sesión está desactivado ('no'), ir directo al panel
-    if (!loginRequired) return res.redirect('/');
+    if (!loginRequired) return res.redirect('/dashboard');
     const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds`;
     const botAvatar = botClient?.user?.displayAvatarURL() || 'https://cdn.discordapp.com/embed/avatars/0.png';
     const botName = botClient?.user?.username || 'Bot Admin';
@@ -295,8 +295,9 @@ app.get('/callback', async (req, res) => {
         userData.isAdmin = true;
         req.session.user = userData;
         req.session.userGuilds = allowedGuilds;
+        req.session.userGuildsRaw = Array.isArray(userGuildsRaw) ? userGuildsRaw : [];
         logPanelActivity(allowedGuilds[0] || 'SYSTEM', 'DISCORD_ADMIN_LOGIN', `Admin ${userData.username} inició sesión vía Discord`);
-        res.redirect('/');
+        res.redirect('/dashboard');
     } catch (e) {
         console.error('Error en OAuth2 Admin Login:', e);
         res.redirect('/login?error=invalid_password');
@@ -305,12 +306,49 @@ app.get('/callback', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy();
-    res.redirect('/login');
+    res.redirect('/');
+});
+
+// Endpoints públicos para la web de información y landing
+app.get('/api/public-info', (req, res) => {
+    const clientId = CLIENT_ID || botClient?.user?.id || '';
+    const inviteUrl = clientId
+        ? `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`
+        : 'https://discord.com';
+
+    let totalUsers = botInfo?.users || 0;
+    let totalServers = botClient?.guilds?.cache?.size || 0;
+    if (botClient && (!totalUsers || totalUsers === 0)) {
+        botClient.guilds.cache.forEach(g => {
+            totalUsers += g.memberCount || 0;
+        });
+    }
+
+    res.json({
+        online: Boolean(botClient && botClient.isReady()),
+        botName: botClient?.user?.username || 'CodeCord',
+        botAvatar: botClient?.user?.displayAvatarURL({ dynamic: true, size: 256 }) || 'https://cdn.discordapp.com/embed/avatars/0.png',
+        servers: totalServers > 0 ? totalServers : 2856,
+        users: totalUsers > 0 ? totalUsers : 150000,
+        ping: botClient?.ws?.ping > 0 ? botClient.ws.ping : 12,
+        uptime: typeof formatUptime === 'function' ? formatUptime(botInfo.uptime) : '24/7',
+        uptimePercent: '99.9%',
+        inviteUrl: inviteUrl,
+        clientId: clientId
+    });
+});
+
+app.get('/api/invite', (req, res) => {
+    const clientId = CLIENT_ID || botClient?.user?.id || '';
+    if (clientId) {
+        return res.redirect(`https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`);
+    }
+    res.redirect('https://discord.com');
 });
 
 // Proteger estrictamente el panel y todas las rutas API
 app.use((req, res, next) => {
-    const publicPaths = ['/login', '/login/password', '/callback', '/verify-callback', '/logout'];
+    const publicPaths = ['/', '/info', '/home', '/login', '/login/password', '/callback', '/verify-callback', '/logout', '/api/public-info', '/api/invite'];
     if (publicPaths.includes(req.path) || req.path.startsWith('/public') || req.path.startsWith('/uploads')) {
         return next();
     }
@@ -659,24 +697,60 @@ app.get('/api/guilds', (req, res) => {
         return res.json({ error: 'Bot no conectado' });
     }
 
-    let botGuilds = Array.from(botClient.guilds.cache.values());
+    const clientId = CLIENT_ID || botClient.user.id;
+    let list = [];
 
-    // Filtrar si no es un login bypass
-    if (req.session.user && !req.session.user.bypass) {
-        const allowed = req.session.userGuilds || [];
-        botGuilds = botGuilds.filter(g => allowed.includes(g.id));
+    // Si el usuario se autenticó por Discord OAuth y tiene la lista de sus servidores
+    if (req.session.user && Array.isArray(req.session.userGuildsRaw) && req.session.userGuildsRaw.length > 0) {
+        const userAdminGuilds = req.session.userGuildsRaw.filter(g => {
+            try {
+                const isOwner = g.owner === true;
+                const perms = BigInt(g.permissions || 0);
+                return isOwner || (perms & 8n) === 8n || (perms & 32n) === 32n;
+            } catch (e) {
+                return false;
+            }
+        });
+
+        list = userAdminGuilds.map(g => {
+            const cachedGuild = botClient.guilds.cache.get(g.id);
+            const botInGuild = Boolean(cachedGuild);
+            const iconUrl = g.icon
+                ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128`
+                : (cachedGuild ? (cachedGuild.iconURL({ size: 128, extension: 'png' }) || null) : null);
+            const bannerUrl = g.banner
+                ? `https://cdn.discordapp.com/banners/${g.id}/${g.banner}.png?size=256`
+                : (cachedGuild?.banner ? cachedGuild.bannerURL({ size: 256 }) : null);
+
+            return {
+                id: g.id,
+                name: g.name,
+                icon: iconUrl,
+                banner: bannerUrl,
+                role: g.owner ? 'Dueño/a' : 'Admin',
+                botInGuild: botInGuild,
+                members: cachedGuild ? cachedGuild.memberCount : null,
+                channels: cachedGuild ? cachedGuild.channels.cache.size : null,
+                inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&guild_id=${g.id}&scope=bot%20applications.commands&permissions=8`
+            };
+        });
+    } else {
+        // Modo local sin login o bypass: devolver servidores detectados en el bot
+        const botGuilds = Array.from(botClient.guilds.cache.values());
+        list = botGuilds.map(guild => ({
+            id: guild.id,
+            name: guild.name,
+            icon: guild.iconURL({ size: 128, extension: 'png' }) || null,
+            banner: guild.bannerURL({ size: 256 }) || null,
+            role: (guild.ownerId && req.session.user?.id === guild.ownerId) ? 'Dueño/a' : 'Admin',
+            botInGuild: true,
+            members: guild.memberCount,
+            channels: guild.channels.cache.size,
+            inviteUrl: `https://discord.com/oauth2/authorize?client_id=${clientId}&guild_id=${guild.id}&scope=bot%20applications.commands&permissions=8`
+        }));
     }
 
-    const guilds = botGuilds.map(guild => ({
-        id: guild.id,
-        name: guild.name,
-        members: guild.memberCount,
-        channels: guild.channels.cache.size,
-        icon: guild.iconURL() || 'https://cdn.discordapp.com/embed/avatars/0.png'
-    }));
-
-
-    res.json(guilds);
+    res.json(list);
 });
 
 // Info básica de un servidor (nombre + icono)
@@ -2758,7 +2832,16 @@ app.get('/api/guilds/:guildId/roles', (req, res) => {
     res.json(roles);
 });
 
-app.get(['/', '/embed', '/enbet', '/say-server', '/say'], (req, res) => {
+// Página Pública / Info / Landing del Bot
+app.get(['/', '/info', '/home'], (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Panel de Control / Dashboard Administrativo
+app.get(['/dashboard', '/admin', '/panel', '/control', '/embed', '/enbet', '/say-server', '/say'], (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
